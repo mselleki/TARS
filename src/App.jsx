@@ -12,8 +12,6 @@ import { TodayPanel } from './components/TodayPanel'
 import { KanbanBoard } from './components/KanbanBoard'
 import { RitualsView } from './components/RitualsView'
 import { ProjectsView } from './components/ProjectsView'
-import { CoursesView } from './components/CoursesView'
-import { TicketsView } from './components/TicketsView'
 import { RitualBanner } from './components/RitualBanner'
 import { ReflectionPrompt } from './components/ReflectionPrompt'
 import { EmptyState, SearchEmptyState } from './components/EmptyState'
@@ -21,7 +19,7 @@ import { InstallPrompt } from './components/InstallPrompt'
 import { Modal } from './components/Modal'
 import { Toast } from './components/Toast'
 import { TaskItem } from './components/TaskItem'
-import { MAX_FOCUS_TASKS, isViewAvailableInContext } from './constants'
+import { MAX_FOCUS_TASKS } from './constants'
 import './App.css'
 
 function App() {
@@ -29,6 +27,8 @@ function App() {
   const [view, setView] = useState('overview')
   const [searchQuery, setSearchQuery] = useState('')
   const [energyFilter, setEnergyFilter] = useState(null)
+  const [domainFilter, setDomainFilter] = useState(null)
+  const [countryFilter, setCountryFilter] = useState(null)
   const [showComposer, setShowComposer] = useState(false)
   const [composerProjectId, setComposerProjectId] = useState(null)
   const [isSilentMode, setIsSilentMode] = useState(false)
@@ -75,6 +75,7 @@ function App() {
     updateTicket,
     deleteTicket,
     resolveTicket,
+    addRequester,
     updateReflection,
     todayPlan,
   } = useStore()
@@ -87,6 +88,8 @@ function App() {
       context,
       searchQuery,
       energyFilter,
+      domainFilter,
+      countryFilter,
       todayFocusIds,
     })
 
@@ -168,13 +171,6 @@ function App() {
     setShowComposer(true)
   }, [])
 
-  const handleContextChange = useCallback((newContext) => {
-    setContext(newContext)
-    if (!isViewAvailableInContext(view, newContext)) {
-      setView('overview')
-    }
-  }, [view])
-
   const handleAddFocus = (taskId) => {
     if (todayFocusIds.length >= MAX_FOCUS_TASKS) {
       const toRemove = todayFocusIds[todayFocusIds.length - 1]
@@ -189,18 +185,22 @@ function App() {
 
   return (
     <div className="flex min-h-screen bg-[var(--bg)] text-[var(--text)]">
-      <Sidebar view={view} onViewChange={setView} context={context} />
+      <Sidebar view={view} onViewChange={setView} />
 
       <div className="flex min-w-0 flex-1 flex-col">
       <Header
         context={context}
-        onContextChange={handleContextChange}
+        onContextChange={setContext}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         searchResultsCount={filtered.length}
         searchRef={searchRef}
         energyFilter={energyFilter}
         onEnergyFilterChange={setEnergyFilter}
+        domainFilter={domainFilter}
+        onDomainFilterChange={setDomainFilter}
+        countryFilter={countryFilter}
+        onCountryFilterChange={setCountryFilter}
         onInstallClick={install}
         canInstall={canInstall}
         isSilentMode={isSilentMode}
@@ -226,6 +226,19 @@ function App() {
             onAddFocus={handleAddFocus}
             onRemoveFocus={removeFocus}
             focusIds={todayFocusIds}
+            context={context}
+            tickets={state.tickets ?? []}
+            onAddTicket={addTicket}
+            onUpdateTicket={updateTicket}
+            onDeleteTicket={deleteTicket}
+            onResolveTicket={resolveTicket}
+            requesters={state.requesters ?? []}
+            onAddRequester={addRequester}
+            onAddProject={addProject}
+            onAddTask={(p) => addTask(p)}
+            onToggleTask={toggleTaskStatus}
+            onUpdateTask={updateTask}
+            onDeleteTask={deleteTask}
           />
         )}
 
@@ -366,37 +379,12 @@ function App() {
           />
         )}
 
-        {view === 'tickets' && (
-          <TicketsView
-            tickets={state.tickets ?? []}
-            context={context}
-            onAdd={addTicket}
-            onUpdate={updateTicket}
-            onDelete={deleteTicket}
-            onResolve={resolveTicket}
-          />
-        )}
-
         {view === 'rituals' && (
           <RitualsView
             rituals={state.rituals}
             onAdd={addRitual}
             onUpdate={updateRitual}
             onDelete={deleteRitual}
-          />
-        )}
-
-        {view === 'courses' && (
-          <CoursesView
-            projects={state.projects}
-            tasks={state.tasks.filter((t) => t.context === context)}
-            context={context}
-            onAddProject={addProject}
-            onAddSubProject={handleAddCategory}
-            onAddTask={(payload) => addTask(payload)}
-            onUpdateTask={updateTask}
-            onDeleteTask={deleteTask}
-            onToggleTask={toggleTaskStatus}
           />
         )}
 

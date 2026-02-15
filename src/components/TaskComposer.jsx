@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { PRIORITIES, ENERGY } from '../constants'
+import { PRIORITIES, ENERGY, DOMAINS, COUNTRIES } from '../constants'
 import { flattenProjectsForSelect } from '../utils/projects'
 
 export function TaskComposer({
@@ -16,7 +16,16 @@ export function TaskComposer({
   const [priority, setPriority] = useState('medium')
   const [energy, setEnergy] = useState('quick')
   const [dueDate, setDueDate] = useState('')
+  const [domainIds, setDomainIds] = useState([])
+  const [countryIds, setCountryIds] = useState([])
   const inputRef = useRef(null)
+
+  const toggleDomain = (val) => {
+    setDomainIds((prev) => (prev.includes(val) ? prev.filter((x) => x !== val) : [...prev, val]))
+  }
+  const toggleCountry = (val) => {
+    setCountryIds((prev) => (prev.includes(val) ? prev.filter((x) => x !== val) : [...prev, val]))
+  }
 
   useEffect(() => {
     if (!initialFocus) return
@@ -30,9 +39,20 @@ export function TaskComposer({
     e.preventDefault()
     const t = title.trim()
     if (!t) return
-    onSubmit({ title: t, context, priority, energy, dueDate: dueDate || '', projectId: projectId || null })
+    onSubmit({
+      title: t,
+      context,
+      priority,
+      energy,
+      dueDate: dueDate || '',
+      projectId: projectId || null,
+      domainIds: context === 'pro' ? domainIds : [],
+      countryIds: context === 'pro' ? countryIds : [],
+    })
     setTitle('')
     setDueDate('')
+    setDomainIds([])
+    setCountryIds([])
   }
 
   const handleKeyDown = (e) => {
@@ -127,6 +147,40 @@ export function TaskComposer({
           className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] px-3 py-3 text-sm text-[var(--text-secondary)] outline-none focus:border-[var(--accent)]"
           aria-label="Due date"
         />
+        {context === 'pro' && (
+          <>
+            <div className="flex flex-wrap items-center gap-1">
+              <span className="text-xs text-[var(--muted)] mr-1">Domain:</span>
+              {DOMAINS.map((d) => (
+                <button
+                  key={d.value}
+                  type="button"
+                  onClick={() => toggleDomain(d.value)}
+                  className={`rounded-[var(--radius-sm)] px-2 py-1 text-xs transition-[var(--transition)] ${
+                    domainIds.includes(d.value) ? 'bg-[var(--accent)] text-white' : 'border border-[var(--border)] text-[var(--muted)]'
+                  }`}
+                >
+                  {d.label}
+                </button>
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center gap-1">
+              <span className="text-xs text-[var(--muted)] mr-1">Country:</span>
+              {COUNTRIES.map((c) => (
+                <button
+                  key={c.value}
+                  type="button"
+                  onClick={() => toggleCountry(c.value)}
+                  className={`rounded-[var(--radius-sm)] px-2 py-1 text-xs transition-[var(--transition)] ${
+                    countryIds.includes(c.value) ? 'bg-[var(--accent)] text-white' : 'border border-[var(--border)] text-[var(--muted)]'
+                  }`}
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
         <div className="flex gap-2">
           <button
             type="submit"

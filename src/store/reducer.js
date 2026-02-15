@@ -7,11 +7,13 @@ import {
   loadDailyPlans,
   loadProjects,
   loadTickets,
+  loadRequesters,
   saveTasks,
   saveRituals,
   saveDailyPlans,
   saveProjects,
   saveTickets,
+  saveRequesters,
 } from '../utils/storage'
 
 const ts = () => now()
@@ -39,6 +41,9 @@ export const actions = {
   TICKET_UPDATE: 'TICKET_UPDATE',
   TICKET_DELETE: 'TICKET_DELETE',
   TICKET_RESOLVE: 'TICKET_RESOLVE',
+  REQUESTER_ADD: 'REQUESTER_ADD',
+  REQUESTER_UPDATE: 'REQUESTER_UPDATE',
+  REQUESTER_DELETE: 'REQUESTER_DELETE',
 }
 
 function tasksReducer(tasks, action) {
@@ -64,6 +69,8 @@ function tasksReducer(tasks, action) {
               ...updates,
               title: updates.title !== undefined ? String(updates.title).trim() || task.title : task.title,
               note: updates.note !== undefined ? String(updates.note).slice(0, MAX_NOTE_LENGTH) : task.note,
+              domainIds: updates.domainIds !== undefined ? (Array.isArray(updates.domainIds) ? updates.domainIds : []) : task.domainIds,
+              countryIds: updates.countryIds !== undefined ? (Array.isArray(updates.countryIds) ? updates.countryIds : []) : task.countryIds,
               updatedAt: ts(),
             }
           : task
@@ -127,6 +134,8 @@ function ticketsReducer(tickets, action) {
         ref: (action.payload.ref ?? '').trim(),
         reason: (action.payload.reason ?? '').trim(),
         context: action.payload.context ?? 'pro',
+        countryId: action.payload.countryId ?? null,
+        requesterId: action.payload.requesterId ?? null,
         resolvedAt: null,
         createdAt: ts(),
       }
@@ -141,6 +150,8 @@ function ticketsReducer(tickets, action) {
               ...updates,
               ref: updates.ref !== undefined ? String(updates.ref).trim() : t.ref,
               reason: updates.reason !== undefined ? String(updates.reason).trim() : t.reason,
+              countryId: updates.countryId !== undefined ? updates.countryId : t.countryId,
+              requesterId: updates.requesterId !== undefined ? updates.requesterId : t.requesterId,
             }
           : t
       )
@@ -155,6 +166,30 @@ function ticketsReducer(tickets, action) {
     }
     default:
       return tickets
+  }
+}
+
+function requestersReducer(requesters, action) {
+  switch (action.type) {
+    case actions.INIT:
+      return action.payload.requesters ?? []
+    case actions.REQUESTER_ADD: {
+      const r = {
+        id: action.payload.id ?? crypto.randomUUID(),
+        name: (action.payload.name ?? '').trim() || 'Sans nom',
+      }
+      return [...requesters, r]
+    }
+    case actions.REQUESTER_UPDATE: {
+      const { id, updates } = action.payload
+      return requesters.map((r) =>
+        r.id === id ? { ...r, ...updates, name: (updates.name ?? r.name).trim() || r.name } : r
+      )
+    }
+    case actions.REQUESTER_DELETE:
+      return requesters.filter((r) => r.id !== action.payload)
+    default:
+      return requesters
   }
 }
 
@@ -244,7 +279,8 @@ export function rootReducer(state, action) {
   const rituals = ritualsReducer(state.rituals, action)
   const dailyPlans = dailyPlansReducer(state.dailyPlans, action)
   const tickets = ticketsReducer(state.tickets, action)
-  return { projects, tasks, rituals, dailyPlans, tickets }
+  const requesters = requestersReducer(state.requesters, action)
+  return { projects, tasks, rituals, dailyPlans, tickets, requesters }
 }
 
 export function getInitialState() {
@@ -254,6 +290,7 @@ export function getInitialState() {
     rituals: loadRituals(),
     dailyPlans: loadDailyPlans(),
     tickets: loadTickets(),
+    requesters: loadRequesters(),
   }
 }
 
@@ -263,4 +300,5 @@ export function persistState(state) {
   saveRituals(state.rituals)
   saveDailyPlans(state.dailyPlans)
   saveTickets(state.tickets ?? [])
+  saveRequesters(state.requesters ?? [])
 }

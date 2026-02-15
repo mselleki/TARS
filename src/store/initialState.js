@@ -12,6 +12,8 @@ export function createInitialTask(overrides = {}) {
     ritualId: null,
     projectId: null,
     context: 'pro',
+    domainIds: [],
+    countryIds: [],
     createdAt: now,
     updatedAt: now,
     ...overrides,

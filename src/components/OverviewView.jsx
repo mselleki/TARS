@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { TaskItem } from './TaskItem'
 import { EmptyState, SearchEmptyState } from './EmptyState'
+import { TicketsPanel } from './TicketsPanel'
+import { CoursesPanel } from './CoursesPanel'
 
 const SECTIONS = [
   { id: 'in_progress', label: 'In progress', tint: 'var(--column-in-progress)' },
@@ -23,6 +25,19 @@ export function OverviewView({
   onAddFocus,
   onRemoveFocus,
   focusIds = [],
+  context = 'pro',
+  tickets = [],
+  onAddTicket,
+  onUpdateTicket,
+  onDeleteTicket,
+  onResolveTicket,
+  requesters = [],
+  onAddRequester,
+  onAddProject,
+  onAddTask,
+  onToggleTask,
+  onUpdateTask,
+  onDeleteTask,
 }) {
   const [collapsed, setCollapsed] = useState({})
   const toggleSection = (id) => setCollapsed((c) => ({ ...c, [id]: !c[id] }))
@@ -34,17 +49,41 @@ export function OverviewView({
   ]
 
   const totalTasks = backlog.length + inProgress.length + done.length
-
-  if (totalTasks === 0) {
-    return searchQuery ? (
-      <SearchEmptyState onClear={onClearSearch || (() => {})} />
-    ) : (
-      <EmptyState onAction={onNewTask} shortcut="Ctrl+K" />
-    )
-  }
+  const hasTasks = totalTasks > 0
 
   return (
     <div className="space-y-6">
+      {context === 'pro' && (
+        <TicketsPanel
+          tickets={tickets}
+          requesters={requesters}
+          onAdd={onAddTicket}
+          onUpdate={onUpdateTicket}
+          onDelete={onDeleteTicket}
+          onResolve={onResolveTicket}
+          onAddRequester={onAddRequester}
+        />
+      )}
+      {context === 'perso' && (
+        <CoursesPanel
+          projects={projects}
+          tasks={[...inProgress, ...backlog, ...done]}
+          context={context}
+          onAddProject={onAddProject}
+          onAddTask={onAddTask}
+          onUpdateTask={onUpdateTask}
+          onDeleteTask={onDeleteTask}
+          onToggleTask={onToggleTask}
+        />
+      )}
+      {!hasTasks && searchQuery && (
+        <SearchEmptyState onClear={onClearSearch || (() => {})} />
+      )}
+      {!hasTasks && !searchQuery && (
+        <EmptyState onAction={onNewTask} shortcut="Ctrl+K" />
+      )}
+      {hasTasks && (
+      <>
       <div className="mb-8">
         <button
           type="button"
@@ -116,6 +155,8 @@ export function OverviewView({
           </section>
         )
       })}
+      </>
+      )}
     </div>
   )
 }

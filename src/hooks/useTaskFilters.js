@@ -6,10 +6,11 @@ export function useTaskFilters({
   context,
   searchQuery,
   energyFilter,
+  domainFilter,
+  countryFilter,
   todayFocusIds,
 }) {
   const searchLower = searchQuery.trim().toLowerCase()
-  const todayStr = today()
 
   return useMemo(() => {
     const byContext = tasks.filter((t) => t.context === context)
@@ -23,14 +24,20 @@ export function useTaskFilters({
     const byEnergy = energyFilter
       ? bySearch.filter((t) => t.energy === energyFilter)
       : bySearch
+    const byDomain = domainFilter
+      ? byEnergy.filter((t) => (t.domainIds ?? []).includes(domainFilter))
+      : byEnergy
+    const byCountry = countryFilter
+      ? byDomain.filter((t) => (t.countryIds ?? []).includes(countryFilter))
+      : byDomain
 
     const focusTasks = todayFocusIds
-      .map((id) => byEnergy.find((t) => t.id === id))
+      .map((id) => byCountry.find((t) => t.id === id))
       .filter(Boolean)
 
-    const backlog = byEnergy.filter((t) => t.status === 'backlog')
-    const inProgress = byEnergy.filter((t) => t.status === 'in_progress')
-    const done = byEnergy.filter((t) => t.status === 'done')
+    const backlog = byCountry.filter((t) => t.status === 'backlog')
+    const inProgress = byCountry.filter((t) => t.status === 'in_progress')
+    const done = byCountry.filter((t) => t.status === 'done')
 
     const kanbanColumns = [
       { id: 'backlog', label: 'Backlog', tasks: backlog },
@@ -39,12 +46,12 @@ export function useTaskFilters({
     ]
 
     return {
-      filtered: byEnergy,
+      filtered: byCountry,
       focusTasks,
       backlog,
       inProgress,
       done,
       kanbanColumns,
     }
-  }, [tasks, context, searchQuery, energyFilter, todayFocusIds])
+  }, [tasks, context, searchQuery, energyFilter, domainFilter, countryFilter, todayFocusIds])
 }

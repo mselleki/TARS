@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { PRIORITIES, ENERGY, MAX_NOTE_LENGTH } from '../constants'
+import { PRIORITIES, ENERGY, DOMAINS, COUNTRIES, MAX_NOTE_LENGTH } from '../constants'
 import { formatDate, today } from '../utils/date'
 import { flattenProjectsForSelect } from '../utils/projects'
 
@@ -43,7 +43,18 @@ export function TaskItem({
 
   const startEdit = (field, value) => {
     setEditingField(field)
-    setEditValue(value ?? '')
+    setEditValue(Array.isArray(value) ? value : (value ?? ''))
+  }
+
+  const toggleDomain = (val) => {
+    const arr = task.domainIds ?? []
+    const next = arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]
+    onUpdate(task.id, { domainIds: next })
+  }
+  const toggleCountry = (val) => {
+    const arr = task.countryIds ?? []
+    const next = arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]
+    onUpdate(task.id, { countryIds: next })
   }
 
   const saveEdit = () => {
@@ -60,6 +71,10 @@ export function TaskItem({
       onUpdate(task.id, { note: String(editValue).slice(0, MAX_NOTE_LENGTH) })
     } else if (editingField === 'project') {
       onUpdate(task.id, { projectId: editValue || null })
+    } else if (editingField === 'domain') {
+      onUpdate(task.id, { domainIds: editValue })
+    } else if (editingField === 'country') {
+      onUpdate(task.id, { countryIds: editValue })
     }
     setEditingField(null)
   }
@@ -221,6 +236,71 @@ export function TaskItem({
                   : 'No project'}
               </button>
           ))}
+
+          {task.context === 'pro' && (
+            <>
+              {editingField === 'domain' ? (
+                <span className="flex flex-wrap items-center gap-1">
+                  {DOMAINS.map((d) => {
+                    const selected = (task.domainIds ?? []).includes(d.value)
+                    return (
+                      <button
+                        key={d.value}
+                        type="button"
+                        onClick={() => toggleDomain(d.value)}
+                        className={`rounded-[var(--radius-sm)] px-2 py-0.5 text-[11px] transition-[var(--transition)] ${
+                          selected ? 'bg-[var(--accent)] text-white' : 'border border-[var(--border)] text-[var(--muted)] hover:border-[var(--accent)]'
+                        }`}
+                      >
+                        {d.label}
+                      </button>
+                    )
+                  })}
+                  <button type="button" onClick={() => setEditingField(null)} className="text-[10px] text-[var(--muted)] hover:text-[var(--text)]">×</button>
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => startEdit('domain', task.domainIds ?? [])}
+                  className="rounded-[var(--radius-sm)] px-2 py-0.5 text-[11px] text-[var(--muted)] transition-colors hover:text-[var(--text)]"
+                >
+                  {(task.domainIds ?? []).length > 0
+                    ? (task.domainIds ?? []).map((id) => DOMAINS.find((d) => d.value === id)?.label ?? id).join(', ')
+                    : 'Domain'}
+                </button>
+              )}
+              {editingField === 'country' ? (
+                <span className="flex flex-wrap gap-1">
+                  {COUNTRIES.map((c) => {
+                    const selected = (task.countryIds ?? []).includes(c.value)
+                    return (
+                      <button
+                        key={c.value}
+                        type="button"
+                        onClick={() => toggleCountry(c.value)}
+                        className={`rounded-[var(--radius-sm)] px-2 py-0.5 text-[11px] transition-[var(--transition)] ${
+                          selected ? 'bg-[var(--accent)] text-white' : 'border border-[var(--border)] text-[var(--muted)] hover:border-[var(--accent)]'
+                        }`}
+                      >
+                        {c.label}
+                      </button>
+                    )
+                  })}
+                  <button type="button" onClick={() => setEditingField(null)} className="text-[10px] text-[var(--muted)] hover:text-[var(--text)]">×</button>
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => startEdit('country', task.countryIds ?? [])}
+                  className="rounded-[var(--radius-sm)] px-2 py-0.5 text-[11px] text-[var(--muted)] transition-colors hover:text-[var(--text)]"
+                >
+                  {(task.countryIds ?? []).length > 0
+                    ? (task.countryIds ?? []).map((id) => COUNTRIES.find((c) => c.value === id)?.label ?? id).join(', ')
+                    : 'Country'}
+                </button>
+              )}
+            </>
+          )}
 
           {editingField === 'dueDate' ? (
             <input

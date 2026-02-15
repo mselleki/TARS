@@ -97,6 +97,20 @@ export function useStore() {
     dispatch({ type: actions.TICKET_RESOLVE, payload: id })
   }, [])
 
+  const addRequester = useCallback((payload) => {
+    const id = payload.id ?? crypto.randomUUID()
+    dispatch({ type: actions.REQUESTER_ADD, payload: { ...payload, id } })
+    return id
+  }, [])
+
+  const updateRequester = useCallback((id, updates) => {
+    dispatch({ type: actions.REQUESTER_UPDATE, payload: { id, updates } })
+  }, [])
+
+  const deleteRequester = useCallback((id) => {
+    dispatch({ type: actions.REQUESTER_DELETE, payload: id })
+  }, [])
+
   const updateReflection = useCallback((reflection) => {
     dispatch({ type: actions.REFLECTION_UPDATE, payload: { reflection } })
   }, [])
@@ -127,6 +141,9 @@ export function useStore() {
     updateTicket,
     deleteTicket,
     resolveTicket,
+    addRequester,
+    updateRequester,
+    deleteRequester,
     updateReflection,
     todayPlan,
   }

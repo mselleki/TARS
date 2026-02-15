@@ -4,6 +4,7 @@ export const STORAGE_KEYS = {
   dailyPlans: 'organizer-daily-plans',
   projects: 'organizer-projects',
   tickets: 'organizer-tickets',
+  requesters: 'organizer-requesters',
 }
 
 export const LEGACY_STORAGE_KEY = 'organizer-tasks'
@@ -25,24 +26,26 @@ export const CONTEXTS = [
   { value: 'perso', label: 'Perso' },
 ]
 
+export const DOMAINS = [
+  { value: 'product', label: 'Product' },
+  { value: 'vendor', label: 'Vendor' },
+  { value: 'customer', label: 'Customer' },
+]
+
+export const COUNTRIES = [
+  { value: 'gb', label: 'GB' },
+  { value: 'ie', label: 'IE' },
+  { value: 'se', label: 'SE' },
+  { value: 'fr', label: 'FR' },
+]
+
 export const VIEWS = [
   { id: 'overview', label: 'Overview', primary: true },
   { id: 'today', label: 'Today' },
-  { id: 'tickets', label: 'Tickets', primary: false, context: 'pro' },
-  { id: 'courses', label: 'Courses', primary: false, context: 'perso' },
   { id: 'board', label: 'Board' },
   { id: 'projects', label: 'Projects' },
   { id: 'rituals', label: 'Rituals' },
 ]
-
-export function getViewsForContext(context) {
-  return VIEWS.filter((v) => !v.context || v.context === context)
-}
-
-export function isViewAvailableInContext(viewId, context) {
-  const v = VIEWS.find((x) => x.id === viewId)
-  return v && (!v.context || v.context === context)
-}
 
 export const MAX_FOCUS_TASKS = 3
 export const MAX_NOTE_LENGTH = 140

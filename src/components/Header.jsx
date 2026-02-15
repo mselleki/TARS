@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CONTEXTS, ENERGY } from '../constants'
+import { CONTEXTS, ENERGY, DOMAINS, COUNTRIES } from '../constants'
 import { SearchBar } from './SearchBar'
 
 const SHORTCUTS = [
@@ -18,6 +18,10 @@ export function Header({
   searchRef,
   energyFilter,
   onEnergyFilterChange,
+  domainFilter,
+  onDomainFilterChange,
+  countryFilter,
+  onCountryFilterChange,
   onInstallClick,
   canInstall,
   isSilentMode,
@@ -138,27 +142,71 @@ export function Header({
           </div>
         </div>
 
-        <div className="flex items-center gap-3 border-t border-[var(--border)] py-2.5">
-          <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--muted)]">Energy</span>
-          <div className="flex gap-0.5 rounded-[var(--radius-md)] bg-[var(--bg)] p-0.5">
-            {ENERGY.map((e) => {
-              const isActive = energyFilter === e.value
-              return (
-                <button
-                  key={e.value}
-                  type="button"
-                  onClick={() => onEnergyFilterChange?.(isActive ? null : e.value)}
-                  className={`rounded-[var(--radius-sm)] px-3 py-1.5 text-[11px] font-medium transition-[var(--transition)] ${
-                    isActive
-                      ? 'bg-[var(--surface)] text-[var(--text)] shadow-[var(--shadow-sm)]'
-                      : 'text-[var(--muted)] hover:text-[var(--text-secondary)]'
-                  }`}
-                >
-                  {e.label}
-                </button>
-              )
-            })}
+        <div className="flex flex-wrap items-center gap-3 border-t border-[var(--border)] py-2.5">
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--muted)]">Energy</span>
+            <div className="flex gap-0.5 rounded-[var(--radius-md)] bg-[var(--bg)] p-0.5">
+              {ENERGY.map((e) => {
+                const isActive = energyFilter === e.value
+                return (
+                  <button
+                    key={e.value}
+                    type="button"
+                    onClick={() => onEnergyFilterChange?.(isActive ? null : e.value)}
+                    className={`rounded-[var(--radius-sm)] px-3 py-1.5 text-[11px] font-medium transition-[var(--transition)] ${
+                      isActive ? 'bg-[var(--surface)] text-[var(--text)] shadow-[var(--shadow-sm)]' : 'text-[var(--muted)] hover:text-[var(--text-secondary)]'
+                    }`}
+                  >
+                    {e.label}
+                  </button>
+                )
+              })}
+            </div>
           </div>
+          {context === 'pro' && (
+            <>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--muted)]">Domain</span>
+                <div className="flex gap-0.5 rounded-[var(--radius-md)] bg-[var(--bg)] p-0.5">
+                  {DOMAINS.map((d) => {
+                    const isActive = domainFilter === d.value
+                    return (
+                      <button
+                        key={d.value}
+                        type="button"
+                        onClick={() => onDomainFilterChange?.(isActive ? null : d.value)}
+                        className={`rounded-[var(--radius-sm)] px-2 py-1 text-[11px] font-medium transition-[var(--transition)] ${
+                          isActive ? 'bg-[var(--surface)] text-[var(--text)] shadow-[var(--shadow-sm)]' : 'text-[var(--muted)] hover:text-[var(--text-secondary)]'
+                        }`}
+                      >
+                        {d.label}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--muted)]">Country</span>
+                <div className="flex gap-0.5 rounded-[var(--radius-md)] bg-[var(--bg)] p-0.5">
+                  {COUNTRIES.map((c) => {
+                    const isActive = countryFilter === c.value
+                    return (
+                      <button
+                        key={c.value}
+                        type="button"
+                        onClick={() => onCountryFilterChange?.(isActive ? null : c.value)}
+                        className={`rounded-[var(--radius-sm)] px-2 py-1 text-[11px] font-medium transition-[var(--transition)] ${
+                          isActive ? 'bg-[var(--surface)] text-[var(--text)] shadow-[var(--shadow-sm)]' : 'text-[var(--muted)] hover:text-[var(--text-secondary)]'
+                        }`}
+                      >
+                        {c.label}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {searchQuery && (

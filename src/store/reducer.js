@@ -7,12 +7,14 @@ import {
   loadDailyPlans,
   loadProjects,
   loadTickets,
+  loadReqTickets,
   loadRequesters,
   saveTasks,
   saveRituals,
   saveDailyPlans,
   saveProjects,
   saveTickets,
+  saveReqTickets,
   saveRequesters,
 } from '../utils/storage'
 
@@ -44,6 +46,9 @@ export const actions = {
   REQUESTER_ADD: 'REQUESTER_ADD',
   REQUESTER_UPDATE: 'REQUESTER_UPDATE',
   REQUESTER_DELETE: 'REQUESTER_DELETE',
+  REQ_TICKET_ADD: 'REQ_TICKET_ADD',
+  REQ_TICKET_UPDATE: 'REQ_TICKET_UPDATE',
+  REQ_TICKET_DELETE: 'REQ_TICKET_DELETE',
 }
 
 function tasksReducer(tasks, action) {
@@ -169,6 +174,57 @@ function ticketsReducer(tickets, action) {
   }
 }
 
+function reqTicketsReducer(tickets, action) {
+  const ts = () => Date.now()
+  switch (action.type) {
+    case actions.INIT:
+      return action.payload.reqTickets ?? []
+    case actions.REQ_TICKET_ADD: {
+      const p = action.payload
+      const t = {
+        id: (p.id ?? '').trim().toUpperCase() || `REQ${Date.now().toString().slice(-6)}`,
+        business: (p.business ?? '').trim() || '',
+        domain: (p.domain ?? '').trim() || '',
+        owner: (p.owner ?? '').trim() || '',
+        summary: (p.summary ?? '').trim() || '',
+        status: ['ACTIONABLE', 'WAITING_REPLY', 'DONE'].includes(p.status) ? p.status : 'ACTIONABLE',
+        scope: p.scope === 'PERSO' ? 'PERSO' : 'PRO',
+        countryId: p.countryId ?? null,
+        createdAt: ts(),
+        updatedAt: ts(),
+        lastFollowUpAt: null,
+        dueAt: p.dueAt ?? null,
+      }
+      return [...tickets, t]
+    }
+    case actions.REQ_TICKET_UPDATE: {
+      const { id, updates } = action.payload
+      return tickets.map((t) =>
+        t.id === id
+          ? {
+              ...t,
+              ...updates,
+              business: updates.business !== undefined ? String(updates.business).trim() : t.business,
+              domain: updates.domain !== undefined ? String(updates.domain).trim() : t.domain,
+              owner: updates.owner !== undefined ? String(updates.owner).trim() : t.owner,
+              summary: updates.summary !== undefined ? String(updates.summary).trim() : t.summary,
+              status: updates.status !== undefined && ['ACTIONABLE', 'WAITING_REPLY', 'DONE'].includes(updates.status) ? updates.status : t.status,
+              scope: updates.scope === 'PERSO' ? 'PERSO' : updates.scope === 'PRO' ? 'PRO' : t.scope,
+              updatedAt: ts(),
+              lastFollowUpAt: updates.lastFollowUpAt !== undefined ? updates.lastFollowUpAt : t.lastFollowUpAt,
+              dueAt: updates.dueAt !== undefined ? updates.dueAt : t.dueAt,
+              countryId: updates.countryId !== undefined ? updates.countryId : t.countryId,
+            }
+          : t
+      )
+    }
+    case actions.REQ_TICKET_DELETE:
+      return tickets.filter((t) => t.id !== action.payload)
+    default:
+      return tickets
+  }
+}
+
 function requestersReducer(requesters, action) {
   switch (action.type) {
     case actions.INIT:
@@ -279,8 +335,9 @@ export function rootReducer(state, action) {
   const rituals = ritualsReducer(state.rituals, action)
   const dailyPlans = dailyPlansReducer(state.dailyPlans, action)
   const tickets = ticketsReducer(state.tickets, action)
+  const reqTickets = reqTicketsReducer(state.reqTickets ?? [], action)
   const requesters = requestersReducer(state.requesters, action)
-  return { projects, tasks, rituals, dailyPlans, tickets, requesters }
+  return { projects, tasks, rituals, dailyPlans, tickets, reqTickets, requesters }
 }
 
 export function getInitialState() {
@@ -290,6 +347,7 @@ export function getInitialState() {
     rituals: loadRituals(),
     dailyPlans: loadDailyPlans(),
     tickets: loadTickets(),
+    reqTickets: loadReqTickets(),
     requesters: loadRequesters(),
   }
 }
@@ -300,5 +358,6 @@ export function persistState(state) {
   saveRituals(state.rituals)
   saveDailyPlans(state.dailyPlans)
   saveTickets(state.tickets ?? [])
+  saveReqTickets(state.reqTickets ?? [])
   saveRequesters(state.requesters ?? [])
 }

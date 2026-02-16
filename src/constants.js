@@ -4,6 +4,7 @@ export const STORAGE_KEYS = {
   dailyPlans: 'organizer-daily-plans',
   projects: 'organizer-projects',
   tickets: 'organizer-tickets',
+  reqTickets: 'organizer-req-tickets',
   requesters: 'organizer-requesters',
 }
 
@@ -15,21 +16,33 @@ export const PRIORITIES = [
   { value: 'low', label: 'Low', chip: 'border border-transparent text-[var(--priority-low)]' },
 ]
 
-export const ENERGY = [
-  { value: 'deep', label: 'Deep', chip: 'border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--accent)] font-medium' },
-  { value: 'quick', label: 'Quick', chip: 'border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--success)]' },
-  { value: 'light', label: 'Light', chip: 'border border-[var(--border)] bg-[var(--surface)] text-[var(--muted)]' },
-]
-
 export const CONTEXTS = [
   { value: 'pro', label: 'Pro' },
   { value: 'perso', label: 'Perso' },
 ]
 
+/** Business -> domains mapping for ticket capture */
+export const BUSINESSES = [
+  { id: 'sysco', label: 'Sysco', domains: ['product', 'vendor', 'customer'] },
+  { id: 'other', label: 'Other', domains: ['product', 'vendor', 'customer'] },
+]
+
+export const DOMAIN_LABELS = {
+  product: 'Product',
+  vendor: 'Vendor',
+  customer: 'Customer',
+}
+
 export const DOMAINS = [
   { value: 'product', label: 'Product' },
   { value: 'vendor', label: 'Vendor' },
   { value: 'customer', label: 'Customer' },
+]
+
+export const TICKET_STATUSES = [
+  { value: 'ACTIONABLE', label: 'Actionable' },
+  { value: 'WAITING_REPLY', label: 'Waiting reply' },
+  { value: 'DONE', label: 'Done' },
 ]
 
 export const COUNTRIES = [

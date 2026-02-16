@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CONTEXTS, ENERGY, DOMAINS, COUNTRIES } from '../constants'
+import { CONTEXTS, DOMAINS, COUNTRIES, BUSINESSES, DOMAIN_LABELS } from '../constants'
 import { SearchBar } from './SearchBar'
 
 const SHORTCUTS = [
@@ -16,12 +16,9 @@ export function Header({
   onSearchChange,
   searchResultsCount,
   searchRef,
-  energyFilter,
-  onEnergyFilterChange,
-  domainFilter,
-  onDomainFilterChange,
-  countryFilter,
-  onCountryFilterChange,
+  view = 'overview',
+  ticketFilters = {},
+  onTicketFiltersChange,
   onInstallClick,
   canInstall,
   isSilentMode,
@@ -30,6 +27,7 @@ export function Header({
   onToggleDarkMode = () => {},
 }) {
   const [showShortcuts, setShowShortcuts] = useState(false)
+  const [filtersExpanded, setFiltersExpanded] = useState(false)
 
   return (
     <header className="sticky top-0 z-10 border-b border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-sm)]">
@@ -142,72 +140,89 @@ export function Header({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 border-t border-[var(--border)] py-2.5">
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--muted)]">Energy</span>
-            <div className="flex gap-0.5 rounded-[var(--radius-md)] bg-[var(--bg)] p-0.5">
-              {ENERGY.map((e) => {
-                const isActive = energyFilter === e.value
+        {view === 'overview' && (
+          <div className="flex flex-wrap items-center gap-3 border-t border-[var(--border)] py-2.5">
+            <div
+              role="group"
+              aria-label="Scope"
+              className="flex rounded-[var(--radius-md)] bg-[var(--bg)] p-0.5"
+            >
+              {[
+                { value: 'PRO', label: 'Pro' },
+                { value: 'PERSO', label: 'Perso' },
+              ].map((s) => {
+                const scopeMatch = context === 'perso' ? s.value === 'PERSO' : s.value === 'PRO'
                 return (
                   <button
-                    key={e.value}
+                    key={s.value}
                     type="button"
-                    onClick={() => onEnergyFilterChange?.(isActive ? null : e.value)}
+                    onClick={() => onContextChange(s.value === 'PRO' ? 'pro' : 'perso')}
                     className={`rounded-[var(--radius-sm)] px-3 py-1.5 text-[11px] font-medium transition-[var(--transition)] ${
-                      isActive ? 'bg-[var(--surface)] text-[var(--text)] shadow-[var(--shadow-sm)]' : 'text-[var(--muted)] hover:text-[var(--text-secondary)]'
+                      scopeMatch ? 'bg-[var(--surface)] text-[var(--text)] shadow-[var(--shadow-sm)] border border-[var(--border)]' : 'text-[var(--muted)] hover:text-[var(--text-secondary)]'
                     }`}
                   >
-                    {e.label}
+                    {s.label}
                   </button>
                 )
               })}
             </div>
+            <button
+              type="button"
+              onClick={() => setFiltersExpanded((e) => !e)}
+              className={`rounded-[var(--radius-md)] px-2.5 py-1.5 text-[11px] font-medium transition-[var(--transition)] ${
+                filtersExpanded ? 'bg-[var(--accent-subtle)] text-[var(--accent)]' : 'text-[var(--muted)] hover:text-[var(--text)]'
+              }`}
+              aria-expanded={filtersExpanded}
+            >
+              Filters
+            </button>
+            {filtersExpanded && (
+              <div className="flex flex-wrap items-center gap-2">
+                <select
+                  value={ticketFilters.business ?? ''}
+                  onChange={(e) => onTicketFiltersChange?.({ ...ticketFilters, business: e.target.value || null })}
+                  className="rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-[11px]"
+                  aria-label="Business"
+                >
+                  <option value="">Business</option>
+                  {BUSINESSES.map((b) => (
+                    <option key={b.id} value={b.id}>{b.label}</option>
+                  ))}
+                </select>
+                <select
+                  value={ticketFilters.domain ?? ''}
+                  onChange={(e) => onTicketFiltersChange?.({ ...ticketFilters, domain: e.target.value || null })}
+                  className="rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-[11px]"
+                  aria-label="Domain"
+                >
+                  <option value="">Domain</option>
+                  {DOMAINS.map((d) => (
+                    <option key={d.value} value={d.value}>{d.label}</option>
+                  ))}
+                </select>
+                <input
+                  type="text"
+                  value={ticketFilters.owner ?? ''}
+                  onChange={(e) => onTicketFiltersChange?.({ ...ticketFilters, owner: e.target.value || null })}
+                  placeholder="Owner"
+                  className="w-24 rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-[11px]"
+                  aria-label="Owner"
+                />
+                <select
+                  value={ticketFilters.countryId ?? ''}
+                  onChange={(e) => onTicketFiltersChange?.({ ...ticketFilters, countryId: e.target.value || null })}
+                  className="rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-[11px]"
+                  aria-label="Country"
+                >
+                  <option value="">Country</option>
+                  {COUNTRIES.map((c) => (
+                    <option key={c.value} value={c.value}>{c.label}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
-          {context === 'pro' && (
-            <>
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--muted)]">Domain</span>
-                <div className="flex gap-0.5 rounded-[var(--radius-md)] bg-[var(--bg)] p-0.5">
-                  {DOMAINS.map((d) => {
-                    const isActive = domainFilter === d.value
-                    return (
-                      <button
-                        key={d.value}
-                        type="button"
-                        onClick={() => onDomainFilterChange?.(isActive ? null : d.value)}
-                        className={`rounded-[var(--radius-sm)] px-2 py-1 text-[11px] font-medium transition-[var(--transition)] ${
-                          isActive ? 'bg-[var(--surface)] text-[var(--text)] shadow-[var(--shadow-sm)]' : 'text-[var(--muted)] hover:text-[var(--text-secondary)]'
-                        }`}
-                      >
-                        {d.label}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--muted)]">Country</span>
-                <div className="flex gap-0.5 rounded-[var(--radius-md)] bg-[var(--bg)] p-0.5">
-                  {COUNTRIES.map((c) => {
-                    const isActive = countryFilter === c.value
-                    return (
-                      <button
-                        key={c.value}
-                        type="button"
-                        onClick={() => onCountryFilterChange?.(isActive ? null : c.value)}
-                        className={`rounded-[var(--radius-sm)] px-2 py-1 text-[11px] font-medium transition-[var(--transition)] ${
-                          isActive ? 'bg-[var(--surface)] text-[var(--text)] shadow-[var(--shadow-sm)]' : 'text-[var(--muted)] hover:text-[var(--text-secondary)]'
-                        }`}
-                      >
-                        {c.label}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            </>
-          )}
-        </div>
+        )}
 
         {searchQuery && (
           <p className="border-t border-[var(--border)] py-2 text-xs text-[var(--muted)]">

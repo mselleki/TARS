@@ -97,6 +97,21 @@ export function useStore() {
     dispatch({ type: actions.TICKET_RESOLVE, payload: id })
   }, [])
 
+  const addReqTicket = useCallback((payload) => {
+    const rawId = (payload.id ?? '').trim().toUpperCase()
+    const id = rawId || `REQ${Date.now().toString().slice(-6)}`
+    dispatch({ type: actions.REQ_TICKET_ADD, payload: { ...payload, id } })
+    return id
+  }, [])
+
+  const updateReqTicket = useCallback((id, updates) => {
+    dispatch({ type: actions.REQ_TICKET_UPDATE, payload: { id, updates } })
+  }, [])
+
+  const deleteReqTicket = useCallback((id) => {
+    dispatch({ type: actions.REQ_TICKET_DELETE, payload: id })
+  }, [])
+
   const addRequester = useCallback((payload) => {
     const id = payload.id ?? crypto.randomUUID()
     dispatch({ type: actions.REQUESTER_ADD, payload: { ...payload, id } })
@@ -141,6 +156,9 @@ export function useStore() {
     updateTicket,
     deleteTicket,
     resolveTicket,
+    addReqTicket,
+    updateReqTicket,
+    deleteReqTicket,
     addRequester,
     updateRequester,
     deleteRequester,

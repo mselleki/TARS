@@ -26,9 +26,7 @@ function App() {
   const [context, setContext] = useState('pro')
   const [view, setView] = useState('overview')
   const [searchQuery, setSearchQuery] = useState('')
-  const [energyFilter, setEnergyFilter] = useState(null)
-  const [domainFilter, setDomainFilter] = useState(null)
-  const [countryFilter, setCountryFilter] = useState(null)
+  const [ticketFilters, setTicketFilters] = useState({ business: null, domain: null, owner: null, countryId: null })
   const [showComposer, setShowComposer] = useState(false)
   const [composerProjectId, setComposerProjectId] = useState(null)
   const [isSilentMode, setIsSilentMode] = useState(false)
@@ -75,6 +73,9 @@ function App() {
     updateTicket,
     deleteTicket,
     resolveTicket,
+    addReqTicket,
+    updateReqTicket,
+    deleteReqTicket,
     addRequester,
     updateReflection,
     todayPlan,
@@ -87,9 +88,6 @@ function App() {
       tasks: state.tasks,
       context,
       searchQuery,
-      energyFilter,
-      domainFilter,
-      countryFilter,
       todayFocusIds,
     })
 
@@ -114,23 +112,11 @@ function App() {
     setIsSilentMode(false)
   }, [])
 
-  const handleSetEnergy = useCallback(
-    (energy) => {
-      const active = document.activeElement?.closest('[data-task-id]')
-      if (active) {
-        const id = active.getAttribute('data-task-id')
-        if (id) updateTask(id, { energy })
-      }
-    },
-    [updateTask]
-  )
-
   useKeyboardShortcuts({
     onNewTask: handleNewTask,
     onFocusSearch: handleFocusSearch,
     onGoToday: handleGoToday,
     onGoOverview: handleGoOverview,
-    onSetEnergy: handleSetEnergy,
     onEscape: handleEscape,
     enabled: !showComposer,
   })
@@ -193,14 +179,11 @@ function App() {
         onContextChange={setContext}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        searchResultsCount={filtered.length}
+        searchResultsCount={view === 'overview' ? (state.reqTickets ?? []).length : filtered.length}
         searchRef={searchRef}
-        energyFilter={energyFilter}
-        onEnergyFilterChange={setEnergyFilter}
-        domainFilter={domainFilter}
-        onDomainFilterChange={setDomainFilter}
-        countryFilter={countryFilter}
-        onCountryFilterChange={setCountryFilter}
+        view={view}
+        ticketFilters={ticketFilters}
+        onTicketFiltersChange={setTicketFilters}
         onInstallClick={install}
         canInstall={canInstall}
         isSilentMode={isSilentMode}
@@ -212,33 +195,13 @@ function App() {
       <main className="flex-1 overflow-auto px-4 py-6 sm:px-6 lg:mx-auto lg:max-w-4xl">
         {view === 'overview' && (
           <OverviewView
-            backlog={backlog}
-            inProgress={inProgress}
-            done={done}
+            reqTickets={state.reqTickets ?? []}
             searchQuery={searchQuery}
-            onClearSearch={() => setSearchQuery('')}
-            projects={state.projects.filter((p) => p.context === context)}
-            onNewTask={() => handleNewTask()}
-            onToggle={toggleTaskStatus}
-            onUpdate={updateTask}
-            onDelete={deleteTask}
-            onStatusChange={handleStatusChange}
-            onAddFocus={handleAddFocus}
-            onRemoveFocus={removeFocus}
-            focusIds={todayFocusIds}
-            context={context}
-            tickets={state.tickets ?? []}
-            onAddTicket={addTicket}
-            onUpdateTicket={updateTicket}
-            onDeleteTicket={deleteTicket}
-            onResolveTicket={resolveTicket}
-            requesters={state.requesters ?? []}
-            onAddRequester={addRequester}
-            onAddProject={addProject}
-            onAddTask={(p) => addTask(p)}
-            onToggleTask={toggleTaskStatus}
-            onUpdateTask={updateTask}
-            onDeleteTask={deleteTask}
+            scopeFilter={context === 'perso' ? 'PERSO' : 'PRO'}
+            filters={ticketFilters}
+            onAddReqTicket={addReqTicket}
+            onUpdateReqTicket={updateReqTicket}
+            onDeleteReqTicket={deleteReqTicket}
           />
         )}
 

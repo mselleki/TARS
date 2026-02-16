@@ -44,6 +44,35 @@ export function saveTickets(tickets) {
   saveJSON(STORAGE_KEYS.tickets, tickets)
 }
 
+export function loadReqTickets() {
+  const raw = loadJSON(STORAGE_KEYS.reqTickets, [])
+  return raw.map(normalizeReqTicket)
+}
+
+export function saveReqTickets(tickets) {
+  saveJSON(STORAGE_KEYS.reqTickets, tickets)
+}
+
+function normalizeReqTicket(t) {
+  const now = Date.now()
+  const rawId = (t.id ?? '').trim().toUpperCase()
+  return {
+    ...t,
+    id: rawId || `REQ${Date.now().toString().slice(-6)}`,
+    business: (t.business ?? '').trim() || '',
+    domain: (t.domain ?? '').trim() || '',
+    owner: (t.owner ?? '').trim() || '',
+    summary: (t.summary ?? '').trim() || '',
+    status: ['ACTIONABLE', 'WAITING_REPLY', 'DONE'].includes(t.status) ? t.status : 'ACTIONABLE',
+    scope: t.scope === 'PERSO' ? 'PERSO' : 'PRO',
+    createdAt: typeof t.createdAt === 'number' ? t.createdAt : now,
+    updatedAt: typeof t.updatedAt === 'number' ? t.updatedAt : now,
+    lastFollowUpAt: t.lastFollowUpAt != null && typeof t.lastFollowUpAt === 'number' ? t.lastFollowUpAt : null,
+    dueAt: t.dueAt != null && typeof t.dueAt === 'number' ? t.dueAt : null,
+    countryId: t.countryId ?? null,
+  }
+}
+
 function normalizeTicket(t) {
   return {
     ...t,

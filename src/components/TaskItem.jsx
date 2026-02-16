@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { PRIORITIES, ENERGY, DOMAINS, COUNTRIES, MAX_NOTE_LENGTH } from '../constants'
+import { PRIORITIES, DOMAINS, COUNTRIES, MAX_NOTE_LENGTH } from '../constants'
 import { formatDate, today } from '../utils/date'
 import { flattenProjectsForSelect } from '../utils/projects'
 
@@ -31,7 +31,6 @@ export function TaskItem({
   const inputRef = useRef(null)
 
   const priority = PRIORITIES.find((p) => p.value === task.priority) ?? PRIORITIES[1]
-  const energy = ENERGY.find((e) => e.value === task.energy) ?? ENERGY[1]
   const isOverdue = task.dueDate && task.dueDate < today() && task.status !== 'done'
 
   useEffect(() => {
@@ -65,8 +64,6 @@ export function TaskItem({
       onUpdate(task.id, { dueDate: editValue || '' })
     } else if (editingField === 'priority') {
       onUpdate(task.id, { priority: editValue })
-    } else if (editingField === 'energy') {
-      onUpdate(task.id, { energy: editValue })
     } else if (editingField === 'note') {
       onUpdate(task.id, { note: String(editValue).slice(0, MAX_NOTE_LENGTH) })
     } else if (editingField === 'project') {
@@ -151,33 +148,6 @@ export function TaskItem({
         )}
 
         <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-          {editingField === 'energy' ? (
-            <select
-              ref={inputRef}
-              value={editValue}
-              onChange={(e) => {
-                onUpdate(task.id, { energy: e.target.value })
-                setEditingField(null)
-              }}
-              onBlur={saveEdit}
-              onKeyDown={handleKeyDown}
-              className="rounded-md border border-[var(--color-border)] px-2 py-0.5 text-xs"
-              aria-label="Edit energy"
-            >
-              {ENERGY.map((e) => (
-                <option key={e.value} value={e.value}>{e.label}</option>
-              ))}
-            </select>
-          ) : (
-            <button
-              type="button"
-              onClick={() => startEdit('energy', task.energy)}
-              className={`rounded-[var(--radius-sm)] px-2 py-0.5 text-[11px] font-medium transition-[var(--transition)] ${energy.chip}`}
-            >
-              {energy.label}
-            </button>
-          )}
-
           {editingField === 'priority' ? (
             <select
               ref={inputRef}

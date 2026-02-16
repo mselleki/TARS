@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { PRIORITIES, ENERGY, DOMAINS, COUNTRIES } from '../constants'
+import { PRIORITIES, DOMAINS, COUNTRIES } from '../constants'
 import { flattenProjectsForSelect } from '../utils/projects'
 
 export function TaskComposer({
@@ -14,7 +14,6 @@ export function TaskComposer({
 }) {
   const [title, setTitle] = useState('')
   const [priority, setPriority] = useState('medium')
-  const [energy, setEnergy] = useState('quick')
   const [dueDate, setDueDate] = useState('')
   const [domainIds, setDomainIds] = useState([])
   const [countryIds, setCountryIds] = useState([])
@@ -43,7 +42,6 @@ export function TaskComposer({
       title: t,
       context,
       priority,
-      energy,
       dueDate: dueDate || '',
       projectId: projectId || null,
       domainIds: context === 'pro' ? domainIds : [],
@@ -128,16 +126,6 @@ export function TaskComposer({
         >
           {PRIORITIES.map((p) => (
             <option key={p.value} value={p.value}>{p.label}</option>
-          ))}
-        </select>
-        <select
-          value={energy}
-          onChange={(e) => setEnergy(e.target.value)}
-          className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] px-3 py-3 text-sm text-[var(--text-secondary)] outline-none focus:border-[var(--accent)]"
-          aria-label="Energy"
-        >
-          {ENERGY.map((e) => (
-            <option key={e.value} value={e.value}>{e.label}</option>
           ))}
         </select>
         <input

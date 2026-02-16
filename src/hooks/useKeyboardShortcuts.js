@@ -17,7 +17,6 @@ export function useKeyboardShortcuts({
   onFocusSearch,
   onGoToday,
   onGoOverview,
-  onSetEnergy,
   onEscape,
   enabled = true,
 }) {
@@ -35,8 +34,6 @@ export function useKeyboardShortcuts({
         if (e.key === 'k' || e.key === 'K') {
           if (!e.ctrlKey && !e.metaKey) return
         } else if (e.key === '/' || e.key === 't' || e.key === 'T' || e.key === 'o' || e.key === 'O') {
-          return
-        } else if (['1', '2', '3'].includes(e.key) && !e.ctrlKey && !e.metaKey) {
           return
         }
       }
@@ -69,17 +66,8 @@ export function useKeyboardShortcuts({
         }
       }
 
-      if (['1', '2', '3'].includes(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
-        const active = document.activeElement
-        const inTaskCard = active?.closest('[data-task-id]')
-        if (inTaskCard) {
-          e.preventDefault()
-          const map = { '1': 'deep', '2': 'quick', '3': 'light' }
-          onSetEnergy?.(map[e.key])
-        }
-      }
     },
-    [enabled, onNewTask, onFocusSearch, onGoToday, onGoOverview, onSetEnergy, onEscape]
+    [enabled, onNewTask, onFocusSearch, onGoToday, onGoOverview, onEscape]
   )
 
   useEffect(() => {

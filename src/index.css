@@ -23,6 +23,8 @@
   --success: #059669;
   --success-subtle: rgba(5, 150, 105, 0.08);
   --warn: #d97706;
+  --warning: #d97706;
+  --warning-subtle: rgba(217, 119, 6, 0.12);
 
   /* Semantic */
   --color-page: var(--bg);
@@ -90,6 +92,8 @@
   --accent-ring: rgba(59, 130, 246, 0.5);
   --danger: #f87171;
   --danger-subtle: rgba(248, 113, 113, 0.15);
+  --warning: #fbbf24;
+  --warning-subtle: rgba(251, 191, 36, 0.15);
   --success: #34d399;
   --success-subtle: rgba(52, 211, 153, 0.15);
   --column-backlog: rgba(51, 65, 85, 0.5);

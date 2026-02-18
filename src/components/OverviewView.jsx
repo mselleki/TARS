@@ -1,80 +1,14 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { TicketCaptureForm } from './TicketCaptureForm'
 import { TicketList } from './TicketList'
 import { CoursesPanel } from './CoursesPanel'
-import { DOMAIN_LABELS, BUSINESSES } from '../constants'
 
-const GHOST_TICKETS = [
-  {
-    id: 'REQ123456',
-    business: 'sysco',
-    domain: 'product',
-    owner: 'Marie D.',
-    summary: 'Validation specs for new API',
-    status: 'WAITING_REPLY',
-    scope: 'PRO',
-    lastFollowUpAt: Date.now() - 3 * 24 * 60 * 60 * 1000,
-    createdAt: Date.now() - 5 * 24 * 60 * 60 * 1000,
-    updatedAt: Date.now(),
-  },
-  {
-    id: 'REQ789012',
-    business: 'sysco',
-    domain: 'vendor',
-    owner: 'Thomas L.',
-    summary: 'Quote for Q2 equipment',
-    status: 'ACTIONABLE',
-    scope: 'PRO',
-    lastFollowUpAt: null,
-    dueAt: Date.now() + 2 * 24 * 60 * 60 * 1000,
-    createdAt: Date.now() - 1 * 24 * 60 * 60 * 1000,
-    updatedAt: Date.now(),
-  },
-]
-
-function GhostTicketRow({ ticket }) {
-  const businessLabel = BUSINESSES.find((b) => b.id === ticket.business)?.label ?? ticket.business
-  const domainLabel = DOMAIN_LABELS[ticket.domain] ?? ticket.domain
-
+function EmptyStateTickets() {
   return (
-    <li className="flex flex-wrap items-center gap-3 rounded-[var(--radius-md)] border border-dashed border-[var(--border)] bg-[var(--surface)]/50 px-4 py-3 opacity-75">
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="font-mono text-sm font-semibold text-[var(--muted)]">{ticket.id}</span>
-          <span className="rounded-[var(--radius-sm)] bg-[var(--accent-subtle)] px-2 py-0.5 text-[10px] font-medium text-[var(--accent)]">
-            Waiting 3d
-          </span>
-        </div>
-        <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--muted)]">
-          {businessLabel && <span>{businessLabel}</span>}
-          {domainLabel && <span>· {domainLabel}</span>}
-          {ticket.owner && <span>· {ticket.owner}</span>}
-        </div>
-        {ticket.summary && (
-          <p className="text-sm text-[var(--text-secondary)]">{ticket.summary}</p>
-        )}
-      </div>
-    </li>
-  )
-}
-
-function EmptyStateWithGhosts() {
-  return (
-    <div className="space-y-6">
-      <div className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] p-6 text-center">
-        <p className="text-sm text-[var(--text-secondary)]">
-          Track REQ tickets with owners and follow-ups so nothing gets lost.
-        </p>
-      </div>
-      <div>
-        <p className="mb-3 text-xs font-medium uppercase tracking-wider text-[var(--muted)]">
-          Example structure
-        </p>
-        <ul className="space-y-2">
-          <GhostTicketRow ticket={GHOST_TICKETS[0]} />
-          <GhostTicketRow ticket={GHOST_TICKETS[1]} />
-        </ul>
-      </div>
+    <div className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] p-6 text-center">
+      <p className="text-sm text-[var(--text-secondary)]">
+        Track REQ tickets with owners and follow-ups so nothing gets lost.
+      </p>
     </div>
   )
 }
@@ -121,6 +55,7 @@ export function OverviewView({
         <OverviewPersoTodo
           tasks={tasks}
           onToggleTask={onToggleTask}
+          onUpdateTask={onUpdateTask}
           onDeleteTask={onDeleteTask}
         />
       </div>
@@ -144,7 +79,7 @@ export function OverviewView({
 
       <section aria-label="Tickets">
         {showEmptyState ? (
-          <EmptyStateWithGhosts />
+          <EmptyStateTickets />
         ) : (
           <>
             <div className="mb-3 flex items-center justify-between">
@@ -171,7 +106,7 @@ export function OverviewView({
   )
 }
 
-function OverviewPersoTodo({ tasks, onToggleTask, onDeleteTask }) {
+function OverviewPersoTodo({ tasks, onToggleTask, onUpdateTask, onDeleteTask }) {
   const persoTasks = useMemo(
     () => tasks.filter((t) => t.context === 'perso' && !t.projectId && t.status !== 'done').slice(0, 20),
     [tasks]
@@ -186,31 +121,70 @@ function OverviewPersoTodo({ tasks, onToggleTask, onDeleteTask }) {
         {persoTasks.length === 0 ? (
           <p className="text-xs text-[var(--muted)]">Aucune tâche. Ajoutez-en depuis Projects ou le Board (contexte Perso).</p>
         ) : (
-          <ul className="space-y-1">
+          <ul className="space-y-2">
             {persoTasks.map((task) => (
-              <li key={task.id} className="group flex items-center gap-2 rounded-[var(--radius-sm)] px-2 py-1.5 hover:bg-[var(--bg)]">
-                <button
-                  type="button"
-                  onClick={() => onToggleTask?.(task.id)}
-                  className="flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 border-[var(--border)] transition-colors hover:border-[var(--accent)]"
-                  aria-label="Toggle"
-                />
-                <span className="flex-1 truncate text-sm text-[var(--text)]">{task.title || '—'}</span>
-                <button
-                  type="button"
-                  onClick={() => onDeleteTask?.(task.id)}
-                  className="rounded p-1 text-[var(--muted)] opacity-0 group-hover:opacity-100 hover:text-[var(--danger)]"
-                  aria-label="Delete"
-                >
-                  <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </li>
+              <PersoTodoRow
+                key={task.id}
+                task={task}
+                onToggle={onToggleTask}
+                onUpdate={onUpdateTask}
+                onDelete={onDeleteTask}
+              />
             ))}
           </ul>
         )}
       </div>
     </section>
+  )
+}
+
+function PersoTodoRow({ task, onToggle, onUpdate, onDelete }) {
+  const [editing, setEditing] = useState(false)
+  const [value, setValue] = useState(task.title || '')
+
+  const save = () => {
+    const t = value.trim()
+    if (t) onUpdate?.(task.id, { title: t })
+    setEditing(false)
+  }
+
+  return (
+    <li className="group flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)]/50 px-3 py-2.5 hover:border-[var(--border-strong)]">
+      <button
+        type="button"
+        onClick={() => onToggle?.(task.id)}
+        className="flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 border-[var(--border-strong)] transition-colors hover:border-[var(--accent)] hover:bg-[var(--accent-subtle)]"
+        aria-label="Marquer faite"
+      />
+      {editing ? (
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={save}
+          onKeyDown={(e) => e.key === 'Enter' && save()}
+          className="min-w-0 flex-1 rounded-[var(--radius-sm)] border border-[var(--accent)] bg-[var(--surface)] px-2 py-1.5 text-sm outline-none focus:ring-2 focus:ring-[var(--accent-ring)]"
+          autoFocus
+        />
+      ) : (
+        <button
+          type="button"
+          onClick={() => { setValue(task.title || ''); setEditing(true) }}
+          className="min-w-0 flex-1 truncate text-left text-sm text-[var(--text)] hover:text-[var(--accent)]"
+        >
+          {task.title || '—'}
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={() => onDelete?.(task.id)}
+        className="rounded p-1.5 text-[var(--muted)] hover:bg-[var(--danger-subtle)] hover:text-[var(--danger)]"
+        aria-label="Supprimer"
+      >
+        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </li>
   )
 }

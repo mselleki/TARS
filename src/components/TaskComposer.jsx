@@ -139,9 +139,10 @@ export function TaskComposer({
           aria-label="Due date"
         />
         <label
-          className={`flex cursor-pointer items-center gap-2 rounded-[var(--radius-lg)] border px-3 py-3 text-sm transition-colors ${
+          className={`flex cursor-pointer items-center justify-center rounded-[var(--radius-lg)] border px-3 py-3 text-sm transition-colors ${
             doToday ? 'border-[var(--danger)] bg-[var(--danger-subtle)]' : 'border-[var(--border)] bg-[var(--surface)]'
           }`}
+          title="Must be done today"
         >
           <input
             type="checkbox"
@@ -150,12 +151,9 @@ export function TaskComposer({
             className="sr-only"
             aria-label="Must be done today"
           />
-          <span className={doToday ? 'text-[var(--danger)]' : 'text-[var(--muted)]'}>
-            <svg className="h-5 w-5" fill={doToday ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 3h-8v3h-2z" />
-            </svg>
-          </span>
-          <span className="text-[var(--text-secondary)]">Do today</span>
+          <svg className="h-5 w-5 shrink-0" fill={doToday ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 3h-8v3h-2z" />
+          </svg>
         </label>
         {context === 'pro' && (
           <>

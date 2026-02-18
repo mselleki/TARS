@@ -152,16 +152,31 @@ export function TaskItem({
             aria-label="Edit task title"
           />
         ) : (
-          <button
-            type="button"
-            onClick={() => startEdit('title', task.title)}
-            title="Click to edit"
-            className={`block min-h-[1.25rem] w-full overflow-hidden text-ellipsis whitespace-nowrap text-left transition-colors hover:text-[var(--color-accent)] ${
-              isDone ? 'text-[var(--color-text-ghost)] line-through' : 'text-[var(--color-text)]'
-            } ${task.priority === 'high' ? 'text-[15px] font-bold' : 'text-[15px] font-semibold'} ${task.disliked ? 'italic opacity-80' : ''}`}
-          >
-            {task.title || 'Untitled'}
-          </button>
+          <div className="flex min-w-0 flex-1 items-center gap-1">
+            <button
+              type="button"
+              onClick={() => startEdit('title', task.title)}
+              title="Cliquer pour modifier"
+              className={`min-h-[1.25rem] min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-left transition-colors hover:text-[var(--color-accent)] ${
+                isDone ? 'text-[var(--color-text-ghost)] line-through' : 'text-[var(--color-text)]'
+              } ${task.priority === 'high' ? 'text-[15px] font-bold' : 'text-[15px] font-semibold'} ${task.disliked ? 'italic opacity-80' : ''}`}
+            >
+              {task.title || 'Untitled'}
+            </button>
+            {!isDone && (
+              <button
+                type="button"
+                onClick={() => startEdit('title', task.title)}
+                className="shrink-0 rounded p-1 text-[var(--muted)] opacity-0 transition-opacity hover:bg-[var(--accent-subtle)] hover:text-[var(--accent)] group-hover:opacity-100"
+                title="Modifier le titre"
+                aria-label="Modifier le titre"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </button>
+            )}
+          </div>
         )}
 
         <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -285,7 +300,7 @@ export function TaskItem({
                     ? (task.countryIds ?? []).map((id) => {
                         const c = COUNTRIES.find((x) => x.value === id)
                         return c ? (
-                          <span key={id} className={`rounded px-1.5 py-0.5 font-medium ${c.tagClass ?? ''}`}>
+                          <span key={id} className={`rounded-[var(--radius-sm)] px-2 py-1 text-xs font-medium ${c.tagClass ?? ''}`}>
                             {c.label}
                           </span>
                         ) : (

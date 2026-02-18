@@ -139,7 +139,7 @@ export function Header({
           </div>
         </div>
 
-        {view === 'overview' && (
+        {view === 'overview' && context === 'pro' && (
           <div className="flex flex-wrap items-center gap-3 border-t border-[var(--border)] py-2.5">
             <button
               type="button"

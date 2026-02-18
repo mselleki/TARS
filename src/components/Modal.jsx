@@ -39,7 +39,10 @@ export function Modal({ isOpen, onClose, children, title }) {
       aria-labelledby={title ? 'modal-title' : undefined}
       onClose={onClose}
     >
-      <div className="flex min-h-full items-center justify-center p-4">
+      <div
+        className="flex min-h-full items-center justify-center p-4"
+        onClick={(e) => e.target === e.currentTarget && onClose?.()}
+      >
         <div
           className="relative w-full max-w-lg rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-lg)]"
           onClick={(e) => e.stopPropagation()}

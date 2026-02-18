@@ -147,6 +147,7 @@ function normalizeTask(t) {
     context: t.context ?? 'pro',
     domainIds: Array.isArray(t.domainIds) ? t.domainIds : [],
     countryIds: Array.isArray(t.countryIds) ? t.countryIds : [],
+    doToday: Boolean(t.doToday),
     createdAt: typeof t.createdAt === 'number' ? t.createdAt : (t.createdAt ? new Date(t.createdAt).getTime() : Date.now()),
     updatedAt: typeof t.updatedAt === 'number' ? t.updatedAt : Date.now(),
   }

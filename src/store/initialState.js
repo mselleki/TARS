@@ -14,6 +14,7 @@ export function createInitialTask(overrides = {}) {
     context: 'pro',
     domainIds: [],
     countryIds: [],
+    doToday: false,
     createdAt: now,
     updatedAt: now,
     ...overrides,

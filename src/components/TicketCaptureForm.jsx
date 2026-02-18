@@ -69,7 +69,7 @@ export function TicketCaptureForm({
         domain: domain.trim(),
         owner: owner.trim(),
         summary: summary.trim(),
-        scope,
+        scope: 'PRO',
         countryId: countryId || null,
       })
       setReqId('')

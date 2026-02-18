@@ -89,7 +89,7 @@ export function TaskItem({
   const isInProgress = task.status === 'in_progress'
   const isBacklog = task.status === 'backlog'
 
-  const leftBar = isDone ? 'border-l-[var(--muted)]' : isOverdue ? 'border-l-[var(--danger)]' : task.priority === 'high' ? 'border-l-[var(--accent)]' : 'border-l-[var(--border)]'
+  const leftBar = isDone ? 'border-l-[var(--muted)]' : task.doToday ? 'border-l-[var(--danger)]' : isOverdue ? 'border-l-[var(--danger)]' : task.priority === 'high' ? 'border-l-[var(--accent)]' : 'border-l-[var(--border)]'
 
   const baseClasses = `group flex min-w-0 items-start gap-3 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)] border-l-2 bg-[var(--surface)] px-3 py-2.5 transition-[var(--transition)] ${
     isDone
@@ -107,20 +107,37 @@ export function TaskItem({
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
     >
-      <button
-        type="button"
-        onClick={() => onToggle(task.id)}
-        className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center self-start rounded-[var(--radius-sm)] border-2 transition-[var(--transition)] ${
-          isDone ? 'border-[var(--muted)] bg-[var(--muted)] text-white' : 'border-[var(--border-strong)] text-transparent hover:border-[var(--accent)] hover:bg-[var(--accent-subtle)]'
-        }`}
-        aria-label={isDone ? 'Mark incomplete' : 'Mark complete'}
-      >
-        {isDone && (
-          <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
+      <div className="mt-0.5 flex shrink-0 items-center gap-0.5">
+        <button
+          type="button"
+          onClick={() => onToggle(task.id)}
+          className={`flex h-5 w-5 items-center justify-center rounded-[var(--radius-sm)] border-2 transition-[var(--transition)] ${
+            isDone ? 'border-[var(--muted)] bg-[var(--muted)] text-white' : 'border-[var(--border-strong)] text-transparent hover:border-[var(--accent)] hover:bg-[var(--accent-subtle)]'
+          }`}
+          aria-label={isDone ? 'Mark incomplete' : 'Mark complete'}
+        >
+          {isDone && (
+            <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          )}
+        </button>
+        {!isDone && (
+          <button
+            type="button"
+            onClick={() => onUpdate(task.id, { doToday: !task.doToday })}
+            className={`rounded p-1 transition-colors ${
+              task.doToday ? 'text-[var(--danger)]' : 'text-[var(--muted)] hover:text-[var(--danger)] hover:bg-[var(--danger-subtle)]'
+            }`}
+            title={task.doToday ? 'Must be done today (click to clear)' : 'Must be done today'}
+            aria-label={task.doToday ? 'Clear do today' : 'Mark must be done today'}
+          >
+            <svg className="h-4 w-4" fill={task.doToday ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 3h-8v3h-2z" />
+            </svg>
+          </button>
         )}
-      </button>
+      </div>
 
       <div className="min-w-[120px] flex-1 overflow-hidden">
         {editingField === 'title' ? (
@@ -240,7 +257,7 @@ export function TaskItem({
                 </button>
               )}
               {editingField === 'country' ? (
-                <span className="flex flex-wrap gap-1">
+                <span className="flex flex-wrap items-center gap-1">
                   {COUNTRIES.map((c) => {
                     const selected = (task.countryIds ?? []).includes(c.value)
                     return (
@@ -248,8 +265,8 @@ export function TaskItem({
                         key={c.value}
                         type="button"
                         onClick={() => toggleCountry(c.value)}
-                        className={`rounded-[var(--radius-sm)] px-2 py-0.5 text-[11px] transition-[var(--transition)] ${
-                          selected ? 'bg-[var(--accent)] text-white' : 'border border-[var(--border)] text-[var(--muted)] hover:border-[var(--accent)]'
+                        className={`rounded-[var(--radius-sm)] px-2 py-0.5 text-[11px] font-medium transition-[var(--transition)] ${c.tagClass ?? ''} ${
+                          selected ? 'ring-2 ring-[var(--accent)] ring-offset-1' : 'opacity-60 hover:opacity-100'
                         }`}
                       >
                         {c.label}
@@ -262,10 +279,19 @@ export function TaskItem({
                 <button
                   type="button"
                   onClick={() => startEdit('country', task.countryIds ?? [])}
-                  className="rounded-[var(--radius-sm)] px-2 py-0.5 text-[11px] text-[var(--muted)] transition-colors hover:text-[var(--text)]"
+                  className="flex flex-wrap gap-1 rounded-[var(--radius-sm)] text-left text-[11px] text-[var(--muted)] transition-colors hover:text-[var(--text)]"
                 >
                   {(task.countryIds ?? []).length > 0
-                    ? (task.countryIds ?? []).map((id) => COUNTRIES.find((c) => c.value === id)?.label ?? id).join(', ')
+                    ? (task.countryIds ?? []).map((id) => {
+                        const c = COUNTRIES.find((x) => x.value === id)
+                        return c ? (
+                          <span key={id} className={`rounded px-1.5 py-0.5 font-medium ${c.tagClass ?? ''}`}>
+                            {c.label}
+                          </span>
+                        ) : (
+                          <span key={id}>{id}</span>
+                        )
+                      })
                     : 'Country'}
                 </button>
               )}

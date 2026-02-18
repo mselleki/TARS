@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { TicketCaptureForm } from './TicketCaptureForm'
 import { TicketList } from './TicketList'
+import { CoursesPanel } from './CoursesPanel'
 import { DOMAIN_LABELS, BUSINESSES } from '../constants'
 
 const GHOST_TICKETS = [
@@ -79,40 +80,52 @@ function EmptyStateWithGhosts() {
 }
 
 export function OverviewView({
+  context = 'pro',
   reqTickets = [],
   searchQuery = '',
-  scopeFilter = 'PRO',
   filters = {},
   onAddReqTicket,
   onUpdateReqTicket,
   onDeleteReqTicket,
+  projects = [],
+  tasks = [],
+  onAddProject,
+  onAddTask,
+  onUpdateTask,
+  onDeleteTask,
+  onToggleTask,
 }) {
-  const visibleTickets = useMemo(() => {
-    return reqTickets.filter((t) => t.scope === scopeFilter)
-  }, [reqTickets, scopeFilter])
-
-  const existingOwners = useMemo(() => {
-    return reqTickets.map((t) => t.owner).filter(Boolean)
-  }, [reqTickets])
-
-  const handleMarkDone = (id) => {
-    onUpdateReqTicket?.(id, { status: 'DONE' })
-  }
-
-  const handleSetWaiting = (id) => {
-    onUpdateReqTicket?.(id, { status: 'WAITING_REPLY' })
-  }
-
-  const handleAddFollowUp = (id) => {
-    onUpdateReqTicket?.(id, { lastFollowUpAt: Date.now() })
-  }
-
-  const handleSetDueDate = (id, dueAt) => {
-    onUpdateReqTicket?.(id, { dueAt })
-  }
-
-  const hasTickets = visibleTickets.length > 0
+  const proTickets = useMemo(() => reqTickets.filter((t) => t.scope === 'PRO'), [reqTickets])
+  const existingOwners = useMemo(() => reqTickets.map((t) => t.owner).filter(Boolean), [reqTickets])
+  const hasTickets = proTickets.length > 0
   const showEmptyState = !hasTickets
+
+  const handleMarkDone = (id) => onUpdateReqTicket?.(id, { status: 'DONE' })
+  const handleSetWaiting = (id) => onUpdateReqTicket?.(id, { status: 'WAITING_REPLY' })
+  const handleAddFollowUp = (id) => onUpdateReqTicket?.(id, { lastFollowUpAt: Date.now() })
+  const handleSetDueDate = (id, dueAt) => onUpdateReqTicket?.(id, { dueAt })
+
+  if (context === 'perso') {
+    return (
+      <div className="space-y-6">
+        <CoursesPanel
+          projects={projects}
+          tasks={tasks}
+          context="perso"
+          onAddProject={onAddProject}
+          onAddTask={onAddTask}
+          onUpdateTask={onUpdateTask}
+          onDeleteTask={onDeleteTask}
+          onToggleTask={onToggleTask}
+        />
+        <OverviewPersoTodo
+          tasks={tasks}
+          onToggleTask={onToggleTask}
+          onDeleteTask={onDeleteTask}
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -120,14 +133,10 @@ export function OverviewView({
         className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-sm)]"
         aria-label="Add ticket"
       >
-        <h2 className="mb-4 text-sm font-semibold text-[var(--text-secondary)]">
-          Add ticket
-        </h2>
+        <h2 className="mb-4 text-sm font-semibold text-[var(--text-secondary)]">Add ticket</h2>
         <TicketCaptureForm
-          onSubmit={(payload) => {
-            onAddReqTicket?.(payload)
-          }}
-          scope={scopeFilter}
+          onSubmit={(payload) => onAddReqTicket?.(payload)}
+          scope="PRO"
           existingOwners={existingOwners}
           initialFocus
         />
@@ -139,17 +148,15 @@ export function OverviewView({
         ) : (
           <>
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-[var(--text-secondary)]">
-                Tickets
-              </h2>
+              <h2 className="text-sm font-semibold text-[var(--text-secondary)]">Tickets</h2>
               <span className="text-xs text-[var(--muted)]">
-                {visibleTickets.length} ticket{visibleTickets.length !== 1 ? 's' : ''}
+                {proTickets.length} ticket{proTickets.length !== 1 ? 's' : ''}
               </span>
             </div>
             <TicketList
               tickets={reqTickets}
               searchQuery={searchQuery}
-              scopeFilter={scopeFilter}
+              scopeFilter="PRO"
               filters={filters}
               onMarkDone={handleMarkDone}
               onSetWaiting={handleSetWaiting}
@@ -161,5 +168,49 @@ export function OverviewView({
         )}
       </section>
     </div>
+  )
+}
+
+function OverviewPersoTodo({ tasks, onToggleTask, onDeleteTask }) {
+  const persoTasks = useMemo(
+    () => tasks.filter((t) => t.context === 'perso' && !t.projectId && t.status !== 'done').slice(0, 20),
+    [tasks]
+  )
+
+  return (
+    <section className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] overflow-hidden shadow-[var(--shadow-sm)]">
+      <h2 className="border-b border-[var(--border)] px-4 py-3 text-sm font-semibold text-[var(--text-secondary)]">
+        To-do perso
+      </h2>
+      <div className="p-4 space-y-2">
+        {persoTasks.length === 0 ? (
+          <p className="text-xs text-[var(--muted)]">Aucune tâche. Ajoutez-en depuis Projects ou le Board (contexte Perso).</p>
+        ) : (
+          <ul className="space-y-1">
+            {persoTasks.map((task) => (
+              <li key={task.id} className="group flex items-center gap-2 rounded-[var(--radius-sm)] px-2 py-1.5 hover:bg-[var(--bg)]">
+                <button
+                  type="button"
+                  onClick={() => onToggleTask?.(task.id)}
+                  className="flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 border-[var(--border)] transition-colors hover:border-[var(--accent)]"
+                  aria-label="Toggle"
+                />
+                <span className="flex-1 truncate text-sm text-[var(--text)]">{task.title || '—'}</span>
+                <button
+                  type="button"
+                  onClick={() => onDeleteTask?.(task.id)}
+                  className="rounded p-1 text-[var(--muted)] opacity-0 group-hover:opacity-100 hover:text-[var(--danger)]"
+                  aria-label="Delete"
+                >
+                  <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
   )
 }

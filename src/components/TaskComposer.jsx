@@ -15,6 +15,7 @@ export function TaskComposer({
   const [title, setTitle] = useState('')
   const [priority, setPriority] = useState('medium')
   const [dueDate, setDueDate] = useState('')
+  const [doToday, setDoToday] = useState(false)
   const [domainIds, setDomainIds] = useState([])
   const [countryIds, setCountryIds] = useState([])
   const inputRef = useRef(null)
@@ -43,12 +44,14 @@ export function TaskComposer({
       context,
       priority,
       dueDate: dueDate || '',
+      doToday,
       projectId: projectId || null,
       domainIds: context === 'pro' ? domainIds : [],
       countryIds: context === 'pro' ? countryIds : [],
     })
     setTitle('')
     setDueDate('')
+    setDoToday(false)
     setDomainIds([])
     setCountryIds([])
   }
@@ -135,6 +138,25 @@ export function TaskComposer({
           className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] px-3 py-3 text-sm text-[var(--text-secondary)] outline-none focus:border-[var(--accent)]"
           aria-label="Due date"
         />
+        <label
+          className={`flex cursor-pointer items-center gap-2 rounded-[var(--radius-lg)] border px-3 py-3 text-sm transition-colors ${
+            doToday ? 'border-[var(--danger)] bg-[var(--danger-subtle)]' : 'border-[var(--border)] bg-[var(--surface)]'
+          }`}
+        >
+          <input
+            type="checkbox"
+            checked={doToday}
+            onChange={(e) => setDoToday(e.target.checked)}
+            className="sr-only"
+            aria-label="Must be done today"
+          />
+          <span className={doToday ? 'text-[var(--danger)]' : 'text-[var(--muted)]'}>
+            <svg className="h-5 w-5" fill={doToday ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 3h-8v3h-2z" />
+            </svg>
+          </span>
+          <span className="text-[var(--text-secondary)]">Do today</span>
+        </label>
         {context === 'pro' && (
           <>
             <div className="flex flex-wrap items-center gap-1">
@@ -153,14 +175,14 @@ export function TaskComposer({
               ))}
             </div>
             <div className="flex flex-wrap items-center gap-1">
-              <span className="text-xs text-[var(--muted)] mr-1">Country:</span>
+              <span className="mr-1 text-xs text-[var(--muted)]">Country:</span>
               {COUNTRIES.map((c) => (
                 <button
                   key={c.value}
                   type="button"
                   onClick={() => toggleCountry(c.value)}
-                  className={`rounded-[var(--radius-sm)] px-2 py-1 text-xs transition-[var(--transition)] ${
-                    countryIds.includes(c.value) ? 'bg-[var(--accent)] text-white' : 'border border-[var(--border)] text-[var(--muted)]'
+                  className={`rounded-[var(--radius-sm)] px-2 py-1 text-xs font-medium transition-[var(--transition)] ${
+                    countryIds.includes(c.value) ? c.tagClass ?? 'bg-[var(--accent)] text-white' : 'border border-[var(--border)] text-[var(--muted)] hover:opacity-80'
                   }`}
                 >
                   {c.label}

@@ -46,18 +46,16 @@ export const TICKET_STATUSES = [
 ]
 
 export const COUNTRIES = [
-  { value: 'gb', label: 'GB' },
-  { value: 'ie', label: 'IE' },
-  { value: 'se', label: 'SE' },
-  { value: 'fr', label: 'FR' },
+  { value: 'gb', label: 'GB', tagClass: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' },
+  { value: 'ie', label: 'IE', tagClass: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' },
+  { value: 'se', label: 'SE', tagClass: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' },
+  { value: 'fr', label: 'FR', tagClass: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300' },
 ]
 
 export const VIEWS = [
   { id: 'overview', label: 'Overview', primary: true },
-  { id: 'today', label: 'Today' },
   { id: 'board', label: 'Board' },
   { id: 'projects', label: 'Projects' },
-  { id: 'rituals', label: 'Rituals' },
 ]
 
 export const MAX_FOCUS_TASKS = 3

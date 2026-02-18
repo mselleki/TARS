@@ -10,14 +10,12 @@ const COLUMN_CONFIG = {
 
 export function KanbanBoard({
   columns,
-  focusIds,
   projects = [],
   onToggle,
   onUpdate,
   onDelete,
   onStatusChange,
-  onAddFocus,
-  onRemoveFocus,
+  viewMode = 'cards',
 }) {
   const [dragOverColumn, setDragOverColumn] = useState(null)
   const { handleDragStart, handleDragEnd, handleDragOver, getDragPayload } = useDragDrop()
@@ -39,6 +37,27 @@ export function KanbanBoard({
     const payload = getDragPayload(e)
     if (!payload || payload.fromStatus === toStatus) return
     onStatusChange(payload.taskId, toStatus)
+  }
+
+  const allTasks = columns.flatMap((col) => col.tasks)
+
+  if (viewMode === 'list') {
+    return (
+      <ul className="space-y-2">
+        {allTasks.map((task) => (
+          <TaskItem
+            key={task.id}
+            task={task}
+            projects={projects}
+            onToggle={onToggle}
+            onUpdate={onUpdate}
+            onDelete={onDelete}
+            onStatusChange={onStatusChange}
+            compact
+          />
+        ))}
+      </ul>
+    )
   }
 
   return (
@@ -73,9 +92,6 @@ export function KanbanBoard({
                   onUpdate={onUpdate}
                   onDelete={onDelete}
                   onStatusChange={onStatusChange}
-                  onAddFocus={onAddFocus}
-                  onRemoveFocus={onRemoveFocus}
-                  isFocus={focusIds.includes(task.id)}
                   draggable
                   onDragStart={(e) => onTaskDragStart(e, task.id, task.status)}
                   onDragEnd={handleDragEnd}

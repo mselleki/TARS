@@ -6,7 +6,6 @@ const SHORTCUTS = [
   { keys: 'Ctrl+K', label: 'New task' },
   { keys: '/', label: 'Search' },
   { keys: 'O', label: 'Overview' },
-  { keys: 'T', label: 'Today' },
 ]
 
 export function Header({
@@ -142,30 +141,6 @@ export function Header({
 
         {view === 'overview' && (
           <div className="flex flex-wrap items-center gap-3 border-t border-[var(--border)] py-2.5">
-            <div
-              role="group"
-              aria-label="Scope"
-              className="flex rounded-[var(--radius-md)] bg-[var(--bg)] p-0.5"
-            >
-              {[
-                { value: 'PRO', label: 'Pro' },
-                { value: 'PERSO', label: 'Perso' },
-              ].map((s) => {
-                const scopeMatch = context === 'perso' ? s.value === 'PERSO' : s.value === 'PRO'
-                return (
-                  <button
-                    key={s.value}
-                    type="button"
-                    onClick={() => onContextChange(s.value === 'PRO' ? 'pro' : 'perso')}
-                    className={`rounded-[var(--radius-sm)] px-3 py-1.5 text-[11px] font-medium transition-[var(--transition)] ${
-                      scopeMatch ? 'bg-[var(--surface)] text-[var(--text)] shadow-[var(--shadow-sm)] border border-[var(--border)]' : 'text-[var(--muted)] hover:text-[var(--text-secondary)]'
-                    }`}
-                  >
-                    {s.label}
-                  </button>
-                )
-              })}
-            </div>
             <button
               type="button"
               onClick={() => setFiltersExpanded((e) => !e)}

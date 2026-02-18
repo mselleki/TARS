@@ -76,6 +76,7 @@ function tasksReducer(tasks, action) {
               note: updates.note !== undefined ? String(updates.note).slice(0, MAX_NOTE_LENGTH) : task.note,
               domainIds: updates.domainIds !== undefined ? (Array.isArray(updates.domainIds) ? updates.domainIds : []) : task.domainIds,
               countryIds: updates.countryIds !== undefined ? (Array.isArray(updates.countryIds) ? updates.countryIds : []) : task.countryIds,
+              doToday: updates.doToday !== undefined ? Boolean(updates.doToday) : task.doToday,
               updatedAt: ts(),
             }
           : task

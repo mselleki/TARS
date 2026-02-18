@@ -15,7 +15,6 @@ function isInputFocused() {
 export function useKeyboardShortcuts({
   onNewTask,
   onFocusSearch,
-  onGoToday,
   onGoOverview,
   onEscape,
   enabled = true,
@@ -33,7 +32,7 @@ export function useKeyboardShortcuts({
       if (inInput && e.key !== 'Escape') {
         if (e.key === 'k' || e.key === 'K') {
           if (!e.ctrlKey && !e.metaKey) return
-        } else if (e.key === '/' || e.key === 't' || e.key === 'T' || e.key === 'o' || e.key === 'O') {
+        } else if (e.key === '/' || e.key === 'o' || e.key === 'O') {
           return
         }
       }
@@ -50,14 +49,6 @@ export function useKeyboardShortcuts({
         return
       }
 
-      if (e.key === 't' || e.key === 'T') {
-        if (!e.ctrlKey && !e.metaKey) {
-          e.preventDefault()
-          onGoToday?.()
-          return
-        }
-      }
-
       if (e.key === 'o' || e.key === 'O') {
         if (!e.ctrlKey && !e.metaKey) {
           e.preventDefault()
@@ -67,7 +58,7 @@ export function useKeyboardShortcuts({
       }
 
     },
-    [enabled, onNewTask, onFocusSearch, onGoToday, onGoOverview, onEscape]
+    [enabled, onNewTask, onFocusSearch, onGoOverview, onEscape]
   )
 
   useEffect(() => {

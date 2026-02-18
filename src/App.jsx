@@ -3,23 +3,17 @@ import { useStore } from './hooks/useStore'
 import { useTaskFilters } from './hooks/useTaskFilters'
 import { usePWA } from './hooks/usePWA'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
-import { isRitualDueToday } from './utils/rituals'
 import { Header } from './components/Header'
 import { Sidebar } from './components/Sidebar'
 import { OverviewView } from './components/OverviewView'
 import { TaskComposer } from './components/TaskComposer'
-import { TodayPanel } from './components/TodayPanel'
 import { KanbanBoard } from './components/KanbanBoard'
-import { RitualsView } from './components/RitualsView'
 import { ProjectsView } from './components/ProjectsView'
-import { RitualBanner } from './components/RitualBanner'
-import { ReflectionPrompt } from './components/ReflectionPrompt'
 import { EmptyState, SearchEmptyState } from './components/EmptyState'
 import { InstallPrompt } from './components/InstallPrompt'
 import { Modal } from './components/Modal'
 import { Toast } from './components/Toast'
 import { TaskItem } from './components/TaskItem'
-import { MAX_FOCUS_TASKS } from './constants'
 import './App.css'
 
 function App() {
@@ -27,11 +21,11 @@ function App() {
   const [view, setView] = useState('overview')
   const [searchQuery, setSearchQuery] = useState('')
   const [ticketFilters, setTicketFilters] = useState({ business: null, domain: null, owner: null, countryId: null })
+  const [boardViewMode, setBoardViewMode] = useState('cards')
   const [showComposer, setShowComposer] = useState(false)
   const [composerProjectId, setComposerProjectId] = useState(null)
   const [isSilentMode, setIsSilentMode] = useState(false)
   const [selectedTaskId, setSelectedTaskId] = useState(null)
-  const [dismissedRituals, setDismissedRituals] = useState(new Set())
   const [toastMessage, setToastMessage] = useState('')
   const [isDarkMode, setIsDarkMode] = useState(() => {
     try {
@@ -59,16 +53,9 @@ function App() {
     updateTask,
     deleteTask,
     toggleTaskStatus,
-    addFocus,
-    removeFocus,
-    swapFocus,
-    reorderFocus,
     addProject,
     updateProject,
     deleteProject,
-    addRitual,
-    updateRitual,
-    deleteRitual,
     addTicket,
     updateTicket,
     deleteTicket,
@@ -78,23 +65,15 @@ function App() {
     deleteReqTicket,
     addRequester,
     updateReflection,
-    todayPlan,
   } = useStore()
 
-  const todayFocusIds = todayPlan.focusTaskIds ?? []
-
-  const { filtered, focusTasks, backlog, inProgress, done, kanbanColumns } =
+  const { filtered, backlog, inProgress, done, kanbanColumns } =
     useTaskFilters({
       tasks: state.tasks,
       context,
       searchQuery,
-      todayFocusIds,
+      todayFocusIds: [],
     })
-
-  const dueRituals = state.rituals.filter(
-    (r) => isRitualDueToday(r) && !dismissedRituals.has(r.id)
-  )
-  const firstDueRitual = dueRituals[0]
 
   const { canInstall, showInstallBanner, install, dismissInstall } = usePWA()
 
@@ -104,7 +83,6 @@ function App() {
     setShowComposer(true)
   }, [])
   const handleFocusSearch = useCallback(() => searchRef.current?.focus(), [])
-  const handleGoToday = useCallback(() => setView('today'), [])
   const handleGoOverview = useCallback(() => setView('overview'), [])
   const handleEscape = useCallback(() => {
     setShowComposer(false)
@@ -115,19 +93,17 @@ function App() {
   useKeyboardShortcuts({
     onNewTask: handleNewTask,
     onFocusSearch: handleFocusSearch,
-    onGoToday: handleGoToday,
     onGoOverview: handleGoOverview,
     onEscape: handleEscape,
     enabled: !showComposer,
   })
 
   const handleAddTask = useCallback((payload) => {
-    const id = addTask({ ...payload, context, projectId: payload.projectId || null })
-    if (view === 'today' && todayFocusIds.length < MAX_FOCUS_TASKS && id) addFocus(id)
+    addTask({ ...payload, context, projectId: payload.projectId || null })
     setShowComposer(false)
     setComposerProjectId(null)
     setToastMessage('Task created')
-  }, [addTask, context, view, todayFocusIds.length, addFocus])
+  }, [addTask, context])
 
   const handleStatusChange = (id, status) => {
     updateTask(id, { status })
@@ -156,15 +132,6 @@ function App() {
     setComposerProjectId(projectId)
     setShowComposer(true)
   }, [])
-
-  const handleAddFocus = (taskId) => {
-    if (todayFocusIds.length >= MAX_FOCUS_TASKS) {
-      const toRemove = todayFocusIds[todayFocusIds.length - 1]
-      swapFocus(taskId, toRemove)
-    } else {
-      addFocus(taskId)
-    }
-  }
 
   const contextTasks = state.tasks.filter((t) => t.context === context)
   const isEmpty = contextTasks.length === 0
@@ -195,102 +162,30 @@ function App() {
       <main className="flex-1 overflow-auto px-4 py-6 sm:px-6 lg:mx-auto lg:max-w-4xl">
         {view === 'overview' && (
           <OverviewView
+            context={context}
             reqTickets={state.reqTickets ?? []}
             searchQuery={searchQuery}
-            scopeFilter={context === 'perso' ? 'PERSO' : 'PRO'}
             filters={ticketFilters}
             onAddReqTicket={addReqTicket}
             onUpdateReqTicket={updateReqTicket}
             onDeleteReqTicket={deleteReqTicket}
+            projects={state.projects}
+            tasks={state.tasks}
+            onAddProject={addProject}
+            onAddTask={(p) => addTask({ ...p, context: 'perso' })}
+            onUpdateTask={updateTask}
+            onDeleteTask={deleteTask}
+            onToggleTask={toggleTaskStatus}
           />
-        )}
-
-        {view === 'today' && (
-          <>
-            {firstDueRitual && (
-              <RitualBanner
-                ritual={firstDueRitual}
-                onComplete={(id) => setDismissedRituals((s) => new Set(s).add(id))}
-                onDismiss={() => setDismissedRituals((s) => new Set(s).add(firstDueRitual.id))}
-              />
-            )}
-
-            <div className="mb-8">
-              <button
-                type="button"
-                onClick={() => handleNewTask()}
-                className="flex w-full items-center gap-3 rounded-[var(--radius-xl)] border-2 border-dashed border-[var(--border)] bg-[var(--surface)] px-4 py-3.5 text-left text-sm font-semibold text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-[var(--transition)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-ring)]"
-              >
-                <span className="flex h-7 w-7 items-center justify-center rounded-[var(--radius-md)] bg-[var(--bg)] text-[var(--muted)]">
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                </span>
-                Add a task
-                <kbd className="ml-auto hidden rounded bg-[var(--bg)] px-2 py-0.5 text-xs text-[var(--muted)] sm:inline">Ctrl+K</kbd>
-              </button>
-            </div>
-
-            <TodayPanel
-              focusTasks={focusTasks}
-              projects={state.projects.filter((p) => p.context === context)}
-              onToggle={toggleTaskStatus}
-              onUpdate={updateTask}
-              onDelete={deleteTask}
-              onStatusChange={handleStatusChange}
-              onRemoveFocus={removeFocus}
-              onReorderFocus={reorderFocus}
-              onChoosePriorities={() => handleNewTask()}
-              isEmpty={focusTasks.length === 0}
-              isSilentMode={isSilentMode}
-              selectedTaskId={selectedTaskId}
-              onSelectTask={setSelectedTaskId}
-            />
-
-            {!isSilentMode && (
-              <ReflectionPrompt
-                tasks={state.tasks.filter((t) => t.context === context)}
-                reflection={todayPlan.reflection ?? {}}
-                onSave={updateReflection}
-              />
-            )}
-
-            {!isSilentMode && filtered.length > 0 && (
-              <section className="mt-8">
-                <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
-                  Rest
-                </h2>
-                <ul className="space-y-2">
-                  {filtered
-                    .filter((t) => !todayFocusIds.includes(t.id))
-                    .slice(0, 15)
-                    .map((task) => (
-                      <TaskItem
-                        key={task.id}
-                        task={task}
-                        onToggle={toggleTaskStatus}
-                        onUpdate={updateTask}
-                        onDelete={deleteTask}
-                        onStatusChange={handleStatusChange}
-                        onAddFocus={handleAddFocus}
-                        onRemoveFocus={removeFocus}
-                        isFocus={todayFocusIds.includes(task.id)}
-                        projects={state.projects.filter((p) => p.context === context)}
-                      />
-                    ))}
-                </ul>
-              </section>
-            )}
-          </>
         )}
 
         {view === 'board' && (
           <>
-            <div className="mb-8">
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
               <button
                 type="button"
                 onClick={() => handleNewTask()}
-                className="flex w-full items-center gap-3 rounded-[var(--radius-xl)] border-2 border-dashed border-[var(--border)] bg-[var(--surface)] px-4 py-3.5 text-left text-sm font-semibold text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-[var(--transition)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-ring)]"
+                className="flex items-center gap-3 rounded-[var(--radius-xl)] border-2 border-dashed border-[var(--border)] bg-[var(--surface)] px-4 py-3.5 text-left text-sm font-semibold text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-[var(--transition)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-ring)]"
               >
                 <span className="flex h-7 w-7 items-center justify-center rounded-[var(--radius-md)] bg-[var(--bg)] text-[var(--muted)]">
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -299,6 +194,26 @@ function App() {
                 </span>
                 Add a task
               </button>
+              <div role="group" aria-label="View mode" className="flex rounded-[var(--radius-md)] bg-[var(--bg)] p-0.5">
+                <button
+                  type="button"
+                  onClick={() => setBoardViewMode('list')}
+                  className={`rounded-[var(--radius-sm)] px-3 py-1.5 text-[11px] font-medium transition-[var(--transition)] ${
+                    boardViewMode === 'list' ? 'bg-[var(--surface)] text-[var(--text)] shadow-[var(--shadow-sm)] border border-[var(--border)]' : 'text-[var(--muted)] hover:text-[var(--text)]'
+                  }`}
+                >
+                  List
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setBoardViewMode('cards')}
+                  className={`rounded-[var(--radius-sm)] px-3 py-1.5 text-[11px] font-medium transition-[var(--transition)] ${
+                    boardViewMode === 'cards' ? 'bg-[var(--surface)] text-[var(--text)] shadow-[var(--shadow-sm)] border border-[var(--border)]' : 'text-[var(--muted)] hover:text-[var(--text)]'
+                  }`}
+                >
+                  Cards
+                </button>
+              </div>
             </div>
             {filtered.length === 0 ? (
               searchQuery ? (
@@ -309,14 +224,12 @@ function App() {
             ) : (
               <KanbanBoard
                 columns={kanbanColumns}
-                focusIds={todayFocusIds}
                 projects={state.projects.filter((p) => p.context === context)}
                 onToggle={toggleTaskStatus}
                 onUpdate={updateTask}
                 onDelete={deleteTask}
                 onStatusChange={handleStatusChange}
-                onAddFocus={handleAddFocus}
-                onRemoveFocus={removeFocus}
+                viewMode={boardViewMode}
               />
             )}
           </>
@@ -336,18 +249,9 @@ function App() {
             onUpdate={updateTask}
             onDelete={deleteTask}
             onStatusChange={handleStatusChange}
-            onAddFocus={handleAddFocus}
-            onRemoveFocus={removeFocus}
-            focusIds={todayFocusIds}
-          />
-        )}
-
-        {view === 'rituals' && (
-          <RitualsView
-            rituals={state.rituals}
-            onAdd={addRitual}
-            onUpdate={updateRitual}
-            onDelete={deleteRitual}
+            onAddFocus={() => {}}
+            onRemoveFocus={() => {}}
+            focusIds={[]}
           />
         )}
 

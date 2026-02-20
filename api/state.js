@@ -3,10 +3,14 @@ import { Redis } from '@upstash/redis'
 const REDIS_KEY = 'tars:state'
 
 function redis() {
-  const url = process.env.UPSTASH_REDIS_REST_URL
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN
+  const url =
+    process.env.tars_KV_REST_API_URL ||
+    process.env.UPSTASH_REDIS_REST_URL
+  const token =
+    process.env.tars_KV_REST_API_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_TOKEN
   if (!url || !token) {
-    throw new Error('UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN must be set')
+    throw new Error('tars_KV_REST_API_URL and tars_KV_REST_API_TOKEN (or UPSTASH_*) must be set')
   }
   return new Redis({ url, token })
 }

@@ -1,4 +1,39 @@
-# React + Vite
+# TARS
+
+Organizer / daily-life decision tool (tasks, projects, tickets, rituals). React + Vite, PWA, sync via Vercel + Upstash Redis.
+
+## Dev
+
+```bash
+npm install
+npm run dev
+```
+
+## Sync (multi‑appareils)
+
+Les données sont persistées en local (localStorage) et synchronisées avec une base Upstash Redis via l’API Vercel (`/api/state`).
+
+- **Sans config** : en production (même origine), l’app utilise `window.location.origin` pour appeler l’API.
+- **En local** : définir `VITE_API_URL` (ex. ton URL Vercel) dans `.env` pour tester la sync.
+
+Variables à configurer sur **Vercel** (Settings → Environment Variables) :
+
+- `UPSTASH_REDIS_REST_URL`
+- `UPSTASH_REDIS_REST_TOKEN`
+
+Voir `.env.example`.
+
+## Build & deploy (Vercel)
+
+```bash
+npm run build
+```
+
+Déploiement : connecter le repo à Vercel ou `npx vercel --prod`. Le dossier `api/` est servi en serverless.
+
+---
+
+# React + Vite (template)
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

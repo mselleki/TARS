@@ -22,14 +22,20 @@ export async function fetchRemoteState() {
     if (LOG_SYNC) console.warn('[TARS sync] No API URL (same origin or set VITE_API_URL)')
     return null
   }
+  if (LOG_SYNC) console.log('[TARS sync] Fetching from:', url)
   try {
     const res = await fetch(url, { method: 'GET' })
     if (!res.ok) {
-      if (LOG_SYNC) console.warn('[TARS sync] GET failed:', res.status, res.statusText, await res.text().catch(() => ''))
+      const errorText = await res.text().catch(() => '')
+      if (LOG_SYNC) console.warn('[TARS sync] GET failed:', res.status, res.statusText, errorText)
       return null
     }
     const raw = await res.json()
-    if (raw == null) return null
+    if (raw == null) {
+      if (LOG_SYNC) console.log('[TARS sync] No remote data (empty)')
+      return null
+    }
+    if (LOG_SYNC) console.log('[TARS sync] Loaded remote state:', Object.keys(raw).map(k => `${k}:${raw[k]?.length ?? 0}`).join(', '))
     return {
       projects: Array.isArray(raw.projects) ? raw.projects : [],
       tasks: Array.isArray(raw.tasks) ? raw.tasks : [],
@@ -47,7 +53,10 @@ export async function fetchRemoteState() {
 
 export async function pushRemoteState(state) {
   const url = getStateUrl()
-  if (!url) return false
+  if (!url) {
+    if (LOG_SYNC) console.warn('[TARS sync] No API URL for push')
+    return false
+  }
   const payload = {
     projects: state.projects ?? [],
     tasks: state.tasks ?? [],
@@ -57,6 +66,7 @@ export async function pushRemoteState(state) {
     reqTickets: state.reqTickets ?? [],
     requesters: state.requesters ?? [],
   }
+  if (LOG_SYNC) console.log('[TARS sync] Pushing to:', url, Object.keys(payload).map(k => `${k}:${payload[k]?.length ?? 0}`).join(', '))
   try {
     const res = await fetch(url, {
       method: 'POST',
@@ -64,7 +74,10 @@ export async function pushRemoteState(state) {
       body: JSON.stringify(payload),
     })
     if (!res.ok && LOG_SYNC) {
-      console.warn('[TARS sync] POST failed:', res.status, res.statusText, await res.text().catch(() => ''))
+      const errorText = await res.text().catch(() => '')
+      console.warn('[TARS sync] POST failed:', res.status, res.statusText, errorText)
+    } else if (LOG_SYNC && res.ok) {
+      console.log('[TARS sync] Push successful')
     }
     return res.ok
   } catch (e) {

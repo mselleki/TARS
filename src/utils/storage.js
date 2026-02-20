@@ -10,7 +10,13 @@ export function loadJSON(key, defaultValue = []) {
 }
 
 export function saveJSON(key, value) {
-  localStorage.setItem(key, JSON.stringify(value))
+  try {
+    localStorage.setItem(key, JSON.stringify(value))
+  } catch (e) {
+    if (typeof console !== 'undefined' && console.warn) {
+      console.warn('[storage] save failed:', key, e)
+    }
+  }
 }
 
 export function loadTasks() {
@@ -150,5 +156,19 @@ function normalizeTask(t) {
     doToday: Boolean(t.doToday),
     createdAt: typeof t.createdAt === 'number' ? t.createdAt : (t.createdAt ? new Date(t.createdAt).getTime() : Date.now()),
     updatedAt: typeof t.updatedAt === 'number' ? t.updatedAt : Date.now(),
+  }
+}
+
+/** Normalize state fetched from remote API (same shape as getInitialState) */
+export function normalizeRemoteState(raw) {
+  if (!raw) return null
+  return {
+    projects: (raw.projects ?? []).map(normalizeProject),
+    tasks: (raw.tasks ?? []).map(normalizeTask),
+    rituals: raw.rituals ?? [],
+    dailyPlans: raw.dailyPlans ?? [],
+    tickets: (raw.tickets ?? []).map(normalizeTicket),
+    reqTickets: (raw.reqTickets ?? []).map(normalizeReqTicket),
+    requesters: (raw.requesters ?? []).map(normalizeRequester),
   }
 }

@@ -1,4 +1,4 @@
-import { useReducer, useEffect, useState, useCallback } from 'react'
+import { useReducer, useEffect, useState, useCallback, useRef } from 'react'
 import {
   rootReducer,
   getInitialState,
@@ -6,10 +6,19 @@ import {
   actions,
 } from '../store/reducer'
 import { today } from '../utils/date'
+import { fetchRemoteState, pushRemoteState, getStateUrl } from '../utils/remoteSync'
+import { normalizeRemoteState } from '../utils/storage'
+
+const REMOTE_PUSH_DEBOUNCE_MS = 1500
 
 export function useStore() {
   const [state, dispatch] = useReducer(rootReducer, undefined, getInitialState)
   const [initialized, setInitialized] = useState(false)
+  const [remoteLoadDone, setRemoteLoadDone] = useState(false)
+  const stateRef = useRef(state)
+  const remotePushTimeoutRef = useRef(null)
+
+  stateRef.current = state
 
   useEffect(() => {
     setInitialized(true)
@@ -18,6 +27,46 @@ export function useStore() {
   useEffect(() => {
     if (initialized) persistState(state)
   }, [state, initialized])
+
+  useEffect(() => {
+    if (!initialized || !getStateUrl()) {
+      setRemoteLoadDone(true)
+      return
+    }
+    let cancelled = false
+    fetchRemoteState()
+      .then((raw) => {
+        if (cancelled) return
+        const normalized = normalizeRemoteState(raw)
+        if (normalized) dispatch({ type: actions.INIT, payload: normalized })
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setRemoteLoadDone(true)
+      })
+    return () => { cancelled = true }
+  }, [initialized])
+
+  useEffect(() => {
+    if (!initialized || !remoteLoadDone || !getStateUrl()) return
+    if (remotePushTimeoutRef.current) clearTimeout(remotePushTimeoutRef.current)
+    remotePushTimeoutRef.current = setTimeout(() => {
+      remotePushTimeoutRef.current = null
+      pushRemoteState(stateRef.current).catch(() => {})
+    }, REMOTE_PUSH_DEBOUNCE_MS)
+    return () => {
+      if (remotePushTimeoutRef.current) clearTimeout(remotePushTimeoutRef.current)
+    }
+  }, [state, initialized, remoteLoadDone])
+
+  useEffect(() => {
+    const onBeforeUnload = () => {
+      persistState(stateRef.current)
+      if (getStateUrl()) pushRemoteState(stateRef.current).catch(() => {})
+    }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => window.removeEventListener('beforeunload', onBeforeUnload)
+  }, [])
 
   const addTask = useCallback((payload) => {
     const id = payload.id ?? crypto.randomUUID()

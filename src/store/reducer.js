@@ -354,11 +354,17 @@ export function getInitialState() {
 }
 
 export function persistState(state) {
-  saveProjects(state.projects)
-  saveTasks(state.tasks)
-  saveRituals(state.rituals)
-  saveDailyPlans(state.dailyPlans)
-  saveTickets(state.tickets ?? [])
-  saveReqTickets(state.reqTickets ?? [])
-  saveRequesters(state.requesters ?? [])
+  try {
+    saveProjects(state.projects)
+    saveTasks(state.tasks)
+    saveRituals(state.rituals)
+    saveDailyPlans(state.dailyPlans)
+    saveTickets(state.tickets ?? [])
+    saveReqTickets(state.reqTickets ?? [])
+    saveRequesters(state.requesters ?? [])
+  } catch (e) {
+    if (typeof console !== 'undefined' && console.warn) {
+      console.warn('[persistState] failed:', e)
+    }
+  }
 }

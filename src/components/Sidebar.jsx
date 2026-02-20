@@ -58,7 +58,7 @@ export function Sidebar({ view, onViewChange, collapsed = false }) {
 
   return (
     <aside
-      className={`flex shrink-0 flex-col border-r border-[var(--border)] bg-[var(--sidebar-bg)] shadow-[2px_0_12px_rgba(0,0,0,0.04)] transition-all ${
+      className={`hidden shrink-0 flex-col border-r border-[var(--border)] bg-[var(--sidebar-bg)] shadow-[2px_0_12px_rgba(0,0,0,0.04)] transition-all md:flex ${
         collapsed ? 'w-14' : 'w-52'
       }`}
       aria-label="Navigation"

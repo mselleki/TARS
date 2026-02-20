@@ -30,7 +30,7 @@ export const SearchBar = forwardRef(function SearchBar(
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-full border border-[var(--border)] bg-[var(--surface)] py-2 pl-10 pr-10 text-sm outline-none transition-[var(--transition)] placeholder:text-[var(--muted)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-ring)] focus:outline-none"
+        className="min-h-[44px] w-full touch-manipulation rounded-full border border-[var(--border)] bg-[var(--surface)] py-2 pl-10 pr-10 text-base text-[var(--text)] outline-none transition-[var(--transition)] placeholder:text-[var(--muted)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-ring)] focus:outline-none sm:min-h-0 sm:text-sm"
         aria-label="Search tasks"
       />
       {value && (

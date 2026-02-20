@@ -5,6 +5,7 @@ import { usePWA } from './hooks/usePWA'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import { Header } from './components/Header'
 import { Sidebar } from './components/Sidebar'
+import { BottomNav } from './components/BottomNav'
 import { OverviewView } from './components/OverviewView'
 import { TaskComposer } from './components/TaskComposer'
 import { KanbanBoard } from './components/KanbanBoard'
@@ -140,7 +141,7 @@ function App() {
     <div className="flex min-h-screen bg-[var(--bg)] text-[var(--text)]">
       <Sidebar view={view} onViewChange={setView} />
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col pb-20 md:pb-0">
       <Header
         context={context}
         onContextChange={setContext}
@@ -159,7 +160,7 @@ function App() {
         onToggleDarkMode={() => setIsDarkMode((v) => !v)}
       />
 
-      <main className="flex-1 overflow-auto px-4 py-6 sm:px-6 lg:mx-auto lg:max-w-4xl">
+      <main className="flex-1 overflow-auto px-3 py-4 sm:px-6 sm:py-6 lg:mx-auto lg:max-w-4xl">
         {view === 'overview' && (
           <OverviewView
             context={context}
@@ -181,11 +182,11 @@ function App() {
 
         {view === 'board' && (
           <>
-            <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 sm:mb-6 sm:gap-4">
               <button
                 type="button"
                 onClick={() => handleNewTask()}
-                className="flex items-center gap-3 rounded-[var(--radius-xl)] border-2 border-dashed border-[var(--border)] bg-[var(--surface)] px-4 py-3.5 text-left text-sm font-semibold text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-[var(--transition)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-ring)]"
+                className="flex min-h-[48px] touch-manipulation items-center gap-3 rounded-[var(--radius-xl)] border-2 border-dashed border-[var(--border)] bg-[var(--surface)] px-4 py-3.5 text-left text-sm font-semibold text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-[var(--transition)] active:border-[var(--accent)]/40 active:bg-[var(--accent-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-ring)] sm:min-h-0 hover:border-[var(--accent)]/40 hover:bg-[var(--accent-subtle)]"
               >
                 <span className="flex h-7 w-7 items-center justify-center rounded-[var(--radius-md)] bg-[var(--bg)] text-[var(--muted)]">
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -285,6 +286,8 @@ function App() {
         onInstall={install}
         onDismiss={dismissInstall}
       />
+
+      <BottomNav view={view} onViewChange={setView} />
     </div>
   )
 }

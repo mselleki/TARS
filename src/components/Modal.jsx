@@ -35,16 +35,18 @@ export function Modal({ isOpen, onClose, children, title }) {
     <dialog
       ref={dialogRef}
       className="fixed inset-0 z-[100] m-0 max-h-[100dvh] w-full max-w-none overflow-auto border-0 bg-transparent p-0 backdrop:bg-black/50 backdrop:backdrop-blur-sm [&::backdrop]:bg-black/50 [&::backdrop]:backdrop-blur-sm"
+      style={{ paddingLeft: 'env(safe-area-inset-left)', paddingRight: 'env(safe-area-inset-right)' }}
       aria-modal="true"
       aria-labelledby={title ? 'modal-title' : undefined}
       onClose={onClose}
     >
       <div
-        className="flex min-h-full items-center justify-center p-4"
+        className="flex min-h-full items-center justify-center p-3 sm:p-4"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         onClick={(e) => e.target === e.currentTarget && onClose?.()}
       >
         <div
-          className="relative w-full max-w-lg rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-lg)]"
+          className="relative w-full max-w-lg rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-lg)] sm:p-6"
           onClick={(e) => e.stopPropagation()}
         >
           {title && (

@@ -140,3 +140,16 @@
 .task-complete {
   animation: task-complete 0.2s ease-out;
 }
+
+/* Safe area for notched devices (e.g. iPhone 15 Pro) */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pb-safe {
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  }
+}
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}

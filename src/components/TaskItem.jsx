@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { PRIORITIES, DOMAINS, COUNTRIES, MAX_NOTE_LENGTH } from '../constants'
 import { formatDate, today } from '../utils/date'
 import { flattenProjectsForSelect } from '../utils/projects'
-
+import { getHighlightSegments } from '../utils/highlight'
 
 export function TaskItem({
   task,
@@ -21,6 +21,7 @@ export function TaskItem({
   onDragStart,
   onDragEnd,
   projects = [],
+  searchQuery = '',
 }) {
   const [editingField, setEditingField] = useState(null)
   const [editValue, setEditValue] = useState('')
@@ -168,7 +169,17 @@ export function TaskItem({
                 isDone ? 'text-[var(--color-text-ghost)] line-through' : 'text-[var(--color-text)]'
               } ${task.priority === 'high' ? 'text-[15px] font-bold' : 'text-[15px] font-semibold'} ${task.disliked ? 'italic opacity-80' : ''}`}
             >
-              {task.title || 'Untitled'}
+              {searchQuery.trim()
+                ? getHighlightSegments(task.title || 'Untitled', searchQuery).map((seg, i) =>
+                    seg.type === 'match' ? (
+                      <mark key={i} className="rounded bg-[var(--accent-subtle)] font-semibold text-[var(--accent)]">
+                        {seg.value}
+                      </mark>
+                    ) : (
+                      seg.value
+                    )
+                  )
+                : (task.title || 'Untitled')}
             </button>
             {!isDone && (
               <button
@@ -318,7 +329,17 @@ export function TaskItem({
               />
             ) : (
               <button type="button" onClick={() => startEdit('note', task.note || '')} className="text-left text-[11px] text-[var(--color-text-ghost)] hover:text-[var(--color-text-muted)] line-clamp-2">
-                {task.note}
+                {searchQuery.trim()
+                  ? getHighlightSegments(task.note || '', searchQuery).map((seg, i) =>
+                      seg.type === 'match' ? (
+                        <mark key={i} className="rounded bg-[var(--accent-subtle)] font-semibold text-[var(--accent)]">
+                          {seg.value}
+                        </mark>
+                      ) : (
+                        seg.value
+                      )
+                    )
+                  : task.note}
               </button>
             )}
           </div>

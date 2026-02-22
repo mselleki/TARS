@@ -1,13 +1,35 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { formatDate } from '../utils/date'
 import { MAX_NOTE_LENGTH } from '../constants'
 
+const SWIPE_THRESHOLD_PX = 60
+
 export function TaskPanel({ task, onClose, onUpdate }) {
   const [note, setNote] = useState(task?.note ?? '')
+  const touchStartX = useRef(0)
 
   useEffect(() => {
     setNote(task?.note ?? '')
   }, [task?.id, task?.note])
+
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose?.()
+        e.stopPropagation()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [onClose])
+
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX
+  }
+  const handleTouchEnd = (e) => {
+    const endX = e.changedTouches[0].clientX
+    if (endX - touchStartX.current > SWIPE_THRESHOLD_PX) onClose?.()
+  }
 
   const handleBlur = () => {
     const trimmed = String(note).trim().slice(0, MAX_NOTE_LENGTH)
@@ -26,8 +48,10 @@ export function TaskPanel({ task, onClose, onUpdate }) {
         onClick={onClose}
       />
       <aside
-        className="panel-slide-in fixed right-0 top-0 z-40 flex h-full w-full max-w-md flex-col border-l border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-lg)]"
+        className="panel-slide-in fixed right-0 top-0 z-40 flex h-full w-full max-w-md flex-col border-l border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-lg)] touch-pan-y"
         aria-label="Détail de la tâche"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
         <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
           <h2 className="truncate pr-2 text-base font-semibold text-[var(--text)]">

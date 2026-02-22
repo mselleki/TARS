@@ -16,6 +16,7 @@ import { Modal } from './components/Modal'
 import { Toast } from './components/Toast'
 import { TaskItem } from './components/TaskItem'
 import { TaskPanel } from './components/TaskPanel'
+import { TodayView } from './components/TodayView'
 import { COUNTRIES, DOMAINS } from './constants'
 import './App.css'
 
@@ -52,11 +53,12 @@ function App() {
   }, [isDarkMode])
 
   useEffect(() => {
-    if (view !== 'board') setSelectedTaskId(null)
+    if (view !== 'board' && view !== 'today') setSelectedTaskId(null)
   }, [view])
 
   const {
     state,
+    syncStatus,
     addTask,
     updateTask,
     deleteTask,
@@ -64,6 +66,10 @@ function App() {
     addProject,
     updateProject,
     deleteProject,
+    addFocus,
+    removeFocus,
+    reorderFocus,
+    todayPlan,
     addTicket,
     updateTicket,
     deleteTicket,
@@ -167,6 +173,7 @@ function App() {
         onToggleSilentMode={() => setIsSilentMode((v) => !v)}
         isDarkMode={isDarkMode}
         onToggleDarkMode={() => setIsDarkMode((v) => !v)}
+        syncStatus={syncStatus}
       />
 
       <main className={`flex-1 overflow-auto px-3 py-4 sm:px-6 sm:py-6 lg:mx-auto ${view === 'board' ? 'lg:max-w-7xl' : 'lg:max-w-4xl'}`}>
@@ -289,9 +296,31 @@ function App() {
                 onStatusChange={handleStatusChange}
                 onTaskSelect={setSelectedTaskId}
                 viewMode={boardViewMode}
+                searchQuery={searchQuery}
               />
             )}
           </>
+        )}
+
+        {view === 'today' && (
+          <TodayView
+            context={context}
+            tasks={state.tasks.filter((t) => t.context === context)}
+            todayPlan={todayPlan}
+            projects={state.projects.filter((p) => p.context === context)}
+            onToggle={toggleTaskStatus}
+            onUpdate={updateTask}
+            onDelete={deleteTask}
+            onStatusChange={handleStatusChange}
+            onAddFocus={addFocus}
+            onRemoveFocus={removeFocus}
+            onReorderFocus={reorderFocus}
+            onChoosePriorities={() => setView('board')}
+            isSilentMode={isSilentMode}
+            selectedTaskId={selectedTaskId}
+            onSelectTask={setSelectedTaskId}
+            searchQuery={searchQuery}
+          />
         )}
 
         {view === 'projects' && (
@@ -334,7 +363,7 @@ function App() {
         />
       </Modal>
 
-      {view === 'board' && selectedTaskId && (() => {
+      {(view === 'board' || view === 'today') && selectedTaskId && (() => {
         const task = state.tasks.find((t) => t.id === selectedTaskId)
         return task ? (
           <TaskPanel

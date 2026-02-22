@@ -15,6 +15,7 @@ export function useStore() {
   const [state, dispatch] = useReducer(rootReducer, undefined, getInitialState)
   const [initialized, setInitialized] = useState(false)
   const [remoteLoadDone, setRemoteLoadDone] = useState(false)
+  const [syncStatus, setSyncStatus] = useState('idle')
   const stateRef = useRef(state)
   const remotePushTimeoutRef = useRef(null)
 
@@ -34,13 +35,15 @@ export function useStore() {
       return
     }
     let cancelled = false
+    setSyncStatus('syncing')
     fetchRemoteState()
       .then((raw) => {
         if (cancelled) return
         const normalized = normalizeRemoteState(raw)
         if (normalized) dispatch({ type: actions.INIT, payload: normalized })
+        setSyncStatus('ok')
       })
-      .catch(() => {})
+      .catch(() => { if (!cancelled) setSyncStatus('error') })
       .finally(() => {
         if (!cancelled) setRemoteLoadDone(true)
       })
@@ -52,7 +55,10 @@ export function useStore() {
     if (remotePushTimeoutRef.current) clearTimeout(remotePushTimeoutRef.current)
     remotePushTimeoutRef.current = setTimeout(() => {
       remotePushTimeoutRef.current = null
-      pushRemoteState(stateRef.current).catch(() => {})
+      setSyncStatus('syncing')
+      pushRemoteState(stateRef.current)
+        .then((ok) => { setSyncStatus(ok ? 'ok' : 'error') })
+        .catch(() => { setSyncStatus('error') })
     }, REMOTE_PUSH_DEBOUNCE_MS)
     return () => {
       if (remotePushTimeoutRef.current) clearTimeout(remotePushTimeoutRef.current)
@@ -187,6 +193,7 @@ export function useStore() {
 
   return {
     state,
+    syncStatus: getStateUrl() ? syncStatus : 'idle',
     addTask,
     updateTask,
     deleteTask,

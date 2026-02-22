@@ -54,6 +54,7 @@ export const COUNTRIES = [
 
 export const VIEWS = [
   { id: 'overview', label: 'Overview', primary: true },
+  { id: 'today', label: 'Aujourd\'hui', primary: true },
   { id: 'board', label: 'Board' },
   { id: 'projects', label: 'Projects' },
 ]

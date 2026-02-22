@@ -17,6 +17,7 @@ export function KanbanBoard({
   onStatusChange,
   onTaskSelect,
   viewMode = 'cards',
+  searchQuery = '',
 }) {
   const [dragOverColumn, setDragOverColumn] = useState(null)
   const { handleDragStart, handleDragEnd, handleDragOver, getDragPayload } = useDragDrop()
@@ -56,6 +57,7 @@ export function KanbanBoard({
             onStatusChange={onStatusChange}
             onSelect={onTaskSelect}
             compact
+            searchQuery={searchQuery}
           />
         ))}
       </ul>
@@ -98,6 +100,7 @@ export function KanbanBoard({
                   draggable
                   onDragStart={(e) => onTaskDragStart(e, task.id, task.status)}
                   onDragEnd={handleDragEnd}
+                  searchQuery={searchQuery}
                 />
               ))}
             </ul>

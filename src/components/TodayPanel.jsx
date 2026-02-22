@@ -22,21 +22,7 @@ export function TodayPanel({
   const { handleDragStart, handleDragEnd, handleDragOver, getDragPayload } = useDragDrop()
   const slots = Array.from({ length: MAX_FOCUS_TASKS }, (_, i) => focusTasks[i] ?? null)
 
-  if (isEmpty) {
-    return (
-      <section className="mb-8 rounded-[var(--radius-xl)] border-2 border-dashed border-[var(--border)] bg-[var(--surface)]/80 p-12 text-center">
-        <p className="font-medium text-[var(--text-secondary)]">Choose your priorities for today</p>
-        <p className="mt-1 text-sm text-[var(--muted)]">Focus on up to {MAX_FOCUS_TASKS} tasks</p>
-        <button
-          type="button"
-          onClick={onChoosePriorities}
-          className="mt-6 rounded-[var(--radius-lg)] bg-[var(--accent)] px-6 py-3 text-sm font-semibold text-white shadow-[var(--shadow-sm)] transition-[var(--transition)] hover:bg-[var(--accent-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-ring)] focus:ring-offset-2"
-        >
-          Choose your {MAX_FOCUS_TASKS} priorities <kbd className="ml-2 rounded bg-white/20 px-1.5 py-0.5 text-xs">Ctrl+K</kbd>
-        </button>
-      </section>
-    )
-  }
+  if (isEmpty) return null
 
   if (isSilentMode && focusTasks.length > 0) {
     const single = selectedTaskId && focusTasks.find((t) => t.id === selectedTaskId)

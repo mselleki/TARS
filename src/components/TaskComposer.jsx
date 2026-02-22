@@ -11,10 +11,11 @@ export function TaskComposer({
   projectId = null,
   projects = [],
   onProjectChange,
+  initialDueDate = '',
 }) {
   const [title, setTitle] = useState('')
   const [priority, setPriority] = useState('medium')
-  const [dueDate, setDueDate] = useState('')
+  const [dueDate, setDueDate] = useState(initialDueDate || '')
   const [doToday, setDoToday] = useState(false)
   const [domainIds, setDomainIds] = useState([])
   const [countryIds, setCountryIds] = useState([])
@@ -26,6 +27,10 @@ export function TaskComposer({
   const toggleCountry = (val) => {
     setCountryIds((prev) => (prev.includes(val) ? prev.filter((x) => x !== val) : [...prev, val]))
   }
+
+  useEffect(() => {
+    setDueDate(initialDueDate || '')
+  }, [initialDueDate])
 
   useEffect(() => {
     if (!initialFocus) return

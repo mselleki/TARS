@@ -29,6 +29,7 @@ function App() {
   const [boardFilters, setBoardFilters] = useState({ projectId: '', countryId: '', domain: '' })
   const [showComposer, setShowComposer] = useState(false)
   const [composerProjectId, setComposerProjectId] = useState(null)
+  const [composerInitialDueDate, setComposerInitialDueDate] = useState('')
   const [isSilentMode, setIsSilentMode] = useState(false)
   const [selectedTaskId, setSelectedTaskId] = useState(null)
   const [toastMessage, setToastMessage] = useState('')
@@ -103,7 +104,14 @@ function App() {
   const handleEscape = useCallback(() => {
     setShowComposer(false)
     setComposerProjectId(null)
+    setComposerInitialDueDate('')
     setIsSilentMode(false)
+  }, [])
+
+  const handleOpenComposerForDate = useCallback((dateStr) => {
+    setComposerProjectId(null)
+    setComposerInitialDueDate(dateStr || '')
+    setShowComposer(true)
   }, [])
 
   useKeyboardShortcuts({
@@ -193,6 +201,7 @@ function App() {
             onUpdateTask={updateTask}
             onDeleteTask={deleteTask}
             onToggleTask={toggleTaskStatus}
+            onOpenComposerForDate={handleOpenComposerForDate}
           />
         )}
 
@@ -360,6 +369,7 @@ function App() {
           projectId={composerProjectId}
           projects={state.projects.filter((p) => p.context === context)}
           onProjectChange={setComposerProjectId}
+          initialDueDate={composerInitialDueDate}
         />
       </Modal>
 

@@ -29,6 +29,7 @@ export function OverviewView({
   onUpdateTask,
   onDeleteTask,
   onToggleTask,
+  onOpenComposerForDate,
 }) {
   const proTickets = useMemo(() => reqTickets.filter((t) => t.scope === 'PRO'), [reqTickets])
   const existingOwners = useMemo(() => reqTickets.map((t) => t.owner).filter(Boolean), [reqTickets])
@@ -64,6 +65,7 @@ export function OverviewView({
           onToggleTask={onToggleTask}
           onUpdateTask={onUpdateTask}
           onDeleteTask={onDeleteTask}
+          onAddTaskForDate={onOpenComposerForDate}
         />
       </div>
     )

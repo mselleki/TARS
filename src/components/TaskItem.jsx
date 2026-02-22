@@ -4,11 +4,6 @@ import { formatDate, today } from '../utils/date'
 import { flattenProjectsForSelect } from '../utils/projects'
 
 
-const STATUS_OPTIONS = [
-  { value: 'backlog', label: 'Backlog' },
-  { value: 'in_progress', label: 'Doing' },
-]
-
 export function TaskItem({
   task,
   onToggle,
@@ -181,189 +176,134 @@ export function TaskItem({
           </div>
         )}
 
-        <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+        {/* Meta line: one row (compact = priority + date only) */}
+        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-[var(--color-text-ghost)]">
           {editingField === 'priority' ? (
             <select
               ref={inputRef}
               value={editValue}
-              onChange={(e) => {
-                onUpdate(task.id, { priority: e.target.value })
-                setEditingField(null)
-              }}
+              onChange={(e) => { onUpdate(task.id, { priority: e.target.value }); setEditingField(null) }}
               onBlur={saveEdit}
               onKeyDown={handleKeyDown}
-              className="rounded-md border border-[var(--color-border)] px-2 py-0.5 text-xs"
+              className="rounded border border-[var(--color-border)] bg-transparent px-1.5 py-0.5 text-[11px]"
               aria-label="Edit priority"
             >
-              {PRIORITIES.map((p) => (
-                <option key={p.value} value={p.value}>{p.label}</option>
-              ))}
+              {PRIORITIES.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
             </select>
           ) : (
-            <button
-              type="button"
-              onClick={() => startEdit('priority', task.priority)}
-              className={`rounded-[var(--radius-sm)] px-2 py-0.5 text-[11px] ${priority.chip}`}
-            >
+            <button type="button" onClick={() => startEdit('priority', task.priority)} className={`rounded px-1.5 py-0.5 ${priority.chip}`}>
               {priority.label}
             </button>
           )}
-
-          {projects.length > 0 && (editingField === 'project' ? (
-              <select
-                ref={inputRef}
-                value={editValue || ''}
-                onChange={(e) => {
-                  onUpdate(task.id, { projectId: e.target.value || null })
-                  setEditingField(null)
-                }}
-                onBlur={saveEdit}
-                onKeyDown={handleKeyDown}
-                className="rounded-md border border-[var(--color-border)] px-2 py-0.5 text-xs"
-                aria-label="Project"
-              >
-                <option value="">No project</option>
-                {flattenProjectsForSelect(projects).map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {'—'.repeat(p.depth)}{p.depth ? ' ' : ''}{p.title}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <button
-                type="button"
-                onClick={() => startEdit('project', task.projectId || '')}
-                className="rounded-md px-2 py-0.5 text-[11px] text-[var(--color-text-ghost)] transition-colors hover:text-[var(--color-text-secondary)]"
-              >
-                {task.projectId
-                  ? (projects.find((pr) => pr.id === task.projectId)?.title ?? 'Project')
-                  : 'No project'}
-              </button>
-          ))}
-
-          {task.context === 'pro' && (
-            <>
-              {editingField === 'domain' ? (
-                <span className="flex flex-wrap items-center gap-1">
-                  {DOMAINS.map((d) => {
-                    const selected = (task.domainIds ?? []).includes(d.value)
-                    return (
-                      <button
-                        key={d.value}
-                        type="button"
-                        onClick={() => toggleDomain(d.value)}
-                        className={`rounded-[var(--radius-sm)] px-2 py-0.5 text-[11px] transition-[var(--transition)] ${
-                          selected ? 'bg-[var(--accent)] text-white' : 'border border-[var(--border)] text-[var(--muted)] hover:border-[var(--accent)]'
-                        }`}
-                      >
-                        {d.label}
-                      </button>
-                    )
-                  })}
-                  <button type="button" onClick={() => setEditingField(null)} className="text-[10px] text-[var(--muted)] hover:text-[var(--text)]">×</button>
-                </span>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => startEdit('domain', task.domainIds ?? [])}
-                  className="rounded-[var(--radius-sm)] px-2 py-0.5 text-[11px] text-[var(--muted)] transition-colors hover:text-[var(--text)]"
-                >
-                  {(task.domainIds ?? []).length > 0
-                    ? (task.domainIds ?? []).map((id) => DOMAINS.find((d) => d.value === id)?.label ?? id).join(', ')
-                    : 'Domain'}
-                </button>
-              )}
-              {editingField === 'country' ? (
-                <span className="flex flex-wrap items-center gap-1">
-                  {COUNTRIES.map((c) => {
-                    const selected = (task.countryIds ?? []).includes(c.value)
-                    return (
-                      <button
-                        key={c.value}
-                        type="button"
-                        onClick={() => toggleCountry(c.value)}
-                        className={`rounded-[var(--radius-sm)] px-2 py-0.5 text-[11px] font-medium transition-[var(--transition)] ${c.tagClass ?? ''} ${
-                          selected ? 'ring-2 ring-[var(--accent)] ring-offset-1' : 'opacity-60 hover:opacity-100'
-                        }`}
-                      >
-                        {c.label}
-                      </button>
-                    )
-                  })}
-                  <button type="button" onClick={() => setEditingField(null)} className="text-[10px] text-[var(--muted)] hover:text-[var(--text)]">×</button>
-                </span>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => startEdit('country', task.countryIds ?? [])}
-                  className="flex flex-wrap gap-1 rounded-[var(--radius-sm)] text-left text-[11px] text-[var(--muted)] transition-colors hover:text-[var(--text)]"
-                >
-                  {(task.countryIds ?? []).length > 0
-                    ? (task.countryIds ?? []).map((id) => {
-                        const c = COUNTRIES.find((x) => x.value === id)
-                        return c ? (
-                          <span key={id} className={`rounded-[var(--radius-sm)] px-2 py-1 text-xs font-medium ${c.tagClass ?? ''}`}>
-                            {c.label}
-                          </span>
-                        ) : (
-                          <span key={id}>{id}</span>
-                        )
-                      })
-                    : 'Country'}
-                </button>
-              )}
-            </>
-          )}
-
+          <span className="text-[var(--color-border)]">·</span>
           {editingField === 'dueDate' ? (
             <input
               ref={inputRef}
               type="date"
               value={editValue}
               onChange={(e) => setEditValue(e.target.value)}
-              onBlur={() => {
-                onUpdate(task.id, { dueDate: editValue || '' })
-                setEditingField(null)
-              }}
+              onBlur={() => { onUpdate(task.id, { dueDate: editValue || '' }); setEditingField(null) }}
               onKeyDown={handleKeyDown}
-              className="rounded-md border border-[var(--color-border)] px-2 py-0.5 text-xs"
+              className="w-24 rounded border border-[var(--color-border)] bg-transparent px-1.5 py-0.5 text-[11px]"
               aria-label="Edit due date"
             />
           ) : (
-            <button
-              type="button"
-              onClick={() => startEdit('dueDate', task.dueDate || '')}
-              className={`text-[11px] font-medium transition-colors hover:text-[var(--color-text)] ${
-                isOverdue && !isDone ? 'text-[var(--color-overdue)]' : 'text-[var(--color-text-ghost)]'
-              }`}
-            >
-              {task.dueDate ? formatDate(task.dueDate) : 'No date'}
+            <button type="button" onClick={() => startEdit('dueDate', task.dueDate || '')} className={isOverdue && !isDone ? 'text-[var(--color-overdue)]' : ''}>
+              {task.dueDate ? formatDate(task.dueDate) : '—'}
             </button>
           )}
-
-          {!compact && (
-            <button
-              type="button"
-              onClick={() => onUpdate(task.id, { disliked: !task.disliked })}
-              className={`rounded-md p-1 transition-colors ${
-                task.disliked ? 'text-[var(--color-text-muted)]' : 'text-[var(--color-text-ghost)] hover:text-[var(--color-text-muted)]'
-              }`}
-              aria-label={task.disliked ? 'Undo dislike' : "I don't feel like doing this"}
-              title={task.disliked ? 'Undo dislike' : "I don't feel like doing this"}
-            >
-              <svg className="h-[14px] w-[14px]" fill={task.disliked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
+          {!compact && task.context === 'pro' && (
+            <>
+              {(task.countryIds ?? []).length > 0 && (
+                <>
+                  <span className="text-[var(--color-border)]">·</span>
+                  {(task.countryIds ?? []).map((id) => {
+                    const c = COUNTRIES.find((x) => x.value === id)
+                    return c ? (
+                      <button key={id} type="button" onClick={() => toggleCountry(c.value)} className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${c.tagClass ?? ''}`}>{c.label}</button>
+                    ) : null
+                  })}
+                </>
+              )}
+              {(task.domainIds ?? []).length > 0 && (
+                <>
+                  <span className="text-[var(--color-border)]">·</span>
+                  <button type="button" onClick={() => startEdit('domain', task.domainIds ?? [])} className="hover:text-[var(--color-text)]">
+                    {(task.domainIds ?? []).map((id) => DOMAINS.find((d) => d.value === id)?.label ?? id).join(', ')}
+                  </button>
+                </>
+              )}
+            </>
+          )}
+          {!compact && projects.length > 0 && task.projectId && (
+            <>
+              <span className="text-[var(--color-border)]">·</span>
+              <button type="button" onClick={() => startEdit('project', task.projectId || '')} className="truncate max-w-[120px] text-left hover:text-[var(--color-text)]">
+                {projects.find((pr) => pr.id === task.projectId)?.title ?? '…'}
+              </button>
+            </>
+          )}
+          {!compact && task.context === 'pro' && (task.countryIds ?? []).length === 0 && (
+            <button type="button" onClick={() => startEdit('country', task.countryIds ?? [])} className="hover:text-[var(--color-text)]">
+              + pays
             </button>
           )}
-
-          {task.disliked && (
-            <span className="text-[11px] text-[var(--color-text-ghost)]" title="I don&apos;t feel like doing this">
-              *
-            </span>
+          {!compact && task.context === 'pro' && (task.domainIds ?? []).length === 0 && (
+            <button type="button" onClick={() => startEdit('domain', task.domainIds ?? [])} className="hover:text-[var(--color-text)]">
+              + domaine
+            </button>
           )}
         </div>
 
+        {editingField === 'project' && projects.length > 0 && (
+          <div className="mt-1">
+            <select
+              ref={inputRef}
+              value={editValue || ''}
+              onChange={(e) => { onUpdate(task.id, { projectId: e.target.value || null }); setEditingField(null) }}
+              onBlur={() => setEditingField(null)}
+              onKeyDown={handleKeyDown}
+              className="rounded border border-[var(--color-border)] bg-[var(--surface)] px-2 py-1 text-xs"
+              aria-label="Project"
+            >
+              <option value="">No project</option>
+              {flattenProjectsForSelect(projects).map((p) => (
+                <option key={p.id} value={p.id}>{'—'.repeat(p.depth)}{p.depth ? ' ' : ''}{p.title}</option>
+              ))}
+            </select>
+            <button type="button" onClick={() => setEditingField(null)} className="ml-1 text-[10px] text-[var(--muted)]">×</button>
+          </div>
+        )}
+        {editingField === 'country' && (
+          <div className="mt-1 flex flex-wrap items-center gap-1">
+            {COUNTRIES.map((c) => (
+              <button key={c.value} type="button" onClick={() => toggleCountry(c.value)} className={`rounded px-2 py-0.5 text-[11px] font-medium ${c.tagClass ?? ''}`}>
+                {c.label}
+              </button>
+            ))}
+            <button type="button" onClick={() => setEditingField(null)} className="text-[10px] text-[var(--muted)]">×</button>
+          </div>
+        )}
+        {editingField === 'domain' && (
+          <div className="mt-1 flex flex-wrap items-center gap-1">
+            {DOMAINS.map((d) => {
+              const selected = (task.domainIds ?? []).includes(d.value)
+              return (
+                <button
+                  key={d.value}
+                  type="button"
+                  onClick={() => toggleDomain(d.value)}
+                  className={`rounded px-2 py-0.5 text-[11px] ${selected ? 'bg-[var(--accent)] text-white' : 'border border-[var(--border)] text-[var(--muted)]'}`}
+                >
+                  {d.label}
+                </button>
+              )
+            })}
+            <button type="button" onClick={() => setEditingField(null)} className="text-[10px] text-[var(--muted)]">×</button>
+          </div>
+        )}
+
+        {/* Note: only show when present or in edit */}
         {(task.note || editingField === 'note') && (
           <div className="mt-1">
             {editingField === 'note' ? (
@@ -375,28 +315,19 @@ export function TaskItem({
                 onKeyDown={handleKeyDown}
                 maxLength={MAX_NOTE_LENGTH}
                 rows={2}
-                className="w-full rounded-md border border-[var(--color-border)] px-2 py-1 text-xs outline-none focus:border-[var(--color-accent)]"
+                className="w-full rounded border border-[var(--color-border)] px-2 py-1 text-xs outline-none focus:border-[var(--color-accent)]"
                 placeholder="Note..."
                 aria-label="Edit note"
               />
             ) : (
-              <button
-                type="button"
-                onClick={() => startEdit('note', task.note || '')}
-                className="text-left text-[11px] text-[var(--color-text-ghost)] transition-colors hover:text-[var(--color-text-muted)]"
-              >
-                {task.note || 'Add note'}
+              <button type="button" onClick={() => startEdit('note', task.note || '')} className="text-left text-[11px] text-[var(--color-text-ghost)] hover:text-[var(--color-text-muted)] line-clamp-2">
+                {task.note}
               </button>
             )}
           </div>
         )}
-
-        {!task.note && editingField !== 'note' && (
-          <button
-            type="button"
-            onClick={() => startEdit('note', '')}
-            className="mt-0.5 text-[11px] text-[var(--color-text-ghost)] transition-colors hover:text-[var(--color-text-muted)]"
-          >
+        {!compact && !task.note && editingField !== 'note' && (
+          <button type="button" onClick={() => startEdit('note', '')} className="mt-1 text-[10px] text-[var(--color-text-ghost)] opacity-70 hover:opacity-100">
             Add note
           </button>
         )}
@@ -442,33 +373,6 @@ export function TaskItem({
           </svg>
         </button>
 
-        {!isDone && onStatusChange && (
-          <div
-            role="group"
-            aria-label="Task status"
-            className="flex shrink-0 flex-shrink-0 rounded-lg bg-[var(--color-surface)] p-0.5"
-          >
-            {STATUS_OPTIONS.map((opt) => {
-              const isActive = task.status === opt.value
-              return (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => onStatusChange(task.id, opt.value)}
-                  className={`whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-medium transition-all duration-200 ${
-                    isActive
-                      ? opt.value === 'in_progress'
-                        ? 'bg-[var(--color-accent)] text-white shadow-sm'
-                        : 'bg-[var(--color-surface-elevated)] text-[var(--color-text-secondary)] shadow-sm'
-                      : 'text-[var(--color-text-muted)] hover:bg-[var(--color-border-subtle)] hover:text-[var(--color-text)]'
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              )
-            })}
-          </div>
-        )}
       </div>
     </li>
   )

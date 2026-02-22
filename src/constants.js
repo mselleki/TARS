@@ -46,10 +46,10 @@ export const TICKET_STATUSES = [
 ]
 
 export const COUNTRIES = [
-  { value: 'gb', label: 'GB', tagClass: 'border border-rose-300 bg-rose-50 text-rose-900 dark:border-rose-600 dark:bg-rose-950/60 dark:text-rose-100' },
-  { value: 'ie', label: 'IE', tagClass: 'border border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-100' },
-  { value: 'se', label: 'SE', tagClass: 'border border-sky-300 bg-sky-50 text-sky-900 dark:border-sky-600 dark:bg-sky-950/60 dark:text-sky-100' },
-  { value: 'fr', label: 'FR', tagClass: 'border border-violet-300 bg-violet-50 text-violet-900 dark:border-violet-600 dark:bg-violet-950/60 dark:text-violet-100' },
+  { value: 'gb', label: 'GB', tagClass: 'bg-rose-200 text-rose-900 dark:bg-rose-700 dark:text-white' },
+  { value: 'ie', label: 'IE', tagClass: 'bg-emerald-200 text-emerald-900 dark:bg-emerald-700 dark:text-white' },
+  { value: 'se', label: 'SE', tagClass: 'bg-sky-200 text-sky-900 dark:bg-sky-700 dark:text-white' },
+  { value: 'fr', label: 'FR', tagClass: 'bg-violet-200 text-violet-900 dark:bg-violet-700 dark:text-white' },
 ]
 
 export const VIEWS = [

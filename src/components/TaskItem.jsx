@@ -86,7 +86,17 @@ export function TaskItem({
   const isInProgress = task.status === 'in_progress'
   const isBacklog = task.status === 'backlog'
 
-  const leftBar = isDone ? 'border-l-[var(--muted)]' : task.doToday ? 'border-l-[var(--danger)]' : isOverdue ? 'border-l-[var(--danger)]' : task.priority === 'high' ? 'border-l-[var(--accent)]' : 'border-l-[var(--border)]'
+  const leftBar = isDone
+    ? 'border-l-[var(--muted)]'
+    : task.doToday
+      ? 'border-l-[var(--danger)]'
+      : isOverdue
+        ? 'border-l-[var(--danger)]'
+        : task.priority === 'high'
+          ? 'border-l-[var(--priority-high)]'
+          : task.priority === 'today'
+            ? 'border-l-[var(--priority-today)]'
+            : 'border-l-[var(--border)]'
 
   const baseClasses = `group flex min-w-0 flex-wrap items-start gap-3 overflow-visible rounded-[var(--radius-lg)] border border-[var(--border)] border-l-2 bg-[var(--surface)] px-3 py-2.5 transition-[var(--transition)] ${
     isDone
@@ -167,7 +177,7 @@ export function TaskItem({
                 compact ? 'overflow-hidden text-ellipsis whitespace-nowrap' : 'break-words whitespace-normal'
               } ${
                 isDone ? 'text-[var(--color-text-ghost)] line-through' : 'text-[var(--color-text)]'
-              } ${task.priority === 'high' ? 'text-[15px] font-bold' : 'text-[15px] font-semibold'} ${task.disliked ? 'italic opacity-80' : ''}`}
+              } ${(task.priority === 'high' || task.priority === 'today') ? 'text-[15px] font-bold' : 'text-[15px] font-semibold'} ${task.disliked ? 'italic opacity-80' : ''}`}
             >
               {searchQuery.trim()
                 ? getHighlightSegments(task.title || 'Untitled', searchQuery).map((seg, i) =>
@@ -217,6 +227,16 @@ export function TaskItem({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 3h-8v3h-2z" />
               </svg>
             </button>
+          ) : task.priority === 'today' ? (
+            <button type="button" onClick={() => startEdit('priority', task.priority)} className="rounded p-0.5 text-[var(--priority-today)] hover:bg-[var(--priority-today-bg)]" title="Today priority">
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </button>
+          ) : task.priority === 'medium' ? (
+            <button type="button" onClick={() => startEdit('priority', task.priority)} className="rounded px-1 py-0.5 text-[10px] font-medium uppercase text-[var(--priority-medium)] hover:bg-[var(--priority-medium-bg)]" title="Medium priority">M</button>
+          ) : task.priority === 'low' ? (
+            <button type="button" onClick={() => startEdit('priority', task.priority)} className="rounded px-1 py-0.5 text-[10px] font-medium uppercase text-[var(--priority-low)] hover:bg-[var(--border)]" title="Low priority">L</button>
           ) : null}
           {editingField === 'dueDate' ? (
             <input

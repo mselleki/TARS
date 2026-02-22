@@ -13,10 +13,10 @@
   --muted: #6b7280;
   --muted-2: #9ca3af;
 
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
-  --accent-subtle: rgba(37, 99, 235, 0.08);
-  --accent-ring: rgba(37, 99, 235, 0.4);
+  --accent: #4338ca;
+  --accent-hover: #3730a3;
+  --accent-subtle: rgba(67, 56, 202, 0.08);
+  --accent-ring: rgba(67, 56, 202, 0.4);
 
   --danger: #dc2626;
   --danger-subtle: rgba(220, 38, 38, 0.08);
@@ -47,6 +47,8 @@
   --priority-medium-bg: var(--border);
   --priority-low: var(--muted-2);
   --priority-low-bg: transparent;
+  --priority-today: var(--warning);
+  --priority-today-bg: var(--warning-subtle);
 
   /* Energy chips: neutral + subtle accent */
   --energy-deep: var(--accent);
@@ -58,7 +60,7 @@
 
   /* Columns: subtle cool tint */
   --column-backlog: rgba(229, 231, 235, 0.5);
-  --column-in-progress: rgba(37, 99, 235, 0.04);
+  --column-in-progress: rgba(67, 56, 202, 0.06);
   --column-done: rgba(107, 114, 128, 0.04);
 
   /* Sidebar */
@@ -86,18 +88,20 @@
   --text-secondary: #e2e8f0;
   --muted: #94a3b8;
   --muted-2: #64748b;
-  --accent: #3b82f6;
-  --accent-hover: #60a5fa;
-  --accent-subtle: rgba(59, 130, 246, 0.15);
-  --accent-ring: rgba(59, 130, 246, 0.5);
+  --accent: #6366f1;
+  --accent-hover: #818cf8;
+  --accent-subtle: rgba(99, 102, 241, 0.15);
+  --accent-ring: rgba(99, 102, 241, 0.5);
   --danger: #f87171;
   --danger-subtle: rgba(248, 113, 113, 0.15);
   --warning: #fbbf24;
   --warning-subtle: rgba(251, 191, 36, 0.15);
+  --priority-today: var(--warning);
+  --priority-today-bg: var(--warning-subtle);
   --success: #34d399;
   --success-subtle: rgba(52, 211, 153, 0.15);
   --column-backlog: rgba(51, 65, 85, 0.5);
-  --column-in-progress: rgba(59, 130, 246, 0.08);
+  --column-in-progress: rgba(99, 102, 241, 0.08);
   --column-done: rgba(100, 116, 139, 0.08);
   --sidebar-bg: #1e293b;
   --color-border-subtle: #334155;
@@ -119,6 +123,8 @@
   --color-priority-medium-bg: var(--priority-medium-bg);
   --color-priority-low: var(--priority-low);
   --color-priority-low-bg: var(--priority-low-bg);
+  --color-priority-today: var(--priority-today);
+  --color-priority-today-bg: var(--priority-today-bg);
   --color-energy-deep: var(--energy-deep);
   --color-energy-quick: var(--energy-quick);
   --color-energy-light: var(--energy-light);

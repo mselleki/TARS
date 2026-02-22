@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { TicketCaptureForm } from './TicketCaptureForm'
 import { TicketList } from './TicketList'
 import { CoursesPanel } from './CoursesPanel'
+import { PersoAgenda } from './PersoAgenda'
 
 function EmptyStateTickets() {
   return (
@@ -53,6 +54,12 @@ export function OverviewView({
           onToggleTask={onToggleTask}
         />
         <OverviewPersoTodo
+          tasks={tasks}
+          onToggleTask={onToggleTask}
+          onUpdateTask={onUpdateTask}
+          onDeleteTask={onDeleteTask}
+        />
+        <PersoAgenda
           tasks={tasks}
           onToggleTask={onToggleTask}
           onUpdateTask={onUpdateTask}

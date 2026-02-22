@@ -11,9 +11,10 @@ export const STORAGE_KEYS = {
 export const LEGACY_STORAGE_KEY = 'organizer-tasks'
 
 export const PRIORITIES = [
-  { value: 'high', label: 'High', chip: 'border border-[var(--priority-high)]/60 bg-[var(--priority-high-bg)] text-[var(--priority-high)] font-medium' },
-  { value: 'medium', label: 'Medium', chip: 'border border-[var(--border)] bg-[var(--priority-medium-bg)] text-[var(--priority-medium)]' },
   { value: 'low', label: 'Low', chip: 'border border-transparent text-[var(--priority-low)]' },
+  { value: 'medium', label: 'Medium', chip: 'border border-[var(--border)] bg-[var(--priority-medium-bg)] text-[var(--priority-medium)]' },
+  { value: 'high', label: 'High', chip: 'border border-[var(--priority-high)]/60 bg-[var(--priority-high-bg)] text-[var(--priority-high)] font-medium' },
+  { value: 'today', label: 'Today', chip: 'border border-[var(--priority-today)]/60 bg-[var(--priority-today-bg)] text-[var(--priority-today)] font-medium' },
 ]
 
 export const CONTEXTS = [

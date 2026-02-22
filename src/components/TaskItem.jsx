@@ -91,7 +91,7 @@ export function TaskItem({
 
   const leftBar = isDone ? 'border-l-[var(--muted)]' : task.doToday ? 'border-l-[var(--danger)]' : isOverdue ? 'border-l-[var(--danger)]' : task.priority === 'high' ? 'border-l-[var(--accent)]' : 'border-l-[var(--border)]'
 
-  const baseClasses = `group flex min-w-0 items-start gap-3 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)] border-l-2 bg-[var(--surface)] px-3 py-2.5 transition-[var(--transition)] ${
+  const baseClasses = `group flex min-w-0 flex-wrap items-start gap-3 overflow-visible rounded-[var(--radius-lg)] border border-[var(--border)] border-l-2 bg-[var(--surface)] px-3 py-2.5 transition-[var(--transition)] ${
     isDone
       ? 'opacity-90'
       : ''
@@ -402,7 +402,7 @@ export function TaskItem({
         )}
       </div>
 
-      <div className="flex shrink-0 flex-row flex-wrap items-center gap-1 self-start">
+      <div className="flex shrink-0 flex-row flex-wrap items-center gap-1.5 self-start min-w-0">
         {!compact && (
           <>
             {isFocus ? (
@@ -446,7 +446,7 @@ export function TaskItem({
           <div
             role="group"
             aria-label="Task status"
-            className="flex rounded-lg bg-[var(--color-surface)] p-0.5"
+            className="flex shrink-0 flex-shrink-0 rounded-lg bg-[var(--color-surface)] p-0.5"
           >
             {STATUS_OPTIONS.map((opt) => {
               const isActive = task.status === opt.value
@@ -455,7 +455,7 @@ export function TaskItem({
                   key={opt.value}
                   type="button"
                   onClick={() => onStatusChange(task.id, opt.value)}
-                  className={`rounded-md px-2.5 py-1 text-[11px] font-medium transition-all duration-200 ${
+                  className={`whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-medium transition-all duration-200 ${
                     isActive
                       ? opt.value === 'in_progress'
                         ? 'bg-[var(--color-accent)] text-white shadow-sm'

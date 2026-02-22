@@ -24,3 +24,13 @@ export function getProjectPath(projects, projectId) {
   }
   return path
 }
+
+/** Returns [projectId, ...all descendant ids] for filtering by sub-project */
+export function getProjectIdsInSubtree(projects, projectId) {
+  if (!projectId) return []
+  const ids = [projectId]
+  projects
+    .filter((p) => p.parentProjectId === projectId)
+    .forEach((p) => ids.push(...getProjectIdsInSubtree(projects, p.id)))
+  return ids
+}

@@ -15,6 +15,7 @@ import { InstallPrompt } from './components/InstallPrompt'
 import { Modal } from './components/Modal'
 import { Toast } from './components/Toast'
 import { TaskItem } from './components/TaskItem'
+import { COUNTRIES, DOMAINS } from './constants'
 import './App.css'
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('')
   const [ticketFilters, setTicketFilters] = useState({ business: null, domain: null, owner: null, countryId: null })
   const [boardViewMode, setBoardViewMode] = useState('cards')
+  const [boardFilters, setBoardFilters] = useState({ projectId: '', countryId: '', domain: '' })
   const [showComposer, setShowComposer] = useState(false)
   const [composerProjectId, setComposerProjectId] = useState(null)
   const [isSilentMode, setIsSilentMode] = useState(false)
@@ -74,6 +76,8 @@ function App() {
       context,
       searchQuery,
       todayFocusIds: [],
+      boardFilters: view === 'board' && context === 'pro' ? boardFilters : null,
+      projects: state.projects,
     })
 
   const { canInstall, showInstallBanner, install, dismissInstall } = usePWA()
@@ -160,7 +164,7 @@ function App() {
         onToggleDarkMode={() => setIsDarkMode((v) => !v)}
       />
 
-      <main className="flex-1 overflow-auto px-3 py-4 sm:px-6 sm:py-6 lg:mx-auto lg:max-w-4xl">
+      <main className={`flex-1 overflow-auto px-3 py-4 sm:px-6 sm:py-6 lg:mx-auto ${view === 'board' ? 'lg:max-w-7xl' : 'lg:max-w-4xl'}`}>
         {view === 'overview' && (
           <OverviewView
             context={context}
@@ -216,6 +220,54 @@ function App() {
                 </button>
               </div>
             </div>
+
+            {context === 'pro' && (
+              <div className="mb-4 flex flex-wrap items-center gap-2 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] px-3 py-2.5 sm:gap-3 sm:px-4">
+                <span className="text-xs font-medium text-[var(--muted)]">Filtres :</span>
+                <select
+                  value={boardFilters.projectId}
+                  onChange={(e) => setBoardFilters((f) => ({ ...f, projectId: e.target.value }))}
+                  className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] px-2.5 py-1.5 text-sm text-[var(--text)]"
+                  aria-label="Sous-projet"
+                >
+                  <option value="">Tous les sous-projets</option>
+                  {state.projects.filter((p) => p.context === context).map((p) => (
+                    <option key={p.id} value={p.id}>{p.title}</option>
+                  ))}
+                </select>
+                <select
+                  value={boardFilters.countryId}
+                  onChange={(e) => setBoardFilters((f) => ({ ...f, countryId: e.target.value }))}
+                  className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] px-2.5 py-1.5 text-sm text-[var(--text)]"
+                  aria-label="Pays"
+                >
+                  <option value="">Tous les pays</option>
+                  {COUNTRIES.map((c) => (
+                    <option key={c.value} value={c.value}>{c.label}</option>
+                  ))}
+                </select>
+                <select
+                  value={boardFilters.domain}
+                  onChange={(e) => setBoardFilters((f) => ({ ...f, domain: e.target.value }))}
+                  className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] px-2.5 py-1.5 text-sm text-[var(--text)]"
+                  aria-label="Domaine"
+                >
+                  <option value="">Tous les domaines</option>
+                  {DOMAINS.map((d) => (
+                    <option key={d.value} value={d.value}>{d.label}</option>
+                  ))}
+                </select>
+                {(boardFilters.projectId || boardFilters.countryId || boardFilters.domain) && (
+                  <button
+                    type="button"
+                    onClick={() => setBoardFilters({ projectId: '', countryId: '', domain: '' })}
+                    className="text-xs font-medium text-[var(--muted)] underline hover:text-[var(--text)]"
+                  >
+                    Réinitialiser
+                  </button>
+                )}
+              </div>
+            )}
             {filtered.length === 0 ? (
               searchQuery ? (
                 <SearchEmptyState onClear={() => setSearchQuery('')} />

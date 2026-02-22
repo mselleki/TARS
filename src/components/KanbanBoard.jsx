@@ -61,7 +61,7 @@ export function KanbanBoard({
   }
 
   return (
-    <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-3">
+    <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-[minmax(280px,1fr)_minmax(280px,1fr)_minmax(280px,1fr)]">
       {columns.map((col) => {
         const config = COLUMN_CONFIG[col.id] ?? COLUMN_CONFIG.backlog
         const isDragOver = dragOverColumn === col.id

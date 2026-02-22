@@ -157,7 +157,9 @@ export function TaskItem({
               type="button"
               onClick={() => startEdit('title', task.title)}
               title="Cliquer pour modifier"
-              className={`min-h-[1.25rem] min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-left transition-colors hover:text-[var(--color-accent)] ${
+              className={`min-h-[1.25rem] min-w-0 flex-1 text-left transition-colors hover:text-[var(--color-accent)] ${
+                compact ? 'overflow-hidden text-ellipsis whitespace-nowrap' : 'break-words whitespace-normal'
+              } ${
                 isDone ? 'text-[var(--color-text-ghost)] line-through' : 'text-[var(--color-text)]'
               } ${task.priority === 'high' ? 'text-[15px] font-bold' : 'text-[15px] font-semibold'} ${task.disliked ? 'italic opacity-80' : ''}`}
             >

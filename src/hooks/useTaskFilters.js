@@ -1,23 +1,40 @@
 import { useMemo } from 'react'
 import { today } from '../utils/date'
+import { getProjectIdsInSubtree } from '../utils/projects'
 
 export function useTaskFilters({
   tasks,
   context,
   searchQuery,
   todayFocusIds,
+  boardFilters = null,
+  projects = [],
 }) {
   const searchLower = searchQuery.trim().toLowerCase()
 
   return useMemo(() => {
-    const byContext = tasks.filter((t) => t.context === context)
-    const filtered = searchLower
-      ? byContext.filter(
-          (t) =>
-            (t.title || '').toLowerCase().includes(searchLower) ||
-            (t.note || '').toLowerCase().includes(searchLower)
-        )
-      : byContext
+    let filtered = tasks.filter((t) => t.context === context)
+
+    if (boardFilters && (boardFilters.projectId || boardFilters.countryId || boardFilters.domain)) {
+      if (boardFilters.projectId) {
+        const projectIds = getProjectIdsInSubtree(projects, boardFilters.projectId)
+        filtered = filtered.filter((t) => t.projectId && projectIds.includes(t.projectId))
+      }
+      if (boardFilters.countryId) {
+        filtered = filtered.filter((t) => Array.isArray(t.countryIds) && t.countryIds.includes(boardFilters.countryId))
+      }
+      if (boardFilters.domain) {
+        filtered = filtered.filter((t) => Array.isArray(t.domainIds) && t.domainIds.includes(boardFilters.domain))
+      }
+    }
+
+    if (searchLower) {
+      filtered = filtered.filter(
+        (t) =>
+          (t.title || '').toLowerCase().includes(searchLower) ||
+          (t.note || '').toLowerCase().includes(searchLower)
+      )
+    }
 
     const focusTasks = todayFocusIds
       .map((id) => filtered.find((t) => t.id === id))
@@ -41,5 +58,5 @@ export function useTaskFilters({
       done,
       kanbanColumns,
     }
-  }, [tasks, context, searchQuery, todayFocusIds])
+  }, [tasks, context, searchQuery, todayFocusIds, boardFilters, projects])
 }

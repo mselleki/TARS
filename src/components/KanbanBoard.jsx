@@ -15,6 +15,7 @@ export function KanbanBoard({
   onUpdate,
   onDelete,
   onStatusChange,
+  onTaskSelect,
   viewMode = 'cards',
 }) {
   const [dragOverColumn, setDragOverColumn] = useState(null)
@@ -53,6 +54,7 @@ export function KanbanBoard({
             onUpdate={onUpdate}
             onDelete={onDelete}
             onStatusChange={onStatusChange}
+            onSelect={onTaskSelect}
             compact
           />
         ))}
@@ -92,6 +94,7 @@ export function KanbanBoard({
                   onUpdate={onUpdate}
                   onDelete={onDelete}
                   onStatusChange={onStatusChange}
+                  onSelect={onTaskSelect}
                   draggable
                   onDragStart={(e) => onTaskDragStart(e, task.id, task.status)}
                   onDragEnd={handleDragEnd}

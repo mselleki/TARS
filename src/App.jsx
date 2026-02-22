@@ -15,6 +15,7 @@ import { InstallPrompt } from './components/InstallPrompt'
 import { Modal } from './components/Modal'
 import { Toast } from './components/Toast'
 import { TaskItem } from './components/TaskItem'
+import { TaskPanel } from './components/TaskPanel'
 import { COUNTRIES, DOMAINS } from './constants'
 import './App.css'
 
@@ -49,6 +50,10 @@ function App() {
       localStorage.setItem('organizer-theme', 'light')
     }
   }, [isDarkMode])
+
+  useEffect(() => {
+    if (view !== 'board') setSelectedTaskId(null)
+  }, [view])
 
   const {
     state,
@@ -282,6 +287,7 @@ function App() {
                 onUpdate={updateTask}
                 onDelete={deleteTask}
                 onStatusChange={handleStatusChange}
+                onTaskSelect={setSelectedTaskId}
                 viewMode={boardViewMode}
               />
             )}
@@ -327,6 +333,17 @@ function App() {
           onProjectChange={setComposerProjectId}
         />
       </Modal>
+
+      {view === 'board' && selectedTaskId && (() => {
+        const task = state.tasks.find((t) => t.id === selectedTaskId)
+        return task ? (
+          <TaskPanel
+            task={task}
+            onClose={() => setSelectedTaskId(null)}
+            onUpdate={updateTask}
+          />
+        ) : null
+      })()}
 
       <Toast
         message={toastMessage}

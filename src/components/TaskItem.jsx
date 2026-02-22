@@ -12,6 +12,7 @@ export function TaskItem({
   onStatusChange,
   onAddFocus,
   onRemoveFocus,
+  onSelect,
   isFocus,
   isPrimaryFocus,
   selected,
@@ -94,13 +95,22 @@ export function TaskItem({
     selected || (isFocus && !isDone) ? 'ring-2 ring-[var(--accent-ring)] ring-offset-2 shadow-[var(--shadow-md)]' : ''
   } ${leftBar} ${editingField ? 'ring-2 ring-[var(--accent-ring)] ring-offset-2' : ''}`
 
+  const handleCardClick = (e) => {
+    if (e.target.closest('button, input, select, textarea')) return
+    onSelect?.(task.id)
+  }
+
   return (
     <li
-      className={`${compact ? baseClasses.replace('py-2.5', 'py-2') : baseClasses} ${draggable ? 'cursor-grab active:cursor-grabbing' : ''} ${isDone ? 'task-complete' : ''}`}
+      className={`${compact ? baseClasses.replace('py-2.5', 'py-2') : baseClasses} ${draggable ? 'cursor-grab active:cursor-grabbing' : ''} ${isDone ? 'task-complete' : ''} ${onSelect ? 'cursor-pointer' : ''}`}
       data-task-id={task.id}
       draggable={draggable ?? false}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
+      onClick={onSelect ? handleCardClick : undefined}
+      role={onSelect ? 'button' : undefined}
+      tabIndex={onSelect ? 0 : undefined}
+      onKeyDown={onSelect ? (e) => e.key === 'Enter' && handleCardClick(e) : undefined}
     >
       <div className="mt-0.5 flex shrink-0 items-center gap-0.5">
         <button

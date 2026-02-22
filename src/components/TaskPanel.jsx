@@ -21,12 +21,12 @@ export function TaskPanel({ task, onClose, onUpdate }) {
   return (
     <>
       <div
-        className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px]"
+        className="panel-backdrop-in fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px]"
         aria-hidden
         onClick={onClose}
       />
       <aside
-        className="fixed right-0 top-0 z-40 flex h-full w-full max-w-md flex-col border-l border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-lg)]"
+        className="panel-slide-in fixed right-0 top-0 z-40 flex h-full w-full max-w-md flex-col border-l border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-lg)]"
         aria-label="Détail de la tâche"
       >
         <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">

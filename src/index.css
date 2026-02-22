@@ -141,6 +141,24 @@
   animation: task-complete 0.2s ease-out;
 }
 
+@keyframes panel-slide-in {
+  from { transform: translateX(100%); opacity: 0.98; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes panel-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.panel-slide-in {
+  animation: panel-slide-in 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.panel-backdrop-in {
+  animation: panel-backdrop-in 0.2s ease-out;
+}
+
 /* Safe area for notched devices (e.g. iPhone 15 Pro) */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .safe-area-bottom {

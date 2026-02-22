@@ -34,7 +34,7 @@ export function Header({
         <div className="flex flex-wrap items-center justify-between gap-3 py-2.5 sm:gap-4 sm:py-3.5">
           <div className="flex min-w-0 flex-shrink-0 items-center gap-2 sm:gap-4">
             <h1 className="truncate text-base font-semibold tracking-tight text-[var(--text)] sm:text-lg">
-              Organizer
+              TARS
             </h1>
             <div className="hidden h-4 w-px bg-[var(--border)] sm:block" aria-hidden />
             <div

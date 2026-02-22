@@ -10,8 +10,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Organizer',
-        short_name: 'Organizer',
+        name: 'TARS',
+        short_name: 'TARS',
         description: 'Premium daily-life decision tool',
         start_url: '/',
         display: 'standalone',

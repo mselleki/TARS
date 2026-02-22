@@ -14,7 +14,7 @@ export function InstallPrompt({ show, onInstall, onDismiss }) {
           </svg>
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-[var(--text)]">Install Organizer</p>
+          <p className="text-sm font-medium text-[var(--text)]">Install TARS</p>
           <p className="mt-0.5 text-xs text-[var(--muted)]">Add to home screen for quick access</p>
           <div className="mt-3 flex gap-2">
             <button

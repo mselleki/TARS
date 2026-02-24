@@ -7,6 +7,8 @@ export const STORAGE_KEYS = {
   reqTickets: 'organizer-req-tickets',
   requesters: 'organizer-requesters',
   meetings: 'organizer-meetings',
+  standupLog: 'organizer-standup-log',
+  meetingSheets: 'organizer-meeting-sheets',
 }
 
 export const LEGACY_STORAGE_KEY = 'organizer-tasks'

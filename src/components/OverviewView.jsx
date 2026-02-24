@@ -31,10 +31,10 @@ export function OverviewView({
   onDeleteTask,
   onToggleTask,
   onOpenComposerForDate,
-  meetings = [],
-  onAddMeeting,
-  onUpdateMeeting,
-  onDeleteMeeting,
+  standupLog = '',
+  onStandupLogChange,
+  meetingSheets = {},
+  onMeetingSheetChange,
 }) {
   const proTickets = useMemo(() => reqTickets.filter((t) => t.scope === 'PRO'), [reqTickets])
   const existingOwners = useMemo(() => reqTickets.map((t) => t.owner).filter(Boolean), [reqTickets])
@@ -79,10 +79,10 @@ export function OverviewView({
   return (
     <div className="space-y-6">
       <DailyStandup
-        meetings={meetings}
-        onAddMeeting={onAddMeeting}
-        onUpdateMeeting={onUpdateMeeting}
-        onDeleteMeeting={onDeleteMeeting}
+        standupLog={standupLog}
+        onStandupLogChange={onStandupLogChange}
+        meetingSheets={meetingSheets}
+        onMeetingSheetChange={onMeetingSheetChange}
       />
       <section
         className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-sm)]"

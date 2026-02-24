@@ -205,10 +205,10 @@ function App() {
             onDeleteTask={deleteTask}
             onToggleTask={toggleTaskStatus}
             onOpenComposerForDate={handleOpenComposerForDate}
-            meetings={state.meetings ?? []}
-            onAddMeeting={addMeeting}
-            onUpdateMeeting={updateMeeting}
-            onDeleteMeeting={deleteMeeting}
+            standupLog={state.standupLog ?? ''}
+            onStandupLogChange={setStandupLog}
+            meetingSheets={state.meetingSheets ?? {}}
+            onMeetingSheetChange={setMeetingSheet}
           />
         )}
 

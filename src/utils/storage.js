@@ -161,6 +161,38 @@ export function saveMeetings(meetings) {
   saveJSON(STORAGE_KEYS.meetings, meetings ?? [])
 }
 
+export function loadStandupLog() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.standupLog)
+    if (raw == null) return ''
+    const parsed = JSON.parse(raw)
+    return typeof parsed === 'string' ? parsed : ''
+  } catch {
+    return ''
+  }
+}
+
+export function saveStandupLog(content) {
+  try {
+    localStorage.setItem(STORAGE_KEYS.standupLog, JSON.stringify(content ?? ''))
+  } catch (e) {
+    if (typeof console !== 'undefined' && console.warn) console.warn('[storage] saveStandupLog failed', e)
+  }
+}
+
+export function loadMeetingSheets() {
+  try {
+    const raw = loadJSON(STORAGE_KEYS.meetingSheets, {})
+    return raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {}
+  } catch {
+    return {}
+  }
+}
+
+export function saveMeetingSheets(sheets) {
+  saveJSON(STORAGE_KEYS.meetingSheets, sheets && typeof sheets === 'object' && !Array.isArray(sheets) ? sheets : {})
+}
+
 function normalizeTask(t) {
   const status = t.status ?? (t.completed ? 'done' : 'backlog')
   const mapped = status === 'todo' ? 'backlog' : status
@@ -197,5 +229,7 @@ export function normalizeRemoteState(raw) {
     reqTickets: (raw.reqTickets ?? []).map(normalizeReqTicket),
     requesters: (raw.requesters ?? []).map(normalizeRequester),
     meetings: (raw.meetings ?? []).map((m) => normalizeMeeting(m)),
+    standupLog: typeof raw.standupLog === 'string' ? raw.standupLog : '',
+    meetingSheets: raw.meetingSheets && typeof raw.meetingSheets === 'object' && !Array.isArray(raw.meetingSheets) ? raw.meetingSheets : {},
   }
 }

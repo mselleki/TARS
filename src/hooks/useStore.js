@@ -181,6 +181,14 @@ export function useStore() {
     dispatch({ type: actions.MEETING_DELETE, payload: id })
   }, [])
 
+  const setStandupLog = useCallback((content) => {
+    dispatch({ type: actions.STANDUP_LOG_SET, payload: content })
+  }, [])
+
+  const setMeetingSheet = useCallback((key, content) => {
+    dispatch({ type: actions.MEETING_SHEET_UPDATE, payload: { key, content } })
+  }, [])
+
   const addRequester = useCallback((payload) => {
     const id = payload.id ?? crypto.randomUUID()
     dispatch({ type: actions.REQUESTER_ADD, payload: { ...payload, id } })
@@ -232,6 +240,8 @@ export function useStore() {
     addMeeting,
     updateMeeting,
     deleteMeeting,
+    setStandupLog,
+    setMeetingSheet,
     addRequester,
     updateRequester,
     deleteRequester,

@@ -45,6 +45,8 @@ export async function fetchRemoteState() {
       reqTickets: Array.isArray(raw.reqTickets) ? raw.reqTickets : [],
       requesters: Array.isArray(raw.requesters) ? raw.requesters : [],
       meetings: Array.isArray(raw.meetings) ? raw.meetings : [],
+      standupLog: typeof raw.standupLog === 'string' ? raw.standupLog : '',
+      meetingSheets: raw.meetingSheets && typeof raw.meetingSheets === 'object' ? raw.meetingSheets : {},
     }
   } catch (e) {
     if (LOG_SYNC) console.warn('[TARS sync] GET error:', e?.message ?? e)
@@ -67,6 +69,8 @@ export async function pushRemoteState(state) {
     reqTickets: state.reqTickets ?? [],
     requesters: state.requesters ?? [],
     meetings: state.meetings ?? [],
+    standupLog: state.standupLog ?? '',
+    meetingSheets: state.meetingSheets ?? {},
   }
   if (LOG_SYNC) console.log('[TARS sync] Pushing to:', url, Object.keys(payload).map(k => `${k}:${payload[k]?.length ?? 0}`).join(', '))
   try {

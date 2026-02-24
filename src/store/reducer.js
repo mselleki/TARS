@@ -10,6 +10,8 @@ import {
   loadReqTickets,
   loadRequesters,
   loadMeetings,
+  loadStandupLog,
+  loadMeetingSheets,
   saveTasks,
   saveRituals,
   saveDailyPlans,
@@ -18,6 +20,8 @@ import {
   saveReqTickets,
   saveRequesters,
   saveMeetings,
+  saveStandupLog,
+  saveMeetingSheets,
 } from '../utils/storage'
 
 const ts = () => now()
@@ -54,6 +58,8 @@ export const actions = {
   MEETING_ADD: 'MEETING_ADD',
   MEETING_UPDATE: 'MEETING_UPDATE',
   MEETING_DELETE: 'MEETING_DELETE',
+  STANDUP_LOG_SET: 'STANDUP_LOG_SET',
+  MEETING_SHEET_UPDATE: 'MEETING_SHEET_UPDATE',
 }
 
 function tasksReducer(tasks, action) {
@@ -300,6 +306,36 @@ function meetingsReducer(meetings, action) {
   }
 }
 
+function standupLogReducer(log, action) {
+  switch (action.type) {
+    case actions.INIT:
+      return typeof action.payload.standupLog === 'string' ? action.payload.standupLog : ''
+    case actions.STANDUP_LOG_SET:
+      return typeof action.payload === 'string' ? action.payload : (log ?? '')
+    default:
+      return log ?? ''
+  }
+}
+
+function meetingSheetsReducer(sheets, action) {
+  switch (action.type) {
+    case actions.INIT:
+      return action.payload.meetingSheets && typeof action.payload.meetingSheets === 'object' && !Array.isArray(action.payload.meetingSheets)
+        ? action.payload.meetingSheets
+        : {}
+    case actions.MEETING_SHEET_UPDATE: {
+      const { key, content } = action.payload
+      if (!key || typeof key !== 'string') return sheets ?? {}
+      const next = { ...(sheets ?? {}) }
+      if (content === '' || content == null) delete next[key]
+      else next[key] = String(content)
+      return next
+    }
+    default:
+      return sheets ?? {}
+  }
+}
+
 function ritualsReducer(rituals, action) {
   switch (action.type) {
     case actions.INIT:
@@ -389,7 +425,9 @@ export function rootReducer(state, action) {
   const reqTickets = reqTicketsReducer(state.reqTickets ?? [], action)
   const requesters = requestersReducer(state.requesters, action)
   const meetings = meetingsReducer(state.meetings, action)
-  return { projects, tasks, rituals, dailyPlans, tickets, reqTickets, requesters, meetings }
+  const standupLog = standupLogReducer(state.standupLog, action)
+  const meetingSheets = meetingSheetsReducer(state.meetingSheets, action)
+  return { projects, tasks, rituals, dailyPlans, tickets, reqTickets, requesters, meetings, standupLog, meetingSheets }
 }
 
 export function getInitialState() {
@@ -415,6 +453,8 @@ export function persistState(state) {
     saveReqTickets(state.reqTickets ?? [])
     saveRequesters(state.requesters ?? [])
     saveMeetings(state.meetings ?? [])
+    saveStandupLog(state.standupLog ?? '')
+    saveMeetingSheets(state.meetingSheets ?? {})
   } catch (e) {
     if (typeof console !== 'undefined' && console.warn) {
       console.warn('[persistState] failed:', e)

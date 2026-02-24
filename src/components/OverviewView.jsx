@@ -3,6 +3,7 @@ import { TicketCaptureForm } from './TicketCaptureForm'
 import { TicketList } from './TicketList'
 import { CoursesPanel } from './CoursesPanel'
 import { PersoAgenda } from './PersoAgenda'
+import { DailyStandup } from './DailyStandup'
 
 function EmptyStateTickets() {
   return (
@@ -30,6 +31,10 @@ export function OverviewView({
   onDeleteTask,
   onToggleTask,
   onOpenComposerForDate,
+  meetings = [],
+  onAddMeeting,
+  onUpdateMeeting,
+  onDeleteMeeting,
 }) {
   const proTickets = useMemo(() => reqTickets.filter((t) => t.scope === 'PRO'), [reqTickets])
   const existingOwners = useMemo(() => reqTickets.map((t) => t.owner).filter(Boolean), [reqTickets])
@@ -73,6 +78,12 @@ export function OverviewView({
 
   return (
     <div className="space-y-6">
+      <DailyStandup
+        meetings={meetings}
+        onAddMeeting={onAddMeeting}
+        onUpdateMeeting={onUpdateMeeting}
+        onDeleteMeeting={onDeleteMeeting}
+      />
       <section
         className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-sm)]"
         aria-label="Add ticket"

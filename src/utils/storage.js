@@ -62,6 +62,8 @@ export function saveReqTickets(tickets) {
 function normalizeReqTicket(t) {
   const now = Date.now()
   const rawId = (t.id ?? '').trim().toUpperCase()
+  const createdAt = typeof t.createdAt === 'number' ? t.createdAt : now
+  const createdAtDate = typeof t.createdAtDate === 'string' && t.createdAtDate ? t.createdAtDate.slice(0, 10) : new Date(createdAt).toISOString().slice(0, 10)
   return {
     ...t,
     id: rawId || `REQ${Date.now().toString().slice(-6)}`,
@@ -71,7 +73,8 @@ function normalizeReqTicket(t) {
     summary: (t.summary ?? '').trim() || '',
     status: ['ACTIONABLE', 'WAITING_REPLY', 'DONE'].includes(t.status) ? t.status : 'ACTIONABLE',
     scope: t.scope === 'PERSO' ? 'PERSO' : 'PRO',
-    createdAt: typeof t.createdAt === 'number' ? t.createdAt : now,
+    createdAt,
+    createdAtDate,
     updatedAt: typeof t.updatedAt === 'number' ? t.updatedAt : now,
     lastFollowUpAt: t.lastFollowUpAt != null && typeof t.lastFollowUpAt === 'number' ? t.lastFollowUpAt : null,
     dueAt: t.dueAt != null && typeof t.dueAt === 'number' ? t.dueAt : null,
@@ -135,6 +138,29 @@ export function saveDailyPlans(plans) {
   saveJSON(STORAGE_KEYS.dailyPlans, plans)
 }
 
+export function normalizeMeeting(m) {
+  const now = Date.now()
+  const createdAt = typeof m.createdAt === 'number' ? m.createdAt : now
+  const createdAtDate = typeof m.createdAtDate === 'string' && m.createdAtDate ? m.createdAtDate.slice(0, 10) : new Date(createdAt).toISOString().slice(0, 10)
+  return {
+    id: m.id ?? crypto.randomUUID(),
+    createdAt,
+    createdAtDate,
+    countryId: m.countryId ?? null,
+    domain: (m.domain ?? '').trim() || '',
+    content: (m.content ?? '').trim(),
+    title: (m.title ?? '').trim() || '',
+  }
+}
+
+export function loadMeetings() {
+  return loadJSON(STORAGE_KEYS.meetings, []).map(normalizeMeeting)
+}
+
+export function saveMeetings(meetings) {
+  saveJSON(STORAGE_KEYS.meetings, meetings ?? [])
+}
+
 function normalizeTask(t) {
   const status = t.status ?? (t.completed ? 'done' : 'backlog')
   const mapped = status === 'todo' ? 'backlog' : status
@@ -170,5 +196,6 @@ export function normalizeRemoteState(raw) {
     tickets: (raw.tickets ?? []).map(normalizeTicket),
     reqTickets: (raw.reqTickets ?? []).map(normalizeReqTicket),
     requesters: (raw.requesters ?? []).map(normalizeRequester),
+    meetings: (raw.meetings ?? []).map((m) => normalizeMeeting(m)),
   }
 }

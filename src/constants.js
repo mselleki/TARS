@@ -6,6 +6,7 @@ export const STORAGE_KEYS = {
   tickets: 'organizer-tickets',
   reqTickets: 'organizer-req-tickets',
   requesters: 'organizer-requesters',
+  meetings: 'organizer-meetings',
 }
 
 export const LEGACY_STORAGE_KEY = 'organizer-tasks'
@@ -22,11 +23,7 @@ export const CONTEXTS = [
   { value: 'perso', label: 'Perso' },
 ]
 
-/** Business -> domains mapping for ticket capture */
-export const BUSINESSES = [
-  { id: 'sysco', label: 'Sysco', domains: ['product', 'vendor', 'customer'] },
-  { id: 'other', label: 'Other', domains: ['product', 'vendor', 'customer'] },
-]
+export const TICKET_OWNERS = ['Guler', 'Paula', 'Sanna', 'Danielle', 'Sandra Ring', 'Lena']
 
 export const DOMAIN_LABELS = {
   product: 'Product',

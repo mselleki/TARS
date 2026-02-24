@@ -15,6 +15,8 @@ export interface Ticket {
   status: TicketStatus
   scope: TicketScope
   createdAt: number
+  /** Creation date YYYY-MM-DD (default: same day) */
+  createdAtDate?: string
   updatedAt: number
   /** Last follow-up timestamp; null = never relanced */
   lastFollowUpAt: number | null

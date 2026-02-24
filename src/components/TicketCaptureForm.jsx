@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
-import { BUSINESSES, DOMAIN_LABELS, COUNTRIES } from '../constants'
+import { DOMAIN_LABELS, COUNTRIES, TICKET_OWNERS } from '../constants'
 import { normalizeReqId } from '../utils/ticketUtils'
 
 export function TicketCaptureForm({
@@ -10,18 +10,12 @@ export function TicketCaptureForm({
   initialFocus = false,
 }) {
   const [reqId, setReqId] = useState('')
-  const [business, setBusiness] = useState('')
   const [domain, setDomain] = useState('')
   const [owner, setOwner] = useState('')
   const [summary, setSummary] = useState('')
   const [countryId, setCountryId] = useState('')
   const [idError, setIdError] = useState('')
   const firstInputRef = useRef(null)
-
-  const domainsForBusiness = BUSINESSES.find((b) => b.id === business)?.domains ?? []
-  const ownerSuggestions = [...new Set(existingOwners)].filter((o) =>
-    o.toLowerCase().includes(owner.trim().toLowerCase())
-  ).slice(0, 5)
 
   useEffect(() => {
     if (initialFocus) firstInputRef.current?.focus()
@@ -47,13 +41,6 @@ export function TicketCaptureForm({
     }
   }, [])
 
-  const handleBusinessChange = useCallback((e) => {
-    const v = e.target.value
-    const nextDomains = BUSINESSES.find((b) => b.id === v)?.domains ?? []
-    setBusiness(v)
-    if (domain && !nextDomains.includes(domain)) setDomain('')
-  }, [domain])
-
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault()
@@ -65,7 +52,6 @@ export function TicketCaptureForm({
       }
       onSubmit({
         id: normalized,
-        business: business.trim(),
         domain: domain.trim(),
         owner: owner.trim(),
         summary: summary.trim(),
@@ -73,7 +59,6 @@ export function TicketCaptureForm({
         countryId: countryId || null,
       })
       setReqId('')
-      setBusiness('')
       setDomain('')
       setOwner('')
       setSummary('')
@@ -81,7 +66,7 @@ export function TicketCaptureForm({
       setIdError('')
       firstInputRef.current?.focus()
     },
-    [reqId, business, domain, owner, summary, scope, countryId, onSubmit]
+    [reqId, domain, owner, summary, countryId, onSubmit]
   )
 
   const handleKeyDown = useCallback(
@@ -89,7 +74,6 @@ export function TicketCaptureForm({
       if (e.key === 'Escape') {
         e.preventDefault()
         setReqId('')
-        setBusiness('')
         setDomain('')
         setOwner('')
         setSummary('')
@@ -105,8 +89,8 @@ export function TicketCaptureForm({
 
   return (
     <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="space-y-3">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[auto_1fr_1fr_1fr_1fr]">
-        <div className="sm:col-span-2 lg:col-span-1">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div>
           <label htmlFor="ticket-req-id" className="sr-only">
             Ticket ID (REQ…)
           </label>
@@ -131,25 +115,6 @@ export function TicketCaptureForm({
           )}
         </div>
         <div>
-          <label htmlFor="ticket-business" className="sr-only">
-            Business
-          </label>
-          <select
-            id="ticket-business"
-            value={business}
-            onChange={handleBusinessChange}
-            className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm outline-none transition-[var(--transition)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-ring)]"
-            tabIndex={1}
-          >
-            <option value="">Business</option>
-            {BUSINESSES.map((b) => (
-              <option key={b.id} value={b.id}>
-                {b.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
           <label htmlFor="ticket-domain" className="sr-only">
             Domain
           </label>
@@ -158,13 +123,10 @@ export function TicketCaptureForm({
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
             className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm outline-none transition-[var(--transition)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-ring)]"
-            tabIndex={2}
           >
             <option value="">Domain</option>
-            {domainsForBusiness.map((d) => (
-              <option key={d} value={d}>
-                {DOMAIN_LABELS[d] ?? d}
-              </option>
+            {Object.entries(DOMAIN_LABELS).map(([value, label]) => (
+              <option key={value} value={value}>{label}</option>
             ))}
           </select>
         </div>
@@ -172,36 +134,31 @@ export function TicketCaptureForm({
           <label htmlFor="ticket-owner" className="sr-only">
             Owner
           </label>
-          <input
+          <select
             id="ticket-owner"
-            type="text"
             value={owner}
             onChange={(e) => setOwner(e.target.value)}
-            placeholder="Owner"
-            list="ticket-owner-list"
-            className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm outline-none transition-[var(--transition)] placeholder:text-[var(--muted)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-ring)]"
-            tabIndex={3}
-          />
-          <datalist id="ticket-owner-list">
-            {ownerSuggestions.map((o) => (
-              <option key={o} value={o} />
+            className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm outline-none transition-[var(--transition)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-ring)]"
+          >
+            <option value="">Owner</option>
+            {TICKET_OWNERS.map((o) => (
+              <option key={o} value={o}>{o}</option>
             ))}
-          </datalist>
+          </select>
         </div>
-        <div className="sm:col-span-2 lg:col-span-1">
-          <label htmlFor="ticket-summary" className="sr-only">
-            Summary
-          </label>
-          <input
-            id="ticket-summary"
-            type="text"
-            value={summary}
-            onChange={(e) => setSummary(e.target.value)}
-            placeholder="Short reminder…"
-            className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm outline-none transition-[var(--transition)] placeholder:text-[var(--muted)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-ring)]"
-            tabIndex={4}
-          />
-        </div>
+      </div>
+      <div className="w-full">
+        <label htmlFor="ticket-summary" className="sr-only">
+          Short reminder
+        </label>
+        <input
+          id="ticket-summary"
+          type="text"
+          value={summary}
+          onChange={(e) => setSummary(e.target.value)}
+          placeholder="Short reminder…"
+          className="w-full min-w-0 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm outline-none transition-[var(--transition)] placeholder:text-[var(--muted)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-ring)]"
+        />
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <select

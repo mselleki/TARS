@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CONTEXTS, DOMAINS, COUNTRIES, BUSINESSES, DOMAIN_LABELS } from '../constants'
+import { CONTEXTS, DOMAINS, COUNTRIES, DOMAIN_LABELS } from '../constants'
 import { SearchBar } from './SearchBar'
 
 const SHORTCUTS = [
@@ -178,17 +178,6 @@ export function Header({
             </button>
             {filtersExpanded && (
               <div className="flex flex-wrap items-center gap-2">
-                <select
-                  value={ticketFilters.business ?? ''}
-                  onChange={(e) => onTicketFiltersChange?.({ ...ticketFilters, business: e.target.value || null })}
-                  className="rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-[11px]"
-                  aria-label="Business"
-                >
-                  <option value="">Business</option>
-                  {BUSINESSES.map((b) => (
-                    <option key={b.id} value={b.id}>{b.label}</option>
-                  ))}
-                </select>
                 <select
                   value={ticketFilters.domain ?? ''}
                   onChange={(e) => onTicketFiltersChange?.({ ...ticketFilters, domain: e.target.value || null })}

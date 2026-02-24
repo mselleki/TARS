@@ -167,6 +167,20 @@ export function useStore() {
     dispatch({ type: actions.REQ_TICKET_DELETE, payload: id })
   }, [])
 
+  const addMeeting = useCallback((payload) => {
+    const id = payload.id ?? crypto.randomUUID()
+    dispatch({ type: actions.MEETING_ADD, payload: { ...payload, id } })
+    return id
+  }, [])
+
+  const updateMeeting = useCallback((id, updates) => {
+    dispatch({ type: actions.MEETING_UPDATE, payload: { id, updates } })
+  }, [])
+
+  const deleteMeeting = useCallback((id) => {
+    dispatch({ type: actions.MEETING_DELETE, payload: id })
+  }, [])
+
   const addRequester = useCallback((payload) => {
     const id = payload.id ?? crypto.randomUUID()
     dispatch({ type: actions.REQUESTER_ADD, payload: { ...payload, id } })
@@ -215,6 +229,9 @@ export function useStore() {
     addReqTicket,
     updateReqTicket,
     deleteReqTicket,
+    addMeeting,
+    updateMeeting,
+    deleteMeeting,
     addRequester,
     updateRequester,
     deleteRequester,

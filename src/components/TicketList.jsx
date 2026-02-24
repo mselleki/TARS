@@ -5,7 +5,7 @@ import {
   isOverdue,
   daysUntilDue,
 } from '../utils/ticketUtils'
-import { DOMAIN_LABELS, BUSINESSES, COUNTRIES } from '../constants'
+import { DOMAIN_LABELS, COUNTRIES } from '../constants'
 
 const NOW = Date.now()
 
@@ -139,9 +139,11 @@ const TicketRow = memo(function TicketRow({
   onSetDueDate,
   onDelete,
 }) {
-  const businessLabel = BUSINESSES.find((b) => b.id === ticket.business)?.label ?? ticket.business
   const domainLabel = DOMAIN_LABELS[ticket.domain] ?? ticket.domain
   const countryLabel = COUNTRIES.find((c) => c.value === ticket.countryId)?.label
+  const createdAtLabel = ticket.createdAtDate
+    ? new Date(ticket.createdAtDate + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+    : null
 
   return (
     <li
@@ -162,7 +164,7 @@ const TicketRow = memo(function TicketRow({
           <TicketBadges ticket={ticket} />
         </div>
         <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--muted)]">
-          {businessLabel && <span>{businessLabel}</span>}
+          {createdAtLabel && <span>Créé le {createdAtLabel}</span>}
           {domainLabel && <span>· {domainLabel}</span>}
           {ticket.owner && <span>· {ticket.owner}</span>}
           {countryLabel && <span>· {countryLabel}</span>}
@@ -215,11 +217,9 @@ export function TicketList({
           (t.id || '').toLowerCase().includes(q) ||
           (t.owner || '').toLowerCase().includes(q) ||
           (t.summary || '').toLowerCase().includes(q) ||
-          (t.business || '').toLowerCase().includes(q) ||
           (t.domain || '').toLowerCase().includes(q)
       )
     }
-    if (filters.business) list = list.filter((t) => t.business === filters.business)
     if (filters.domain) list = list.filter((t) => t.domain === filters.domain)
     if (filters.owner) list = list.filter((t) => (t.owner || '').toLowerCase().includes(filters.owner.toLowerCase()))
     if (filters.countryId) list = list.filter((t) => t.countryId === filters.countryId)

@@ -9,6 +9,7 @@ import {
   loadTickets,
   loadReqTickets,
   loadRequesters,
+  loadMeetings,
   saveTasks,
   saveRituals,
   saveDailyPlans,
@@ -16,6 +17,7 @@ import {
   saveTickets,
   saveReqTickets,
   saveRequesters,
+  saveMeetings,
 } from '../utils/storage'
 
 const ts = () => now()
@@ -49,6 +51,9 @@ export const actions = {
   REQ_TICKET_ADD: 'REQ_TICKET_ADD',
   REQ_TICKET_UPDATE: 'REQ_TICKET_UPDATE',
   REQ_TICKET_DELETE: 'REQ_TICKET_DELETE',
+  MEETING_ADD: 'MEETING_ADD',
+  MEETING_UPDATE: 'MEETING_UPDATE',
+  MEETING_DELETE: 'MEETING_DELETE',
 }
 
 function tasksReducer(tasks, action) {
@@ -182,6 +187,8 @@ function reqTicketsReducer(tickets, action) {
       return action.payload.reqTickets ?? []
     case actions.REQ_TICKET_ADD: {
       const p = action.payload
+      const now = ts()
+      const todayStr = new Date(now).toISOString().slice(0, 10)
       const t = {
         id: (p.id ?? '').trim().toUpperCase() || `REQ${Date.now().toString().slice(-6)}`,
         business: (p.business ?? '').trim() || '',
@@ -191,8 +198,9 @@ function reqTicketsReducer(tickets, action) {
         status: ['ACTIONABLE', 'WAITING_REPLY', 'DONE'].includes(p.status) ? p.status : 'ACTIONABLE',
         scope: p.scope === 'PERSO' ? 'PERSO' : 'PRO',
         countryId: p.countryId ?? null,
-        createdAt: ts(),
-        updatedAt: ts(),
+        createdAt: now,
+        createdAtDate: (p.createdAtDate || todayStr).slice(0, 10),
+        updatedAt: now,
         lastFollowUpAt: null,
         dueAt: p.dueAt ?? null,
       }
@@ -212,6 +220,7 @@ function reqTicketsReducer(tickets, action) {
               status: updates.status !== undefined && ['ACTIONABLE', 'WAITING_REPLY', 'DONE'].includes(updates.status) ? updates.status : t.status,
               scope: updates.scope === 'PERSO' ? 'PERSO' : updates.scope === 'PRO' ? 'PRO' : t.scope,
               updatedAt: ts(),
+              createdAtDate: updates.createdAtDate !== undefined ? String(updates.createdAtDate).slice(0, 10) : (t.createdAtDate || new Date(t.createdAt).toISOString().slice(0, 10)),
               lastFollowUpAt: updates.lastFollowUpAt !== undefined ? updates.lastFollowUpAt : t.lastFollowUpAt,
               dueAt: updates.dueAt !== undefined ? updates.dueAt : t.dueAt,
               countryId: updates.countryId !== undefined ? updates.countryId : t.countryId,
@@ -247,6 +256,47 @@ function requestersReducer(requesters, action) {
       return requesters.filter((r) => r.id !== action.payload)
     default:
       return requesters
+  }
+}
+
+function meetingsReducer(meetings, action) {
+  switch (action.type) {
+    case actions.INIT:
+      return action.payload.meetings ?? []
+    case actions.MEETING_ADD: {
+      const p = action.payload
+      const now = ts()
+      const todayStr = new Date(now).toISOString().slice(0, 10)
+      const m = {
+        id: p.id ?? crypto.randomUUID(),
+        createdAt: now,
+        createdAtDate: (p.createdAtDate || todayStr).slice(0, 10),
+        countryId: p.countryId ?? null,
+        domain: (p.domain ?? '').trim() || '',
+        content: (p.content ?? '').trim(),
+        title: (p.title ?? '').trim() || '',
+      }
+      return [...(meetings ?? []), m]
+    }
+    case actions.MEETING_UPDATE: {
+      const { id, updates } = action.payload
+      return (meetings ?? []).map((m) =>
+        m.id === id
+          ? {
+              ...m,
+              ...updates,
+              countryId: updates.countryId !== undefined ? updates.countryId : m.countryId,
+              domain: updates.domain !== undefined ? String(updates.domain).trim() : m.domain,
+              content: updates.content !== undefined ? String(updates.content) : m.content,
+              title: updates.title !== undefined ? String(updates.title).trim() : m.title,
+            }
+          : m
+      )
+    }
+    case actions.MEETING_DELETE:
+      return (meetings ?? []).filter((m) => m.id !== action.payload)
+    default:
+      return meetings ?? []
   }
 }
 
@@ -338,7 +388,8 @@ export function rootReducer(state, action) {
   const tickets = ticketsReducer(state.tickets, action)
   const reqTickets = reqTicketsReducer(state.reqTickets ?? [], action)
   const requesters = requestersReducer(state.requesters, action)
-  return { projects, tasks, rituals, dailyPlans, tickets, reqTickets, requesters }
+  const meetings = meetingsReducer(state.meetings, action)
+  return { projects, tasks, rituals, dailyPlans, tickets, reqTickets, requesters, meetings }
 }
 
 export function getInitialState() {
@@ -350,6 +401,7 @@ export function getInitialState() {
     tickets: loadTickets(),
     reqTickets: loadReqTickets(),
     requesters: loadRequesters(),
+    meetings: loadMeetings(),
   }
 }
 
@@ -362,6 +414,7 @@ export function persistState(state) {
     saveTickets(state.tickets ?? [])
     saveReqTickets(state.reqTickets ?? [])
     saveRequesters(state.requesters ?? [])
+    saveMeetings(state.meetings ?? [])
   } catch (e) {
     if (typeof console !== 'undefined' && console.warn) {
       console.warn('[persistState] failed:', e)

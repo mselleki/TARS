@@ -78,6 +78,9 @@ function App() {
     addReqTicket,
     updateReqTicket,
     deleteReqTicket,
+    addMeeting,
+    updateMeeting,
+    deleteMeeting,
     addRequester,
     updateReflection,
   } = useStore()
@@ -202,6 +205,10 @@ function App() {
             onDeleteTask={deleteTask}
             onToggleTask={toggleTaskStatus}
             onOpenComposerForDate={handleOpenComposerForDate}
+            meetings={state.meetings ?? []}
+            onAddMeeting={addMeeting}
+            onUpdateMeeting={updateMeeting}
+            onDeleteMeeting={deleteMeeting}
           />
         )}
 

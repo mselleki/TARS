@@ -81,6 +81,8 @@ function App() {
     addMeeting,
     updateMeeting,
     deleteMeeting,
+    setStandupLog,
+    setMeetingSheet,
     addRequester,
     updateReflection,
   } = useStore()

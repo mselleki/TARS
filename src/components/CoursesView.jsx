@@ -76,14 +76,14 @@ export function CoursesView({
           </div>
           <h2 className="text-lg font-semibold text-[var(--text)]">Liste de courses</h2>
           <p className="mt-2 text-sm text-[var(--muted)]">
-            Créez votre liste pour ne rien oublier au supermarché.
+            Create your list so you don't forget anything at the supermarket.
           </p>
           <button
             type="button"
             onClick={handleCreateList}
             className="mt-6 rounded-[var(--radius-lg)] bg-[var(--success)] px-6 py-3 text-sm font-semibold text-white shadow-[var(--shadow-sm)] transition-[var(--transition)] hover:opacity-90"
           >
-            Créer ma liste
+            Create my list
           </button>
         </div>
       </div>
@@ -103,9 +103,9 @@ export function CoursesView({
             type="text"
             value={quickAdd}
             onChange={(e) => setQuickAdd(e.target.value)}
-            placeholder="Ajouter un article…"
+            placeholder="Add item…"
             className="min-w-0 flex-1 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] px-4 py-2.5 text-sm outline-none placeholder:text-[var(--muted)] focus:border-[var(--success)] focus:ring-1 focus:ring-[var(--success)]/30"
-            aria-label="Ajouter un article"
+            aria-label="Add item"
           />
           <button
             type="submit"
@@ -117,14 +117,14 @@ export function CoursesView({
         </form>
         {totalItems > 0 && (
           <p className="mt-2 text-xs text-[var(--muted)]">
-            {checkedItems}/{totalItems} cochés
+            {checkedItems}/{totalItems} checked
           </p>
         )}
       </div>
 
       {tree.length > 0 && (
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-[var(--muted)]">Ajouter dans :</span>
+          <span className="text-xs text-[var(--muted)]">Add to:</span>
           {tree.map((cat) => (
             <button
               key={cat.id}
@@ -139,12 +139,12 @@ export function CoursesView({
           <button
             type="button"
             onClick={() => {
-              const name = window.prompt('Nom de la catégorie (ex: Fruits, Légumes)')
+              const name = window.prompt('Category name (e.g. Fruits, Vegetables)')
               if (name?.trim()) onAddSubProject?.(coursesProject.id, name.trim().replace(/^\+ /, ''))
             }}
             className="rounded-full border border-dashed border-[var(--border)] px-3 py-1 text-xs text-[var(--muted)] transition-[var(--transition)] hover:border-[var(--success)] hover:text-[var(--success)]"
           >
-            + Catégorie
+            + Category
           </button>
         </div>
       )}
@@ -153,12 +153,12 @@ export function CoursesView({
         <button
           type="button"
           onClick={() => {
-            const name = window.prompt('Nom de la catégorie (ex: Fruits, Légumes)')
+            const name = window.prompt('Category name (e.g. Fruits, Vegetables)')
             if (name?.trim()) onAddSubProject?.(coursesProject.id, name.trim())
           }}
           className="rounded-[var(--radius-md)] border border-dashed border-[var(--border)] px-3 py-2 text-xs text-[var(--muted)] transition-[var(--transition)] hover:border-[var(--success)] hover:text-[var(--success)]"
         >
-          + Créer une catégorie pour organiser
+          + Create category to organize
         </button>
       )}
 
@@ -214,7 +214,7 @@ export function CoursesView({
 
       {coursesTasks.length === 0 && (
         <p className="py-8 text-center text-sm text-[var(--muted)]">
-          Commencez à ajouter des articles avec le champ ci-dessus.
+          Start adding items using the field above.
         </p>
       )}
     </div>
@@ -251,7 +251,7 @@ function CourseItem({ task, onToggle, onUpdate, onDelete }) {
             ? 'border-[var(--success)] bg-[var(--success)] text-white'
             : 'border-[var(--border-strong)] text-transparent hover:border-[var(--success)]'
         }`}
-        aria-label={isDone ? 'Décocher' : 'Cocher'}
+        aria-label={isDone ? 'Uncheck' : 'Check'}
       >
         {isDone && (
           <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
@@ -275,14 +275,14 @@ function CourseItem({ task, onToggle, onUpdate, onDelete }) {
           onClick={() => setEditing(true)}
           className={`min-w-0 flex-1 truncate text-left text-sm ${isDone ? 'text-[var(--muted)] line-through' : 'text-[var(--text)]'}`}
         >
-          {task.title || 'Sans titre'}
+          {task.title || 'Untitled'}
         </button>
       )}
       <button
         type="button"
         onClick={() => onDelete()}
         className="rounded p-1 text-[var(--muted)] opacity-0 transition-[var(--transition)] hover:bg-[var(--danger-subtle)] hover:text-[var(--danger)] group-hover:opacity-100"
-        aria-label="Supprimer"
+        aria-label="Delete"
       >
         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

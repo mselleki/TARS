@@ -61,7 +61,7 @@ export function CoursesPanel({
             onClick={handleCreateList}
             className="rounded-[var(--radius-md)] bg-[var(--success)] px-3 py-1.5 text-xs font-medium text-white hover:opacity-90"
           >
-            Créer la liste
+            Create list
           </button>
         </div>
       </section>
@@ -92,7 +92,7 @@ export function CoursesPanel({
               type="text"
               value={quickAdd}
               onChange={(e) => setQuickAdd(e.target.value)}
-              placeholder="Ajouter un article…"
+              placeholder="Add item…"
               className="min-w-0 flex-1 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm outline-none placeholder:text-[var(--muted)] focus:border-[var(--success)]"
             />
             <button

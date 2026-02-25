@@ -139,7 +139,7 @@ function OverviewPersoTodo({ tasks, onToggleTask, onUpdateTask, onDeleteTask }) 
       </h2>
       <div className="p-4 space-y-2">
         {persoTasks.length === 0 ? (
-          <p className="text-xs text-[var(--muted)]">Aucune tâche. Ajoutez-en depuis Projects ou le Board (contexte Perso).</p>
+          <p className="text-xs text-[var(--muted)]">No tasks. Add some from Projects or the Board (Perso context).</p>
         ) : (
           <ul className="space-y-2">
             {persoTasks.map((task) => (
@@ -174,7 +174,7 @@ function PersoTodoRow({ task, onToggle, onUpdate, onDelete }) {
         type="button"
         onClick={() => onToggle?.(task.id)}
         className="flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 border-[var(--border-strong)] transition-colors hover:border-[var(--accent)] hover:bg-[var(--accent-subtle)]"
-        aria-label="Marquer faite"
+        aria-label="Mark done"
       />
       {editing ? (
         <input
@@ -199,7 +199,7 @@ function PersoTodoRow({ task, onToggle, onUpdate, onDelete }) {
         type="button"
         onClick={() => onDelete?.(task.id)}
         className="rounded p-1.5 text-[var(--muted)] hover:bg-[var(--danger-subtle)] hover:text-[var(--danger)]"
-        aria-label="Supprimer"
+        aria-label="Delete"
       >
         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

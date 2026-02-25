@@ -147,7 +147,7 @@ function App() {
   }, [addProject, context])
 
   const handleAddCategory = useCallback((parentId, title) => {
-    addProject({ title: title || 'Nouvelle catégorie', context, parentProjectId: parentId })
+    addProject({ title: title || 'New category', context, parentProjectId: parentId })
   }, [addProject, context])
 
   const handleDeleteProject = useCallback((id) => {
@@ -260,7 +260,7 @@ function App() {
                   className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] px-2.5 py-1.5 text-sm text-[var(--text)]"
                   aria-label="Sous-projet"
                 >
-                  <option value="">Tous les sous-projets</option>
+                  <option value="">All sub-projects</option>
                   {state.projects.filter((p) => p.context === context).map((p) => (
                     <option key={p.id} value={p.id}>{p.title}</option>
                   ))}
@@ -269,9 +269,9 @@ function App() {
                   value={boardFilters.countryId}
                   onChange={(e) => setBoardFilters((f) => ({ ...f, countryId: e.target.value }))}
                   className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] px-2.5 py-1.5 text-sm text-[var(--text)]"
-                  aria-label="Pays"
+                  aria-label="Country"
                 >
-                  <option value="">Tous les pays</option>
+                  <option value="">All countries</option>
                   {COUNTRIES.map((c) => (
                     <option key={c.value} value={c.value}>{c.label}</option>
                   ))}
@@ -280,9 +280,9 @@ function App() {
                   value={boardFilters.domain}
                   onChange={(e) => setBoardFilters((f) => ({ ...f, domain: e.target.value }))}
                   className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] px-2.5 py-1.5 text-sm text-[var(--text)]"
-                  aria-label="Domaine"
+                  aria-label="Domain"
                 >
-                  <option value="">Tous les domaines</option>
+                  <option value="">All domains</option>
                   {DOMAINS.map((d) => (
                     <option key={d.value} value={d.value}>{d.label}</option>
                   ))}
@@ -293,7 +293,7 @@ function App() {
                     onClick={() => setBoardFilters({ projectId: '', countryId: '', domain: '' })}
                     className="text-xs font-medium text-[var(--muted)] underline hover:text-[var(--text)]"
                   >
-                    Réinitialiser
+                    Reset
                   </button>
                 )}
               </div>

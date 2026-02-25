@@ -100,7 +100,7 @@ function normalizeRequester(r) {
   return {
     ...r,
     id: r.id ?? crypto.randomUUID(),
-    name: (r.name ?? '').trim() || 'Sans nom',
+    name: (r.name ?? '').trim() || 'Unnamed',
   }
 }
 

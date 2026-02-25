@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
 import { today } from '../utils/date'
 
-const WEEKDAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
-const MONTHS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 function getMonthGrid(year, month) {
   const first = new Date(year, month, 1)
@@ -50,10 +50,10 @@ function formatDayLabel(dateStr) {
 function formatDailyTitle(dateStr) {
   const d = new Date(dateStr + 'T12:00:00')
   const todayStr = today()
-  if (dateStr === todayStr) return "Aujourd'hui"
+  if (dateStr === todayStr) return 'Today'
   const yesterday = new Date(todayStr)
   yesterday.setDate(yesterday.getDate() - 1)
-  if (dateStr === yesterday.toISOString().slice(0, 10)) return 'Hier'
+  if (dateStr === yesterday.toISOString().slice(0, 10)) return 'Yesterday'
   return `${WEEKDAYS[d.getDay() === 0 ? 6 : d.getDay() - 1]} ${d.getDate()} ${MONTHS[d.getMonth()]}`
 }
 
@@ -126,20 +126,20 @@ export function PersoAgenda({
             type="button"
             onClick={viewMode === 'month' ? goPrev : viewMode === 'week' ? goPrevWeek : goPrevDay}
             className="rounded-[var(--radius-md)] p-2 text-[var(--muted)] hover:bg-[var(--border)] hover:text-[var(--text)]"
-            aria-label="Précédent"
+            aria-label="Previous"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           </button>
           <h2 className="text-sm font-semibold text-[var(--text-secondary)] shrink-0 min-w-[140px] text-center">
             {viewMode === 'month' && `${MONTHS[base.month]} ${base.year}`}
-            {viewMode === 'week' && `Semaine du ${formatDayLabel(weekDates[0])} ${MONTHS[new Date(weekDates[0] + 'T12:00:00').getMonth()]}`}
+            {viewMode === 'week' && `Week of ${formatDayLabel(weekDates[0])} ${MONTHS[new Date(weekDates[0] + 'T12:00:00').getMonth()]}`}
             {viewMode === 'daily' && formatDailyTitle(dailyDate)}
           </h2>
           <button
             type="button"
             onClick={viewMode === 'month' ? goNext : viewMode === 'week' ? goNextWeek : goNextDay}
             className="rounded-[var(--radius-md)] p-2 text-[var(--muted)] hover:bg-[var(--border)] hover:text-[var(--text)]"
-            aria-label="Suivant"
+            aria-label="Next"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
           </button>
@@ -156,7 +156,7 @@ export function PersoAgenda({
               }}
               className={`px-3 py-1.5 text-xs font-medium rounded-[var(--radius-sm)] transition-[var(--transition)] ${viewMode === mode ? 'bg-[var(--surface)] text-[var(--accent)] shadow-[var(--shadow-sm)]' : 'text-[var(--muted)] hover:text-[var(--text)]'}`}
             >
-              {mode === 'month' ? 'Mois' : mode === 'week' ? 'Semaine' : 'Jour'}
+              {mode === 'month' ? 'Month' : mode === 'week' ? 'Week' : 'Day'}
             </button>
           ))}
         </div>
@@ -265,7 +265,7 @@ export function PersoAgenda({
                             />
                           ))}
                       </ul>
-                      <span className="text-xs text-[var(--muted)]">+ tâche</span>
+                      <span className="text-xs text-[var(--muted)]">+ task</span>
                     </td>
                   )
                 })}
@@ -282,7 +282,7 @@ export function PersoAgenda({
         >
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-medium text-[var(--muted)]">{dailyDate}</span>
-            <span className="text-xs text-[var(--accent)]">+ Ajouter une tâche</span>
+            <span className="text-xs text-[var(--accent)]">+ Add task</span>
           </div>
           <ul className="space-y-2">
             {(tasksByDate.get(dailyDate) ?? [])
@@ -314,7 +314,7 @@ function AgendaCellItem({ task, onToggle, onDelete }) {
         type="button"
         onClick={(e) => { e.stopPropagation(); onToggle?.(task.id) }}
         className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded border border-[var(--border-strong)] transition-colors hover:border-[var(--accent)]"
-        aria-label={isDone ? 'Marquer non faite' : 'Marquer faite'}
+        aria-label={isDone ? 'Mark incomplete' : 'Mark complete'}
       >
         {isDone && (
           <svg className="h-2 w-2" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
@@ -329,7 +329,7 @@ function AgendaCellItem({ task, onToggle, onDelete }) {
         type="button"
         onClick={(e) => { e.stopPropagation(); onDelete?.(task.id) }}
         className="rounded p-0.5 text-[var(--muted)] opacity-0 hover:bg-[var(--danger-subtle)] hover:text-[var(--danger)] group-hover:opacity-100"
-        aria-label="Supprimer"
+        aria-label="Delete"
       >
         <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

@@ -51,7 +51,7 @@ export function TicketsPanel({ tickets = [], requesters = [], onAdd, onUpdate, o
           <svg className="h-4 w-4 text-[var(--accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
           </svg>
-          Tickets à suivre
+          Tickets to track
         </span>
         <span className="rounded-[var(--radius-sm)] bg-[var(--bg)] px-2 py-0.5 text-xs font-medium tabular-nums text-[var(--muted)]">
           {openTickets.length}
@@ -81,9 +81,9 @@ export function TicketsPanel({ tickets = [], requesters = [], onAdd, onUpdate, o
                 value={countryId}
                 onChange={(e) => setCountryId(e.target.value)}
                 className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm outline-none focus:border-[var(--accent)]"
-                aria-label="Pays"
+                aria-label="Country"
               >
-                <option value="">Pays</option>
+                <option value="">Country</option>
                 {COUNTRIES.map((c) => (
                   <option key={c.value} value={c.value}>{c.label}</option>
                 ))}
@@ -93,9 +93,9 @@ export function TicketsPanel({ tickets = [], requesters = [], onAdd, onUpdate, o
                   value={requesterId}
                   onChange={(e) => setRequesterId(e.target.value)}
                   className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm outline-none focus:border-[var(--accent)] min-w-[140px]"
-                  aria-label="Demandeur"
+                  aria-label="Requester"
                 >
-                  <option value="">Demandeur</option>
+                  <option value="">Requester</option>
                   {requesters.map((r) => (
                     <option key={r.id} value={r.id}>{r.name}</option>
                   ))}
@@ -106,7 +106,7 @@ export function TicketsPanel({ tickets = [], requesters = [], onAdd, onUpdate, o
                       type="text"
                       value={newRequesterName}
                       onChange={(e) => setNewRequesterName(e.target.value)}
-                      placeholder="Nom"
+                      placeholder="Name"
                       className="w-28 rounded-[var(--radius-md)] border border-[var(--border)] px-2 py-1.5 text-sm"
                       onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddNewRequester())}
                     />
@@ -119,7 +119,7 @@ export function TicketsPanel({ tickets = [], requesters = [], onAdd, onUpdate, o
                     onClick={() => setShowNewRequester(true)}
                     className="rounded-[var(--radius-md)] border border-dashed border-[var(--border)] px-2 py-1.5 text-xs text-[var(--muted)] hover:text-[var(--text)]"
                   >
-                    + Personne
+                    + Person
                   </button>
                 )}
               </div>
@@ -182,7 +182,7 @@ function TicketRow({ ticket, requesters, onUpdate, onDelete, onResolve, onAddReq
             onChange={(e) => onUpdate?.(ticket.id, { countryId: e.target.value || null })}
             className="rounded-[var(--radius-sm)] border border-[var(--border)] px-2 py-1 text-xs"
           >
-            <option value="">Pays</option>
+            <option value="">Country</option>
             {COUNTRIES.map((c) => (
               <option key={c.value} value={c.value}>{c.label}</option>
             ))}
@@ -192,7 +192,7 @@ function TicketRow({ ticket, requesters, onUpdate, onDelete, onResolve, onAddReq
             onChange={(e) => onUpdate?.(ticket.id, { requesterId: e.target.value || null })}
             className="rounded-[var(--radius-sm)] border border-[var(--border)] px-2 py-1 text-xs min-w-[100px]"
           >
-            <option value="">Demandeur</option>
+            <option value="">Requester</option>
             {requesters.map((r) => (
               <option key={r.id} value={r.id}>{r.name}</option>
             ))}
@@ -202,7 +202,7 @@ function TicketRow({ ticket, requesters, onUpdate, onDelete, onResolve, onAddReq
               type="text"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              placeholder="Nouvelle personne"
+              placeholder="New person"
               className="w-24 rounded-[var(--radius-sm)] border border-[var(--border)] px-2 py-0.5 text-xs"
               onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddRequester())}
             />
@@ -214,9 +214,9 @@ function TicketRow({ ticket, requesters, onUpdate, onDelete, onResolve, onAddReq
         <span
           onClick={() => setEditing(true)}
           className="cursor-pointer text-[10px] text-[var(--muted)] hover:text-[var(--text)]"
-          title="Cliquer pour modifier"
+          title="Click to edit"
         >
-          {[country?.label, requester?.name].filter(Boolean).join(' · ') || 'Pays · Demandeur'}
+          {[country?.label, requester?.name].filter(Boolean).join(' · ') || 'Country · Requester'}
         </span>
       )}
       <div className="flex gap-1 opacity-0 group-hover:opacity-100">
@@ -224,7 +224,7 @@ function TicketRow({ ticket, requesters, onUpdate, onDelete, onResolve, onAddReq
           type="button"
           onClick={() => onResolve?.(ticket.id)}
           className="rounded p-1 text-[var(--success)] hover:bg-[var(--success-subtle)]"
-          title="Marquer suivi"
+          title="Mark followed"
         >
           <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

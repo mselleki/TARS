@@ -34,7 +34,7 @@ export function TicketsView({
     return (
       <div className="mx-auto max-w-md rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] p-8 text-center">
         <p className="text-sm text-[var(--muted)]">
-          Passez en contexte <strong>Pro</strong> pour suivre vos tickets tech.
+          Switch to <strong>Pro</strong> context to track your tech tickets.
         </p>
       </div>
     )
@@ -43,11 +43,11 @@ export function TicketsView({
   return (
     <div className="mx-auto max-w-xl space-y-6">
       <div className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
-        <h2 className="mb-3 text-sm font-semibold text-[var(--text)]">Nouveau ticket à suivre</h2>
+        <h2 className="mb-3 text-sm font-semibold text-[var(--text)]">New ticket to track</h2>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
             <label htmlFor="ticket-ref" className="mb-1 block text-xs font-medium text-[var(--muted)]">
-              Référence ticket
+              Ticket reference
             </label>
             <input
               ref={refInputRef}
@@ -61,14 +61,14 @@ export function TicketsView({
           </div>
           <div>
             <label htmlFor="ticket-reason" className="mb-1 block text-xs font-medium text-[var(--muted)]">
-              Raison du follow-up
+              Reason for follow-up
             </label>
             <input
               id="ticket-reason"
               type="text"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="ex: Blocage prod, promis pour mardi"
+              placeholder="e.g. Prod blocker, promised for Tuesday"
               className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm outline-none placeholder:text-[var(--muted)] focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent-ring)]"
             />
           </div>
@@ -77,7 +77,7 @@ export function TicketsView({
             disabled={!ref.trim()}
             className="rounded-[var(--radius-md)] bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white transition-[var(--transition)] hover:bg-[var(--accent-hover)] disabled:opacity-50"
           >
-            Ajouter
+            Add
           </button>
         </form>
       </div>
@@ -85,7 +85,7 @@ export function TicketsView({
       {openTickets.length > 0 && (
         <section>
           <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
-            À suivre ({openTickets.length})
+            To track ({openTickets.length})
           </h3>
           <ul className="space-y-2">
             {openTickets.map((t) => (
@@ -104,7 +104,7 @@ export function TicketsView({
       {resolvedTickets.length > 0 && (
         <section>
           <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
-            Suivis ({resolvedTickets.length})
+            Tracked ({resolvedTickets.length})
           </h3>
           <ul className="space-y-2">
             {resolvedTickets
@@ -125,7 +125,7 @@ export function TicketsView({
 
       {proTickets.length === 0 && (
         <p className="py-6 text-center text-sm text-[var(--muted)]">
-          Aucun ticket enregistré. Ajoutez vos tickets tech et la raison du follow-up pour ne pas oublier.
+          No tickets yet. Add your tech tickets and follow-up reason so nothing gets forgotten.
         </p>
       )}
     </div>
@@ -154,14 +154,14 @@ function TicketItem({ ticket, resolved, onUpdate, onDelete, onResolve }) {
             type="text"
             value={editRef}
             onChange={(e) => setEditRef(e.target.value)}
-            placeholder="Référence"
+            placeholder="Reference"
             className="w-full rounded-[var(--radius-sm)] border border-[var(--border)] px-2 py-1 text-sm"
           />
           <input
             type="text"
             value={editReason}
             onChange={(e) => setEditReason(e.target.value)}
-            placeholder="Raison"
+            placeholder="Reason"
             className="w-full rounded-[var(--radius-sm)] border border-[var(--border)] px-2 py-1 text-sm"
           />
           <div className="flex gap-2">
@@ -170,14 +170,14 @@ function TicketItem({ ticket, resolved, onUpdate, onDelete, onResolve }) {
               onClick={handleSave}
               className="text-xs font-medium text-[var(--accent)] hover:underline"
             >
-              Enregistrer
+              Save
             </button>
             <button
               type="button"
               onClick={() => setEditing(false)}
               className="text-xs text-[var(--muted)] hover:underline"
             >
-              Annuler
+              Cancel
             </button>
           </div>
         </div>
@@ -199,7 +199,7 @@ function TicketItem({ ticket, resolved, onUpdate, onDelete, onResolve }) {
                 type="button"
                 onClick={() => onResolve?.(ticket.id)}
                 className="rounded p-1.5 text-[var(--success)] transition-colors hover:bg-[var(--success-subtle)]"
-                title="Marquer comme suivi"
+                title="Mark as followed"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -210,7 +210,7 @@ function TicketItem({ ticket, resolved, onUpdate, onDelete, onResolve }) {
               type="button"
               onClick={() => setEditing(true)}
               className="rounded p-1.5 text-[var(--muted)] transition-colors hover:bg-[var(--border)] hover:text-[var(--text)]"
-              title="Modifier"
+              title="Edit"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -220,7 +220,7 @@ function TicketItem({ ticket, resolved, onUpdate, onDelete, onResolve }) {
               type="button"
               onClick={() => onDelete?.(ticket.id)}
               className="rounded p-1.5 text-[var(--muted)] transition-colors hover:bg-[var(--danger-subtle)] hover:text-[var(--danger)]"
-              title="Supprimer"
+              title="Delete"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

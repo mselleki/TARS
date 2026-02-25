@@ -142,7 +142,7 @@ const TicketRow = memo(function TicketRow({
   const domainLabel = DOMAIN_LABELS[ticket.domain] ?? ticket.domain
   const countryLabel = COUNTRIES.find((c) => c.value === ticket.countryId)?.label
   const createdAtLabel = ticket.createdAtDate
-    ? new Date(ticket.createdAtDate + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+    ? new Date(ticket.createdAtDate + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
     : null
 
   return (
@@ -164,7 +164,7 @@ const TicketRow = memo(function TicketRow({
           <TicketBadges ticket={ticket} />
         </div>
         <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--muted)]">
-          {createdAtLabel && <span>Créé le {createdAtLabel}</span>}
+          {createdAtLabel && <span>Created on {createdAtLabel}</span>}
           {domainLabel && <span>· {domainLabel}</span>}
           {ticket.owner && <span>· {ticket.owner}</span>}
           {countryLabel && <span>· {countryLabel}</span>}

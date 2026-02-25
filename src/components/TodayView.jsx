@@ -67,11 +67,11 @@ export function TodayView({
       />
       <section>
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
-          À faire aujourd&apos;hui
+          To do today
         </h2>
         {todayTasks.length === 0 ? (
           <p className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] p-6 text-center text-sm text-[var(--muted)]">
-            Aucune tâche à faire ou à échéance aujourd&apos;hui.
+            No tasks to do or due today.
           </p>
         ) : (
           <ul className="space-y-2">

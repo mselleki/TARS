@@ -18,8 +18,8 @@ const GRID_DOMAINS = [
 
 function getNewMeetingBlock() {
   const now = new Date()
-  const dateLabel = now.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
-  return `\n\n────────────────────────────────────────\n  Nouvelle réunion · ${dateLabel}\n────────────────────────────────────────\n\n`
+  const dateLabel = now.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  return `\n\n────────────────────────────────────────\n  New meeting · ${dateLabel}\n────────────────────────────────────────\n\n`
 }
 
 function sheetKey(countryId, domain) {
@@ -89,49 +89,49 @@ export function DailyStandup({
 
   return (
     <div className="space-y-10">
-      {/* Carnet Stand-up quotidien */}
+      {/* Daily stand-up notebook */}
       <section
         className="relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[#fdfcfa] shadow-[0 2px 8px rgba(0,0,0,0.04), 0 12px 32px -12px rgba(0,0,0,0.08)] dark:bg-[#f5f3f0] dark:text-gray-900 dark:border-gray-300"
-        aria-label="Carnet stand-up quotidien"
+        aria-label="Daily stand-up notebook"
       >
         <div className="absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-indigo-200/50 via-indigo-100/30 to-transparent dark:from-indigo-300/40 dark:via-indigo-200/20" aria-hidden />
         <div className="pl-12 pr-6 py-6">
           <div className="flex items-center justify-between gap-4 mb-5">
             <h2 className="text-lg font-semibold text-gray-800 tracking-tight dark:text-gray-900">
-              Stand-up quotidien
+              Daily stand-up
             </h2>
             <button
               type="button"
               onClick={handleNewMeeting}
               className="shrink-0 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-md shadow-indigo-900/20 transition-[var(--transition)] hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-900/25"
             >
-              + Nouvelle réunion
+              + New meeting
             </button>
           </div>
           <textarea
             ref={logRef}
             value={standupLog}
             onChange={(e) => onStandupLogChange?.(e.target.value)}
-            placeholder="Cliquez sur « Nouvelle réunion » pour insérer un bloc daté, puis écrivez en dessous…"
+            placeholder="Click « New meeting » to insert a dated block, then write below…"
             className="min-h-[240px] w-full resize-y rounded-lg border-0 bg-transparent px-0 py-2 text-[15px] leading-[1.7] text-gray-900 placeholder:text-gray-500 outline-none focus:ring-0 dark:text-gray-900 dark:placeholder:text-gray-600"
             style={{ fontFamily: 'ui-serif, Georgia, "Times New Roman", serif' }}
-            aria-label="Notes du stand-up"
+            aria-label="Stand-up notes"
           />
         </div>
       </section>
 
-      {/* Carnet par Pays × Domaine */}
+      {/* Country × Domain notebook */}
       <section
         className="relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[#fdfcfa] p-5 shadow-[0 2px 8px rgba(0,0,0,0.04), 0 12px 32px -12px rgba(0,0,0,0.06)] dark:bg-[#f5f3f0] dark:border-gray-300 dark:shadow-[0 2px 12px rgba(0,0,0,0.08)]"
-        aria-label="Carnet par pays et domaine"
+        aria-label="Country × Domain notebook"
       >
         <div className="absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-amber-200/40 via-teal-200/20 to-transparent dark:from-amber-300/30 dark:via-teal-200/15" aria-hidden />
         <div className="relative mb-5">
           <h2 className="text-lg font-semibold text-gray-800 tracking-tight dark:text-gray-900">
-            Carnet Pays × Domaine
+            Country × Domain notebook
           </h2>
           <p className="mt-1 text-sm text-gray-600 dark:text-gray-700">
-            En abscisse : domaines. En ordonnée : pays.
+            X-axis: domains. Y-axis: countries.
           </p>
         </div>
         <div className="relative overflow-x-auto rounded-xl border border-gray-200 bg-white/60 p-3 shadow-inner dark:border-gray-300 dark:bg-white/40">
@@ -139,7 +139,7 @@ export function DailyStandup({
             <thead>
               <tr>
                 <th className="w-16 rounded-tl-lg bg-gray-100/80 px-3 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-600 dark:bg-gray-200/60 dark:text-gray-700">
-                  Pays \ Domaine
+                  Country \ Domain
                 </th>
                 {GRID_DOMAINS.map((d, i) => (
                   <th
@@ -193,7 +193,7 @@ export function DailyStandup({
           />
           <aside
             className="panel-slide-in fixed right-0 top-0 z-40 flex h-full w-full max-w-md flex-col border-l border-[var(--border)] bg-[var(--surface)] shadow-xl"
-            aria-label="Notes Pays × Domaine"
+            aria-label="Country × Domain notes"
           >
             <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
               <h3 className="text-base font-semibold text-[var(--text)]">
@@ -203,7 +203,7 @@ export function DailyStandup({
                 type="button"
                 onClick={() => setSelectedSheet(null)}
                 className="rounded-lg p-2 text-[var(--muted)] hover:bg-[var(--bg)] hover:text-[var(--text)]"
-                aria-label="Fermer"
+                aria-label="Close"
               >
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
@@ -221,8 +221,8 @@ export function DailyStandup({
                   autoFocus
                 />
               </section>
-              <section aria-label="Tâches">
-                <h4 className="mb-2 text-sm font-semibold text-[var(--text)]">Tâches</h4>
+              <section aria-label="Tasks">
+                <h4 className="mb-2 text-sm font-semibold text-[var(--text)]">Tasks</h4>
                 <ul className="space-y-2">
                   {sheet.tasks.map((t) => (
                     <li key={t.id} className="flex items-center gap-2">
@@ -234,7 +234,7 @@ export function DailyStandup({
                           onMeetingSheetChange?.(currentKey, { tasks: next })
                         }}
                         className="h-4 w-4 rounded border-[var(--border-strong)] text-[var(--accent)] focus:ring-[var(--accent-ring)]"
-                        aria-label={t.label || 'Cocher'}
+                        aria-label={t.label || 'Toggle'}
                       />
                       <input
                         type="text"
@@ -243,7 +243,7 @@ export function DailyStandup({
                           const next = sheet.tasks.map((x) => (x.id === t.id ? { ...x, label: e.target.value } : x))
                           onMeetingSheetChange?.(currentKey, { tasks: next })
                         }}
-                        placeholder="Libellé de la tâche"
+                        placeholder="Task label"
                         className="min-w-0 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-sm text-[var(--text)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent-ring)]"
                       />
                     </li>
@@ -257,7 +257,7 @@ export function DailyStandup({
                   }}
                   className="mt-2 flex items-center gap-2 rounded-lg border border-dashed border-[var(--border)] px-3 py-2 text-sm text-[var(--muted)] transition-[var(--transition)] hover:border-[var(--accent)]/50 hover:bg-[var(--accent-subtle)] hover:text-[var(--text)]"
                 >
-                  <span className="text-base">+</span> Ajouter une tâche
+                  <span className="text-base">+</span> Add task
                 </button>
               </section>
             </div>
@@ -290,7 +290,7 @@ function SheetCell({ countryValue, domainValue, notes, onOpen, isAnimating }) {
       onClick={handleClick}
       className={`sheet-cell block w-full rounded-xl border text-left shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-indigo-400/50 focus:ring-offset-1 active:scale-[0.99] ${domainClass} ${isAnimating ? 'sheet-cell--clicked' : ''}`}
       style={{ minHeight: '112px' }}
-      aria-label="Ouvrir notes"
+      aria-label="Open notes"
     >
       <div className="flex min-h-[112px] items-center justify-center px-3 py-3">
         {preview ? (
@@ -299,7 +299,7 @@ function SheetCell({ countryValue, domainValue, notes, onOpen, isAnimating }) {
           </p>
         ) : (
           <p className="text-xs italic text-gray-500 dark:text-gray-600" style={{ fontFamily: 'ui-serif, Georgia, serif' }}>
-            — Cliquer pour éditer…
+            — Click to edit…
           </p>
         )}
       </div>

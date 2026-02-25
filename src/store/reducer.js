@@ -248,7 +248,7 @@ function requestersReducer(requesters, action) {
     case actions.REQUESTER_ADD: {
       const r = {
         id: action.payload.id ?? crypto.randomUUID(),
-        name: (action.payload.name ?? '').trim() || 'Sans nom',
+        name: (action.payload.name ?? '').trim() || 'Unnamed',
       }
       return [...requesters, r]
     }

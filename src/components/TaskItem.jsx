@@ -172,7 +172,7 @@ export function TaskItem({
             <button
               type="button"
               onClick={() => startEdit('title', task.title)}
-              title="Cliquer pour modifier"
+              title="Click to edit"
               className={`min-h-[1.25rem] min-w-0 flex-1 text-left transition-colors hover:text-[var(--color-accent)] ${
                 compact ? 'overflow-hidden text-ellipsis whitespace-nowrap' : 'break-words whitespace-normal'
               } ${
@@ -196,8 +196,8 @@ export function TaskItem({
                 type="button"
                 onClick={() => startEdit('title', task.title)}
                 className="shrink-0 rounded p-1 text-[var(--muted)] opacity-0 transition-opacity hover:bg-[var(--accent-subtle)] hover:text-[var(--accent)] group-hover:opacity-100"
-                title="Modifier le titre"
-                aria-label="Modifier le titre"
+                title="Edit title"
+                aria-label="Edit title"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -273,12 +273,12 @@ export function TaskItem({
           )}
           {!compact && task.context === 'pro' && (task.countryIds ?? []).length === 0 && (
             <button type="button" onClick={() => startEdit('country', task.countryIds ?? [])} className="rounded px-1.5 py-0.5 text-[10px] text-[var(--muted)] hover:bg-[var(--border)]/50 hover:text-[var(--color-text)]">
-              + pays
+              + country
             </button>
           )}
           {!compact && task.context === 'pro' && (task.domainIds ?? []).length === 0 && (
             <button type="button" onClick={() => startEdit('domain', task.domainIds ?? [])} className="rounded px-1.5 py-0.5 text-[10px] text-[var(--muted)] hover:bg-[var(--border)]/50 hover:text-[var(--color-text)]">
-              + domaine
+              + domain
             </button>
           )}
         </div>

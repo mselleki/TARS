@@ -74,8 +74,8 @@ export function Header({
               {syncStatus !== 'idle' && (
                 <span
                   className="flex items-center text-[var(--muted)]"
-                  title={syncStatus === 'syncing' ? 'Synchronisation…' : syncStatus === 'ok' ? 'Synchronisé' : 'Erreur de sync'}
-                  aria-label={syncStatus === 'syncing' ? 'Synchronisation en cours' : syncStatus === 'ok' ? 'Synchronisé' : 'Erreur de synchronisation'}
+                  title={syncStatus === 'syncing' ? 'Syncing…' : syncStatus === 'ok' ? 'Synced' : 'Sync error'}
+                  aria-label={syncStatus === 'syncing' ? 'Syncing' : syncStatus === 'ok' ? 'Synced' : 'Sync error'}
                 >
                   {syncStatus === 'syncing' && (
                     <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden>

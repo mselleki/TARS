@@ -106,32 +106,33 @@ export function DailyStandup({
 
       {/* Carnet par Pays × Domaine */}
       <section
-        className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[0 2px 8px rgba(0,0,0,0.04)] dark:bg-[var(--surface)] dark:shadow-[0 2px 12px rgba(0,0,0,0.15)]"
+        className="relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[#fdfcfa] p-5 shadow-[0 2px 8px rgba(0,0,0,0.04), 0 12px 32px -12px rgba(0,0,0,0.06)] dark:bg-[#f5f3f0] dark:border-gray-300 dark:shadow-[0 2px 12px rgba(0,0,0,0.08)]"
         aria-label="Carnet par pays et domaine"
       >
-        <div className="mb-5">
-          <h2 className="text-lg font-semibold text-[var(--text)] tracking-tight">
+        <div className="absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-amber-200/40 via-teal-200/20 to-transparent dark:from-amber-300/30 dark:via-teal-200/15" aria-hidden />
+        <div className="relative mb-5">
+          <h2 className="text-lg font-semibold text-gray-800 tracking-tight dark:text-gray-900">
             Carnet Pays × Domaine
           </h2>
-          <p className="mt-1 text-sm text-[var(--muted)]">
+          <p className="mt-1 text-sm text-gray-600 dark:text-gray-700">
             En abscisse : domaines. En ordonnée : pays.
           </p>
         </div>
-        <div className="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--bg)]/50 p-3">
+        <div className="relative overflow-x-auto rounded-xl border border-gray-200 bg-white/60 p-3 shadow-inner dark:border-gray-300 dark:bg-white/40">
           <table className="w-full min-w-[560px] border-collapse">
             <thead>
               <tr>
-                <th className="w-16 rounded-t-lg bg-[var(--surface)] px-3 py-3 text-left text-xs font-medium text-[var(--muted)]">
+                <th className="w-16 rounded-tl-lg bg-gray-100/80 px-3 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-600 dark:bg-gray-200/60 dark:text-gray-700">
                   Pays \ Domaine
                 </th>
-                {GRID_DOMAINS.map((d) => (
+                {GRID_DOMAINS.map((d, i) => (
                   <th
                     key={d.value}
-                    className={`px-2 py-3 text-center text-xs font-semibold ${
-                      d.value === 'product' ? 'text-amber-700 dark:text-amber-400' :
-                      d.value === 'vendor' ? 'text-teal-700 dark:text-teal-400' :
-                      d.value === 'customer' ? 'text-indigo-700 dark:text-indigo-400' :
-                      'text-[var(--text-secondary)]'
+                    className={`px-2 py-3 text-center text-xs font-semibold ${i === GRID_DOMAINS.length - 1 ? 'rounded-tr-lg' : ''} ${
+                      d.value === 'product' ? 'bg-amber-100/70 text-amber-800 dark:bg-amber-200/50 dark:text-amber-900' :
+                      d.value === 'vendor' ? 'bg-teal-100/70 text-teal-800 dark:bg-teal-200/50 dark:text-teal-900' :
+                      d.value === 'customer' ? 'bg-indigo-100/70 text-indigo-800 dark:bg-indigo-200/50 dark:text-indigo-900' :
+                      'bg-gray-100/80 text-gray-700 dark:bg-gray-200/60 dark:text-gray-800'
                     }`}
                   >
                     {d.label}
@@ -140,9 +141,9 @@ export function DailyStandup({
               </tr>
             </thead>
             <tbody>
-              {GRID_COUNTRIES.map((row, rowIndex) => (
+              {GRID_COUNTRIES.map((row) => (
                 <tr key={row.value}>
-                  <td className="rounded-l-lg bg-[var(--surface)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] align-top">
+                  <td className="rounded-l-lg bg-gray-100/60 px-3 py-2 text-xs font-semibold text-gray-700 align-top dark:bg-gray-200/40 dark:text-gray-800">
                     {row.label}
                   </td>
                   {GRID_DOMAINS.map((col) => (
@@ -209,10 +210,10 @@ export function DailyStandup({
 }
 
 const DOMAIN_COLORS = {
-  product: 'border-l-amber-500/70 bg-amber-50/50 dark:bg-amber-950/20 dark:border-l-amber-400/50',
-  vendor: 'border-l-teal-500/70 bg-teal-50/50 dark:bg-teal-950/20 dark:border-l-teal-400/50',
-  customer: 'border-l-indigo-500/70 bg-indigo-50/50 dark:bg-indigo-950/20 dark:border-l-indigo-400/50',
-  all: 'border-l-[var(--border-strong)] bg-[var(--surface)]',
+  product: 'bg-amber-50 border-amber-200/80 hover:bg-amber-100/80 hover:border-amber-300 dark:bg-amber-100/60 dark:border-amber-300/70 dark:hover:bg-amber-200/50',
+  vendor: 'bg-teal-50/90 border-teal-200/80 hover:bg-teal-100/80 hover:border-teal-300 dark:bg-teal-100/60 dark:border-teal-300/70 dark:hover:bg-teal-200/50',
+  customer: 'bg-indigo-50/90 border-indigo-200/80 hover:bg-indigo-100/80 hover:border-indigo-300 dark:bg-indigo-100/60 dark:border-indigo-300/70 dark:hover:bg-indigo-200/50',
+  all: 'bg-gray-50 border-gray-200 hover:bg-gray-100 hover:border-gray-300 dark:bg-gray-100/70 dark:border-gray-300 dark:hover:bg-gray-200/60',
 }
 
 function SheetCell({ countryLabel, domainLabel, countryValue, domainValue, content, onOpen, isAnimating }) {
@@ -227,21 +228,21 @@ function SheetCell({ countryLabel, domainLabel, countryValue, domainValue, conte
     <button
       type="button"
       onClick={handleClick}
-      className={`sheet-cell block w-full rounded-xl border border-[var(--border)] border-l-4 text-left shadow-sm transition-[var(--transition)] hover:shadow-md hover:border-[var(--accent)]/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent-ring)] focus:ring-offset-1 dark:shadow-none ${domainClass} ${isAnimating ? 'sheet-cell--clicked' : ''}`}
-      style={{ minHeight: '108px' }}
+      className={`sheet-cell block w-full rounded-xl border text-left shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-indigo-400/50 focus:ring-offset-1 active:scale-[0.99] ${domainClass} ${isAnimating ? 'sheet-cell--clicked' : ''}`}
+      style={{ minHeight: '112px' }}
       aria-label={`Ouvrir notes ${countryLabel} ${domainLabel}`}
     >
-      <div className="border-b border-[var(--border)]/60 px-3 py-2 text-[11px] font-medium text-[var(--text-secondary)]">
+      <div className="px-3 pt-2.5 pb-1.5 text-[11px] font-semibold text-gray-700 dark:text-gray-800">
         {countryLabel} · {domainLabel}
       </div>
-      <div className="px-3 py-2.5">
+      <div className="px-3 pb-3 pt-0.5">
         {preview ? (
-          <p className="text-xs leading-relaxed text-[var(--text)] line-clamp-3" style={{ fontFamily: 'ui-serif, Georgia, serif' }}>
+          <p className="text-xs leading-relaxed text-gray-800 line-clamp-3 dark:text-gray-900" style={{ fontFamily: 'ui-serif, Georgia, serif' }}>
             {preview}
           </p>
         ) : (
-          <p className="text-xs text-[var(--muted)]" style={{ fontFamily: 'ui-serif, Georgia, serif' }}>
-            Cliquer pour éditer…
+          <p className="text-xs italic text-gray-500 dark:text-gray-600" style={{ fontFamily: 'ui-serif, Georgia, serif' }}>
+            — Cliquer pour éditer…
           </p>
         )}
       </div>

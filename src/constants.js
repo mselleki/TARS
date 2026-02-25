@@ -31,12 +31,14 @@ export const DOMAIN_LABELS = {
   product: 'Product',
   vendor: 'Vendor',
   customer: 'Customer',
+  sector4: 'Sector 4',
 }
 
 export const DOMAINS = [
   { value: 'product', label: 'Product', tagClass: 'bg-amber-200 text-amber-900 dark:bg-amber-700 dark:text-white' },
   { value: 'vendor', label: 'Vendor', tagClass: 'bg-teal-200 text-teal-900 dark:bg-teal-700 dark:text-white' },
   { value: 'customer', label: 'Customer', tagClass: 'bg-indigo-200 text-indigo-900 dark:bg-indigo-700 dark:text-white' },
+  { value: 'sector4', label: 'Sector 4', tagClass: 'bg-rose-200 text-rose-900 dark:bg-rose-700 dark:text-white' },
 ]
 
 export const TICKET_STATUSES = [

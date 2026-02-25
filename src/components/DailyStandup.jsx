@@ -13,6 +13,7 @@ const GRID_DOMAINS = [
   { value: 'product', label: 'Product' },
   { value: 'vendor', label: 'Vendor' },
   { value: 'customer', label: 'Customer' },
+  { value: 'sector2', label: 'Sector 2' },
   { value: 'sector4', label: 'Sector 4' },
   { value: 'all', label: 'All' },
 ]
@@ -149,6 +150,7 @@ export function DailyStandup({
                       d.value === 'product' ? 'bg-amber-100/70 text-amber-800 dark:bg-amber-200/50 dark:text-amber-900' :
                       d.value === 'vendor' ? 'bg-teal-100/70 text-teal-800 dark:bg-teal-200/50 dark:text-teal-900' :
                       d.value === 'customer' ? 'bg-indigo-100/70 text-indigo-800 dark:bg-indigo-200/50 dark:text-indigo-900' :
+                      d.value === 'sector2' ? 'bg-emerald-100/70 text-emerald-800 dark:bg-emerald-200/50 dark:text-emerald-900' :
                       d.value === 'sector4' ? 'bg-rose-100/70 text-rose-800 dark:bg-rose-200/50 dark:text-rose-900' :
                       'bg-gray-100/80 text-gray-700 dark:bg-gray-200/60 dark:text-gray-800'
                     }`}
@@ -275,6 +277,7 @@ const DOMAIN_COLORS = {
   product: 'bg-amber-50 border-amber-200/80 hover:bg-amber-100/80 hover:border-amber-300 dark:bg-amber-100/60 dark:border-amber-300/70 dark:hover:bg-amber-200/50',
   vendor: 'bg-teal-50/90 border-teal-200/80 hover:bg-teal-100/80 hover:border-teal-300 dark:bg-teal-100/60 dark:border-teal-300/70 dark:hover:bg-teal-200/50',
   customer: 'bg-indigo-50/90 border-indigo-200/80 hover:bg-indigo-100/80 hover:border-indigo-300 dark:bg-indigo-100/60 dark:border-indigo-300/70 dark:hover:bg-indigo-200/50',
+  sector2: 'bg-emerald-50/90 border-emerald-200/80 hover:bg-emerald-100/80 hover:border-emerald-300 dark:bg-emerald-100/60 dark:border-emerald-300/70 dark:hover:bg-emerald-200/50',
   sector4: 'bg-rose-50/90 border-rose-200/80 hover:bg-rose-100/80 hover:border-rose-300 dark:bg-rose-100/60 dark:border-rose-300/70 dark:hover:bg-rose-200/50',
   all: 'bg-gray-50 border-gray-200 hover:bg-gray-100 hover:border-gray-300 dark:bg-gray-100/70 dark:border-gray-300 dark:hover:bg-gray-200/60',
 }

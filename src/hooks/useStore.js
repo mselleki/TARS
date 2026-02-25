@@ -185,8 +185,14 @@ export function useStore() {
     dispatch({ type: actions.STANDUP_LOG_SET, payload: content })
   }, [])
 
-  const setMeetingSheet = useCallback((key, content) => {
-    dispatch({ type: actions.MEETING_SHEET_UPDATE, payload: { key, content } })
+  const setMeetingSheet = useCallback((key, patch) => {
+    const payload = { key }
+    if (typeof patch === 'string') payload.notes = patch
+    else if (patch && typeof patch === 'object') {
+      if (patch.notes !== undefined) payload.notes = patch.notes
+      if (patch.tasks !== undefined) payload.tasks = patch.tasks
+    }
+    dispatch({ type: actions.MEETING_SHEET_UPDATE, payload })
   }, [])
 
   const addRequester = useCallback((payload) => {

@@ -180,10 +180,22 @@ export function saveStandupLog(content) {
   }
 }
 
+function normalizeMeetingSheetValue(val) {
+  if (val == null) return { notes: '', tasks: [] }
+  if (typeof val === 'string') return { notes: val, tasks: [] }
+  return {
+    notes: typeof val.notes === 'string' ? val.notes : '',
+    tasks: Array.isArray(val.tasks) ? val.tasks : [],
+  }
+}
+
 export function loadMeetingSheets() {
   try {
     const raw = loadJSON(STORAGE_KEYS.meetingSheets, {})
-    return raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {}
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {}
+    const out = {}
+    for (const k of Object.keys(raw)) out[k] = normalizeMeetingSheetValue(raw[k])
+    return out
   } catch {
     return {}
   }
@@ -230,6 +242,11 @@ export function normalizeRemoteState(raw) {
     requesters: (raw.requesters ?? []).map(normalizeRequester),
     meetings: (raw.meetings ?? []).map((m) => normalizeMeeting(m)),
     standupLog: typeof raw.standupLog === 'string' ? raw.standupLog : '',
-    meetingSheets: raw.meetingSheets && typeof raw.meetingSheets === 'object' && !Array.isArray(raw.meetingSheets) ? raw.meetingSheets : {},
+    meetingSheets: (() => {
+      const rawSheets = raw.meetingSheets && typeof raw.meetingSheets === 'object' && !Array.isArray(raw.meetingSheets) ? raw.meetingSheets : {}
+      const out = {}
+      for (const k of Object.keys(rawSheets)) out[k] = normalizeMeetingSheetValue(rawSheets[k])
+      return out
+    })(),
   }
 }

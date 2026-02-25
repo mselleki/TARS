@@ -26,6 +26,22 @@ function sheetKey(countryId, domain) {
   return `${countryId}|${domain}`
 }
 
+function getSheet(meetingSheets, key) {
+  const raw = meetingSheets[key]
+  if (raw == null) return { notes: '', tasks: [] }
+  if (typeof raw === 'string') return { notes: raw, tasks: [] }
+  const tasks = Array.isArray(raw.tasks) ? raw.tasks : []
+  const normalizedTasks = tasks.map((t, i) =>
+    typeof t === 'string'
+      ? { id: `legacy-${i}`, label: t, done: false }
+      : { id: t.id ?? `task-${i}`, label: t.label ?? '', done: !!t.done }
+  )
+  return {
+    notes: typeof raw.notes === 'string' ? raw.notes : '',
+    tasks: normalizedTasks,
+  }
+}
+
 export function DailyStandup({
   standupLog = '',
   onStandupLogChange,
@@ -149,11 +165,9 @@ export function DailyStandup({
                   {GRID_DOMAINS.map((col) => (
                     <td key={col.value} className="p-2 align-top">
                       <SheetCell
-                        countryLabel={row.label}
-                        domainLabel={col.label}
                         countryValue={row.value}
                         domainValue={col.value}
-                        content={meetingSheets[sheetKey(row.value, col.value)] ?? ''}
+                        notes={(getSheet(meetingSheets, sheetKey(row.value, col.value))).notes}
                         onOpen={handleOpenSheet}
                         isAnimating={clickedCellKey === sheetKey(row.value, col.value)}
                       />
@@ -167,7 +181,10 @@ export function DailyStandup({
       </section>
 
       {/* Panel feuille */}
-      {selectedSheet && (
+      {selectedSheet && (() => {
+        const currentKey = sheetKey(selectedSheet.country, selectedSheet.domain)
+        const sheet = getSheet(meetingSheets, currentKey)
+        return (
         <>
           <div
             className="panel-backdrop-in fixed inset-0 z-30 bg-black/25 backdrop-blur-[2px]"
@@ -191,20 +208,63 @@ export function DailyStandup({
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
-            <div className="flex-1 overflow-auto p-4">
-              <textarea
-                value={meetingSheets[sheetKey(selectedSheet.country, selectedSheet.domain)] ?? ''}
-                onChange={(e) => onMeetingSheetChange?.(sheetKey(selectedSheet.country, selectedSheet.domain), e.target.value)}
-                placeholder="Notes…"
-                className="min-h-[280px] w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--bg)]/50 px-4 py-3 text-sm leading-relaxed text-[var(--text)] placeholder:text-[var(--muted)] outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-ring)]/30"
-                style={{ fontFamily: 'ui-serif, Georgia, serif' }}
-                aria-label="Notes"
-                autoFocus
-              />
+            <div className="flex flex-1 flex-col gap-6 overflow-auto p-4">
+              <section aria-label="Notes">
+                <h4 className="mb-2 text-sm font-semibold text-[var(--text)]">Notes</h4>
+                <textarea
+                  value={sheet.notes}
+                  onChange={(e) => onMeetingSheetChange?.(currentKey, { notes: e.target.value })}
+                  placeholder="Notes…"
+                  className="min-h-[180px] w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--bg)]/50 px-4 py-3 text-sm leading-relaxed text-[var(--text)] placeholder:text-[var(--muted)] outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-ring)]/30"
+                  style={{ fontFamily: 'ui-serif, Georgia, serif' }}
+                  aria-label="Notes"
+                  autoFocus
+                />
+              </section>
+              <section aria-label="Tâches">
+                <h4 className="mb-2 text-sm font-semibold text-[var(--text)]">Tâches</h4>
+                <ul className="space-y-2">
+                  {sheet.tasks.map((t) => (
+                    <li key={t.id} className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={t.done}
+                        onChange={() => {
+                          const next = sheet.tasks.map((x) => (x.id === t.id ? { ...x, done: !x.done } : x))
+                          onMeetingSheetChange?.(currentKey, { tasks: next })
+                        }}
+                        className="h-4 w-4 rounded border-[var(--border-strong)] text-[var(--accent)] focus:ring-[var(--accent-ring)]"
+                        aria-label={t.label || 'Cocher'}
+                      />
+                      <input
+                        type="text"
+                        value={t.label}
+                        onChange={(e) => {
+                          const next = sheet.tasks.map((x) => (x.id === t.id ? { ...x, label: e.target.value } : x))
+                          onMeetingSheetChange?.(currentKey, { tasks: next })
+                        }}
+                        placeholder="Libellé de la tâche"
+                        className="min-w-0 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-sm text-[var(--text)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent-ring)]"
+                      />
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newTask = { id: crypto.randomUUID(), label: '', done: false }
+                    onMeetingSheetChange?.(currentKey, { tasks: [...sheet.tasks, newTask] })
+                  }}
+                  className="mt-2 flex items-center gap-2 rounded-lg border border-dashed border-[var(--border)] px-3 py-2 text-sm text-[var(--muted)] transition-[var(--transition)] hover:border-[var(--accent)]/50 hover:bg-[var(--accent-subtle)] hover:text-[var(--text)]"
+                >
+                  <span className="text-base">+</span> Ajouter une tâche
+                </button>
+              </section>
             </div>
           </aside>
         </>
-      )}
+        )
+      })()}
     </div>
   )
 }
@@ -216,9 +276,9 @@ const DOMAIN_COLORS = {
   all: 'bg-gray-50 border-gray-200 hover:bg-gray-100 hover:border-gray-300 dark:bg-gray-100/70 dark:border-gray-300 dark:hover:bg-gray-200/60',
 }
 
-function SheetCell({ countryLabel, domainLabel, countryValue, domainValue, content, onOpen, isAnimating }) {
+function SheetCell({ countryValue, domainValue, notes, onOpen, isAnimating }) {
   const domainClass = DOMAIN_COLORS[domainValue] ?? DOMAIN_COLORS.all
-  const preview = content ? (content.trim().slice(0, 60) + (content.length > 60 ? '…' : '')) : null
+  const preview = notes ? (notes.trim().slice(0, 60) + (notes.length > 60 ? '…' : '')) : null
 
   const handleClick = () => {
     onOpen?.(countryValue, domainValue)
@@ -230,12 +290,9 @@ function SheetCell({ countryLabel, domainLabel, countryValue, domainValue, conte
       onClick={handleClick}
       className={`sheet-cell block w-full rounded-xl border text-left shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-indigo-400/50 focus:ring-offset-1 active:scale-[0.99] ${domainClass} ${isAnimating ? 'sheet-cell--clicked' : ''}`}
       style={{ minHeight: '112px' }}
-      aria-label={`Ouvrir notes ${countryLabel} ${domainLabel}`}
+      aria-label="Ouvrir notes"
     >
-      <div className="px-3 pt-2.5 pb-1.5 text-[11px] font-semibold text-gray-700 dark:text-gray-800">
-        {countryLabel} · {domainLabel}
-      </div>
-      <div className="px-3 pb-3 pt-0.5">
+      <div className="flex min-h-[112px] items-center justify-center px-3 py-3">
         {preview ? (
           <p className="text-xs leading-relaxed text-gray-800 line-clamp-3 dark:text-gray-900" style={{ fontFamily: 'ui-serif, Georgia, serif' }}>
             {preview}

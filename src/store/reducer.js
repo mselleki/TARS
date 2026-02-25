@@ -317,18 +317,33 @@ function standupLogReducer(log, action) {
   }
 }
 
+function normalizeSheetValue(val) {
+  if (val == null) return { notes: '', tasks: [] }
+  if (typeof val === 'string') return { notes: val, tasks: [] }
+  return {
+    notes: typeof val.notes === 'string' ? val.notes : '',
+    tasks: Array.isArray(val.tasks) ? val.tasks : [],
+  }
+}
+
 function meetingSheetsReducer(sheets, action) {
   switch (action.type) {
-    case actions.INIT:
-      return action.payload.meetingSheets && typeof action.payload.meetingSheets === 'object' && !Array.isArray(action.payload.meetingSheets)
+    case actions.INIT: {
+      const raw = action.payload.meetingSheets && typeof action.payload.meetingSheets === 'object' && !Array.isArray(action.payload.meetingSheets)
         ? action.payload.meetingSheets
         : {}
+      const next = {}
+      for (const k of Object.keys(raw)) next[k] = normalizeSheetValue(raw[k])
+      return next
+    }
     case actions.MEETING_SHEET_UPDATE: {
-      const { key, content } = action.payload
+      const { key, notes, tasks } = action.payload
       if (!key || typeof key !== 'string') return sheets ?? {}
       const next = { ...(sheets ?? {}) }
-      if (content === '' || content == null) delete next[key]
-      else next[key] = String(content)
+      const current = normalizeSheetValue(next[key])
+      if (notes !== undefined) current.notes = String(notes)
+      if (tasks !== undefined) current.tasks = tasks
+      next[key] = current
       return next
     }
     default:

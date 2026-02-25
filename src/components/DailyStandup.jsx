@@ -75,19 +75,19 @@ export function DailyStandup({
     <div className="space-y-10">
       {/* Carnet Stand-up quotidien */}
       <section
-        className="relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[#fdfcfa] shadow-[0 2px 8px rgba(0,0,0,0.04), 0 12px 32px -12px rgba(0,0,0,0.08)] dark:bg-[#1a1816] dark:shadow-[0 2px 12px rgba(0,0,0,0.25)]"
+        className="relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[#fdfcfa] shadow-[0 2px 8px rgba(0,0,0,0.04), 0 12px 32px -12px rgba(0,0,0,0.08)] dark:bg-[#f5f3f0] dark:text-gray-900 dark:border-gray-300"
         aria-label="Carnet stand-up quotidien"
       >
-        <div className="absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-[var(--accent)]/8 via-[var(--accent)]/4 to-transparent dark:from-[var(--accent)]/12 dark:via-transparent" aria-hidden />
+        <div className="absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-indigo-200/50 via-indigo-100/30 to-transparent dark:from-indigo-300/40 dark:via-indigo-200/20" aria-hidden />
         <div className="pl-12 pr-6 py-6">
           <div className="flex items-center justify-between gap-4 mb-5">
-            <h2 className="text-lg font-semibold text-[var(--text)] tracking-tight">
+            <h2 className="text-lg font-semibold text-gray-800 tracking-tight dark:text-gray-900">
               Stand-up quotidien
             </h2>
             <button
               type="button"
               onClick={handleNewMeeting}
-              className="shrink-0 rounded-xl bg-[var(--accent)] px-5 py-2.5 text-sm font-medium text-white shadow-md shadow-[var(--accent)]/20 transition-[var(--transition)] hover:bg-[var(--accent-hover)] hover:shadow-lg hover:shadow-[var(--accent)]/25"
+              className="shrink-0 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-md shadow-indigo-900/20 transition-[var(--transition)] hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-900/25"
             >
               + Nouvelle réunion
             </button>
@@ -97,7 +97,7 @@ export function DailyStandup({
             value={standupLog}
             onChange={(e) => onStandupLogChange?.(e.target.value)}
             placeholder="Cliquez sur « Nouvelle réunion » pour insérer un bloc daté, puis écrivez en dessous…"
-            className="min-h-[240px] w-full resize-y rounded-lg border-0 bg-transparent px-0 py-2 text-[15px] leading-[1.7] text-[var(--text)] placeholder:text-[var(--muted)] outline-none focus:ring-0"
+            className="min-h-[240px] w-full resize-y rounded-lg border-0 bg-transparent px-0 py-2 text-[15px] leading-[1.7] text-gray-900 placeholder:text-gray-500 outline-none focus:ring-0 dark:text-gray-900 dark:placeholder:text-gray-600"
             style={{ fontFamily: 'ui-serif, Georgia, "Times New Roman", serif' }}
             aria-label="Notes du stand-up"
           />

@@ -156,15 +156,15 @@
 .dark {
   /* ── Backgrounds ── */
   --bg:               #080808;
-  --bg-2:             #0A0A0F;
-  --surface:          rgba(255, 255, 255, 0.04);
-  --surface-2:        rgba(255, 255, 255, 0.06);
-  --surface-elevated: rgba(255, 255, 255, 0.07);
+  --bg-2:             #0E0E14;
+  --surface:          rgba(255, 255, 255, 0.06);
+  --surface-2:        rgba(255, 255, 255, 0.10);
+  --surface-elevated: rgba(255, 255, 255, 0.14);
 
   /* ── Borders ── */
-  --border:           rgba(255, 255, 255, 0.08);
-  --border-strong:    rgba(255, 255, 255, 0.14);
-  --border-subtle:    rgba(255, 255, 255, 0.05);
+  --border:           rgba(255, 255, 255, 0.10);
+  --border-strong:    rgba(255, 255, 255, 0.18);
+  --border-subtle:    rgba(255, 255, 255, 0.06);
 
   /* ── Text ── */
   --text:             #F0F0F0;
@@ -198,9 +198,9 @@
   --sidebar-gradient: linear-gradient(180deg, #0F0F16 0%, #0D0D12 100%);
 
   /* ── Glass ── */
-  --glass-bg:         rgba(255, 255, 255, 0.04);
-  --glass-bg-strong:  rgba(255, 255, 255, 0.07);
-  --glass-border:     rgba(255, 255, 255, 0.09);
+  --glass-bg:         rgba(255, 255, 255, 0.05);
+  --glass-bg-strong:  rgba(255, 255, 255, 0.09);
+  --glass-border:     rgba(255, 255, 255, 0.12);
   --glass-blur:       blur(12px);
 
   /* ── Priority ── */
@@ -219,9 +219,9 @@
   --energy-light: #71717A;
 
   /* ── Kanban columns ── */
-  --column-backlog:     rgba(255, 255, 255, 0.02);
-  --column-in-progress: rgba(124, 58, 237, 0.04);
-  --column-done:        rgba(16, 185, 129, 0.03);
+  --column-backlog:     rgba(255, 255, 255, 0.03);
+  --column-in-progress: rgba(124, 58, 237, 0.06);
+  --column-done:        rgba(16, 185, 129, 0.05);
 
   /* ── Shadows (deep for dark mode) ── */
   --shadow-sm:   0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);

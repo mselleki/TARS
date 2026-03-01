@@ -49,7 +49,6 @@ export function DailyStandup({
 }) {
   const logRef = useRef(null)
   const [selectedCountry, setSelectedCountry] = useState(null)
-  const [activeDomain, setActiveDomain] = useState('product')
 
   useEffect(() => {
     const onKeyDown = (e) => {
@@ -78,7 +77,6 @@ export function DailyStandup({
 
   const handleOpenCountry = (countryValue) => {
     setSelectedCountry(countryValue)
-    setActiveDomain('product')
   }
 
   const getCountryDots = (countryValue) =>
@@ -87,8 +85,6 @@ export function DailyStandup({
       return s.notes.trim().length > 0 || s.tasks.length > 0
     })
 
-  const currentKey = selectedCountry ? sheetKey(selectedCountry, activeDomain) : null
-  const sheet = currentKey ? getSheet(meetingSheets, currentKey) : null
   const openCountry = GRID_COUNTRIES.find(c => c.value === selectedCountry)
 
   return (
@@ -184,91 +180,73 @@ export function DailyStandup({
               </button>
             </div>
 
-            {/* Domain tabs */}
-            <div className="flex gap-1 px-4 py-2" style={{ borderBottom: '1px solid var(--border)' }}>
-              {GRID_DOMAINS.map(d => (
-                <button
-                  key={d.value}
-                  type="button"
-                  onClick={() => setActiveDomain(d.value)}
-                  className="rounded-[var(--radius-md)] px-3 py-1.5 text-xs font-semibold transition-all"
-                  style={{
-                    background: activeDomain === d.value
-                      ? (d.color ? `${d.color}20` : 'var(--surface-2)')
-                      : 'transparent',
-                    color: activeDomain === d.value
-                      ? (d.color ?? 'var(--text)')
-                      : 'var(--muted)',
-                    borderBottom: activeDomain === d.value
-                      ? `2px solid ${d.color ?? 'var(--accent)'}`
-                      : '2px solid transparent',
-                  }}
-                >
-                  {d.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Notes + tasks */}
-            <div className="flex flex-1 flex-col gap-5 overflow-auto p-5">
-              <section aria-label="Notes">
-                <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--muted)' }}>
-                  Notes
-                </h4>
-                <textarea
-                  key={currentKey}
-                  value={sheet.notes}
-                  onChange={(e) => onMeetingSheetChange?.(currentKey, { ...sheet, notes: e.target.value })}
-                  placeholder="Notes…"
-                  className="textarea-glass min-h-[180px] w-full px-4 py-3 text-sm leading-relaxed"
-                  style={{ fontFamily: 'ui-serif, Georgia, serif' }}
-                  aria-label="Notes"
-                  autoFocus
-                />
-              </section>
-              <section aria-label="Tasks">
-                <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--muted)' }}>
-                  Tasks
-                </h4>
-                <ul className="space-y-2">
-                  {sheet.tasks.map((t) => (
-                    <li key={t.id} className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={t.done}
-                        onChange={() => {
-                          const next = sheet.tasks.map((x) => (x.id === t.id ? { ...x, done: !x.done } : x))
-                          onMeetingSheetChange?.(currentKey, { ...sheet, tasks: next })
-                        }}
-                        className="h-4 w-4 rounded"
-                        style={{ accentColor: 'var(--accent)' }}
-                        aria-label={t.label || 'Toggle'}
+            {/* All domains at once */}
+            <div className="flex-1 overflow-auto p-5 space-y-6">
+              {GRID_DOMAINS.map(d => {
+                const key = sheetKey(selectedCountry, d.value)
+                const domainSheet = getSheet(meetingSheets, key)
+                return (
+                  <section key={d.value} aria-label={d.label}>
+                    <div className="mb-3 flex items-center gap-2">
+                      {d.color && (
+                        <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: d.color }} />
+                      )}
+                      <h4 className="text-sm font-semibold" style={{ color: d.color ?? 'var(--text)' }}>
+                        {d.label}
+                      </h4>
+                    </div>
+                    <div className="space-y-3 pl-[18px]">
+                      <textarea
+                        key={key}
+                        value={domainSheet.notes}
+                        onChange={(e) => onMeetingSheetChange?.(key, { ...domainSheet, notes: e.target.value })}
+                        placeholder="Notes…"
+                        className="textarea-glass min-h-[80px] w-full px-4 py-3 text-sm leading-relaxed"
+                        style={{ fontFamily: 'ui-serif, Georgia, serif' }}
+                        aria-label={`${d.label} notes`}
                       />
-                      <input
-                        type="text"
-                        value={t.label}
-                        onChange={(e) => {
-                          const next = sheet.tasks.map((x) => (x.id === t.id ? { ...x, label: e.target.value } : x))
-                          onMeetingSheetChange?.(currentKey, { ...sheet, tasks: next })
+                      <ul className="space-y-1.5">
+                        {domainSheet.tasks.map((t) => (
+                          <li key={t.id} className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={t.done}
+                              onChange={() => {
+                                const next = domainSheet.tasks.map((x) => (x.id === t.id ? { ...x, done: !x.done } : x))
+                                onMeetingSheetChange?.(key, { ...domainSheet, tasks: next })
+                              }}
+                              className="h-4 w-4 rounded"
+                              style={{ accentColor: d.color ?? 'var(--accent)' }}
+                              aria-label={t.label || 'Toggle'}
+                            />
+                            <input
+                              type="text"
+                              value={t.label}
+                              onChange={(e) => {
+                                const next = domainSheet.tasks.map((x) => (x.id === t.id ? { ...x, label: e.target.value } : x))
+                                onMeetingSheetChange?.(key, { ...domainSheet, tasks: next })
+                              }}
+                              placeholder="Task label"
+                              className="input-glass min-w-0 flex-1 rounded-[var(--radius-md)] px-3 py-1.5 text-sm"
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newTask = { id: crypto.randomUUID(), label: '', done: false }
+                          onMeetingSheetChange?.(key, { ...domainSheet, tasks: [...domainSheet.tasks, newTask] })
                         }}
-                        placeholder="Task label"
-                        className="input-glass min-w-0 flex-1 rounded-[var(--radius-md)] px-3 py-1.5 text-sm"
-                      />
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const newTask = { id: crypto.randomUUID(), label: '', done: false }
-                    onMeetingSheetChange?.(currentKey, { ...sheet, tasks: [...sheet.tasks, newTask] })
-                  }}
-                  className="mt-2 flex items-center gap-2 rounded-[var(--radius-lg)] px-3 py-2 text-sm transition-all"
-                  style={{ border: '1px dashed var(--border-strong)', color: 'var(--muted)' }}
-                >
-                  <span className="text-base leading-none">+</span> Add task
-                </button>
-              </section>
+                        className="flex items-center gap-2 rounded-[var(--radius-lg)] px-3 py-1.5 text-xs transition-all"
+                        style={{ border: '1px dashed var(--border-strong)', color: 'var(--muted)' }}
+                      >
+                        <span className="text-sm leading-none">+</span> Add task
+                      </button>
+                    </div>
+                  </section>
+                )
+              })}
             </div>
           </aside>
         </>

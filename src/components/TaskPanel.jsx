@@ -51,9 +51,9 @@ export function TaskPanel({ task, onClose, onUpdate }) {
       <aside
         className="panel-slide-in fixed right-0 top-0 z-40 flex h-full w-full max-w-md flex-col touch-pan-y"
         style={{
-          background: '#0E0E1A',
-          borderLeft: '1px solid rgba(255,255,255,0.10)',
-          boxShadow: '-24px 0 80px rgba(0,0,0,0.7)',
+          background: 'var(--panel-bg)',
+          borderLeft: '1px solid var(--border)',
+          boxShadow: 'var(--shadow-xl)',
         }}
         aria-label="Task detail"
         onTouchStart={handleTouchStart}

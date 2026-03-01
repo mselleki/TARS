@@ -33,11 +33,11 @@ export function Header({
     <header
       className="sticky top-0 z-10"
       style={{
-        background: 'rgba(8, 8, 8, 0.88)',
+        background: 'var(--header-bg)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         borderBottom: '1px solid var(--border)',
-        boxShadow: '0 1px 0 rgba(255,255,255,0.04)',
+        boxShadow: 'var(--shadow-sm)',
       }}
     >
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
@@ -50,7 +50,7 @@ export function Header({
               role="group"
               aria-label="Context"
               className="flex shrink-0 rounded-[10px] p-0.5"
-              style={{ background: 'rgba(255,255,255,0.06)' }}
+              style={{ background: 'var(--surface-2)' }}
             >
               {CONTEXTS.map((ctx) => (
                 <button
@@ -60,13 +60,13 @@ export function Header({
                   className={`min-h-[36px] touch-manipulation rounded-[8px] px-3.5 py-1.5 text-sm font-medium transition-all sm:min-h-0`}
                   style={{
                     background: context === ctx.value
-                      ? 'rgba(255,255,255,0.10)'
+                      ? 'var(--surface-elevated)'
                       : 'transparent',
                     color: context === ctx.value
                       ? 'var(--text)'
                       : 'var(--muted)',
                     boxShadow: context === ctx.value
-                      ? '0 1px 3px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)'
+                      ? 'var(--shadow-sm)'
                       : 'none',
                     transition: 'all 200ms cubic-bezier(0.16, 1, 0.3, 1)',
                     letterSpacing: '-0.01em',
@@ -135,7 +135,7 @@ export function Header({
                   <div
                     className="absolute right-0 top-full z-20 mt-2 w-52 rounded-[var(--radius-xl)] py-2"
                     style={{
-                      background: '#141420',
+                      background: 'var(--popover-bg)',
                       border: '1px solid var(--border-strong)',
                       boxShadow: 'var(--shadow-lg)',
                     }}
@@ -145,7 +145,7 @@ export function Header({
                         <span style={{ color: 'var(--text-secondary)' }}>{s.label}</span>
                         <kbd
                           className="rounded-[var(--radius-sm)] px-1.5 py-0.5 font-mono text-[10px]"
-                          style={{ background: 'rgba(255,255,255,0.07)', color: 'var(--muted)' }}
+                          style={{ background: 'var(--surface-2)', color: 'var(--muted)' }}
                         >
                           {s.keys}
                         </kbd>

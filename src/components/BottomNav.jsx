@@ -30,7 +30,7 @@ export function BottomNav({ view, onViewChange }) {
     <nav
       className="fixed bottom-0 left-0 right-0 z-20 flex items-center justify-around safe-area-inset-bottom md:hidden"
       style={{
-        background: 'rgba(10, 10, 15, 0.96)',
+        background: 'var(--nav-bg)',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
         borderTop: '1px solid var(--border)',

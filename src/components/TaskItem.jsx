@@ -98,7 +98,7 @@ export function TaskItem({
             ? 'border-l-[var(--priority-today)]'
             : 'border-l-[var(--border)]'
 
-  const baseClasses = `task-card group flex min-w-0 flex-wrap items-start gap-3 overflow-visible rounded-[var(--radius-lg)] border border-[rgba(255,255,255,0.07)] border-l-2 px-3 py-2.5 ${
+  const baseClasses = `task-card task-border group flex min-w-0 flex-wrap items-start gap-3 overflow-visible rounded-[var(--radius-lg)] border border-l-2 px-3 py-2.5 ${
     isDone ? 'opacity-60' : ''
   } ${leftBar}`
 
@@ -132,7 +132,7 @@ export function TaskItem({
             background: 'var(--accent-gradient)',
             borderColor: 'transparent',
           } : {
-            borderColor: 'rgba(255,255,255,0.2)',
+            borderColor: 'var(--border-strong)',
             background: 'transparent',
           }}
           aria-label={isDone ? 'Mark incomplete' : 'Mark complete'}

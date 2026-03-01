@@ -93,9 +93,9 @@ export function DailyStandup({
       <section
         className="relative overflow-hidden rounded-[var(--radius-2xl)]"
         style={{
-          background: 'rgba(255,255,255,0.03)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          boxShadow: 'var(--shadow-md)',
         }}
         aria-label="Daily stand-up notebook"
       >
@@ -140,9 +140,9 @@ export function DailyStandup({
       <section
         className="relative overflow-hidden rounded-[var(--radius-2xl)]"
         style={{
-          background: 'rgba(255,255,255,0.03)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          boxShadow: 'var(--shadow-md)',
         }}
         aria-label="Country × Domain notebook"
       >
@@ -168,7 +168,7 @@ export function DailyStandup({
             className="overflow-x-auto rounded-[var(--radius-xl)]"
             style={{
               border: '1px solid var(--border)',
-              background: 'rgba(255,255,255,0.02)',
+              background: 'var(--surface)',
             }}
           >
             <table className="w-full min-w-[560px] border-collapse">
@@ -176,7 +176,7 @@ export function DailyStandup({
                 <tr>
                   <th
                     className="w-16 px-3 py-3 text-left text-[10px] font-semibold uppercase tracking-wider rounded-tl-[var(--radius-xl)]"
-                    style={{ background: 'rgba(255,255,255,0.04)', color: 'var(--muted)' }}
+                    style={{ background: 'var(--surface-2)', color: 'var(--muted)' }}
                   >
                     ↕ ↔
                   </th>
@@ -188,7 +188,7 @@ export function DailyStandup({
                         background: d.value === 'product'  ? 'rgba(251,191,36,0.08)'
                                   : d.value === 'vendor'   ? 'rgba(16,185,129,0.08)'
                                   : d.value === 'customer' ? 'rgba(124,58,237,0.08)'
-                                  : 'rgba(255,255,255,0.04)',
+                                  : 'var(--surface-2)',
                         color:  d.value === 'product'  ? '#FBBF24'
                               : d.value === 'vendor'   ? '#10B981'
                               : d.value === 'customer' ? '#A78BFA'
@@ -205,7 +205,7 @@ export function DailyStandup({
                   <tr key={row.value}>
                     <td
                       className="px-3 py-2 text-xs font-semibold align-top"
-                      style={{ background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)' }}
+                      style={{ background: 'var(--surface)', color: 'var(--text-secondary)' }}
                     >
                       {row.label}
                     </td>
@@ -243,9 +243,9 @@ export function DailyStandup({
             <aside
               className="panel-slide-in fixed right-0 top-0 z-40 flex h-full w-full max-w-md flex-col"
               style={{
-                background: '#0E0E1A',
-                borderLeft: '1px solid rgba(255,255,255,0.10)',
-                boxShadow: '-24px 0 80px rgba(0,0,0,0.7)',
+                background: 'var(--panel-bg)',
+                borderLeft: '1px solid var(--border)',
+                boxShadow: 'var(--shadow-xl)',
               }}
               aria-label="Country × Domain notes"
             >
@@ -353,7 +353,7 @@ const DOMAIN_CELL_STYLE = {
   product:  { bg: 'rgba(251,191,36,0.06)',  border: 'rgba(251,191,36,0.15)',  hoverBg: 'rgba(251,191,36,0.10)' },
   vendor:   { bg: 'rgba(16,185,129,0.06)',  border: 'rgba(16,185,129,0.15)',  hoverBg: 'rgba(16,185,129,0.10)' },
   customer: { bg: 'rgba(124,58,237,0.06)',  border: 'rgba(124,58,237,0.15)',  hoverBg: 'rgba(124,58,237,0.10)' },
-  all:      { bg: 'rgba(255,255,255,0.03)', border: 'rgba(255,255,255,0.08)', hoverBg: 'rgba(255,255,255,0.06)' },
+  all:      { bg: 'var(--surface)', border: 'var(--border)', hoverBg: 'var(--surface-2)' },
 }
 
 function SheetCell({ countryValue, domainValue, notes, onOpen, isAnimating }) {
@@ -369,7 +369,7 @@ function SheetCell({ countryValue, domainValue, notes, onOpen, isAnimating }) {
         minHeight: '96px',
         background: style.bg,
         border: `1px solid ${style.border}`,
-        boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
+        boxShadow: 'var(--shadow-sm)',
       }}
       aria-label="Open notes"
     >

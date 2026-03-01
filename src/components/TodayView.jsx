@@ -72,7 +72,7 @@ export function TodayView({
         {todayTasks.length === 0 ? (
           <p
             className="rounded-[var(--radius-lg)] p-6 text-center text-sm"
-            style={{ border: '1px solid var(--border)', background: 'rgba(255,255,255,0.02)', color: 'var(--muted)' }}
+            style={{ border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--muted)' }}
           >
             No tasks to do or due today.
           </p>

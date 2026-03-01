@@ -109,7 +109,7 @@ export function KanbanBoard({
               </h3>
               <span
                 className="rounded-[var(--radius-sm)] px-2 py-0.5 text-[11px] font-medium tabular-nums"
-                style={{ background: 'rgba(255,255,255,0.06)', color: 'var(--muted)' }}
+                style={{ background: 'var(--surface-2)', color: 'var(--muted)' }}
               >
                 {col.tasks.length}
               </span>

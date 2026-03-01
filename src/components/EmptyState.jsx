@@ -58,7 +58,7 @@ export function SearchEmptyState({ onClear }) {
       <div
         className="flex h-16 w-16 items-center justify-center rounded-[var(--radius-xl)]"
         style={{
-          background: 'rgba(255,255,255,0.04)',
+          background: 'var(--surface-2)',
           border: '1px solid var(--border)',
         }}
       >

@@ -56,7 +56,7 @@ export function Sidebar({ view, onViewChange, collapsed = false }) {
       className={`hidden shrink-0 flex-col transition-all md:flex`}
       style={{
         width: collapsed ? '56px' : '220px',
-        background: 'var(--sidebar-bg)',
+        background: 'var(--sidebar-gradient)',
         borderRight: '1px solid var(--sidebar-border)',
       }}
       aria-label="Navigation"

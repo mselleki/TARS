@@ -9,7 +9,7 @@ function EmptyStateTickets() {
   return (
     <div
       className="rounded-[var(--radius-xl)] p-6 text-center"
-      style={{ background: 'rgba(255,255,255,0.02)', border: '1px dashed var(--border)' }}
+      style={{ background: 'var(--surface)', border: '1px dashed var(--border)' }}
     >
       <p className="text-sm" style={{ color: 'var(--muted)' }}>
         Track REQ tickets with owners and follow-ups so nothing gets lost.
@@ -89,7 +89,7 @@ export function OverviewView({
       />
       <section
         className="rounded-[var(--radius-xl)] p-5"
-        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)' }}
+        style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
         aria-label="Add ticket"
       >
         <h2
@@ -142,7 +142,7 @@ function OverviewPersoTodo({ tasks, onToggleTask, onUpdateTask, onDeleteTask }) 
   return (
     <section
       className="rounded-[var(--radius-xl)] overflow-hidden"
-      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)' }}
+      style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
     >
       <h2
         className="px-4 py-3 text-sm font-semibold"
@@ -182,7 +182,7 @@ function PersoTodoRow({ task, onToggle, onUpdate, onDelete }) {
   }
 
   return (
-    <li className="task-card group flex items-center gap-3 rounded-[var(--radius-md)] border border-[rgba(255,255,255,0.07)] px-3 py-2.5">
+    <li className="task-card task-border group flex items-center gap-3 rounded-[var(--radius-md)] border px-3 py-2.5">
       <button
         type="button"
         onClick={() => onToggle?.(task.id)}

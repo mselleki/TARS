@@ -48,9 +48,9 @@ export function Modal({ isOpen, onClose, children, title }) {
         <div
           className="relative w-full max-w-lg rounded-[var(--radius-2xl)] p-4 sm:p-6 fade-in"
           style={{
-            background: '#13131F',
-            border: '1px solid rgba(255,255,255,0.12)',
-            boxShadow: '0 24px 80px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.04) inset',
+            background: 'var(--popover-bg)',
+            border: '1px solid var(--border-strong)',
+            boxShadow: 'var(--shadow-xl)',
           }}
           onClick={(e) => e.stopPropagation()}
         >

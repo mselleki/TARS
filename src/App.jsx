@@ -231,7 +231,7 @@ function App() {
                 role="group"
                 aria-label="View mode"
                 className="flex rounded-[var(--radius-md)] p-0.5"
-                style={{ background: 'rgba(255,255,255,0.06)' }}
+                style={{ background: 'var(--surface-2)' }}
               >
                 {['list', 'cards'].map((mode) => (
                   <button
@@ -240,9 +240,9 @@ function App() {
                     onClick={() => setBoardViewMode(mode)}
                     className="rounded-[var(--radius-sm)] px-3 py-1.5 text-[11px] font-medium capitalize transition-all"
                     style={{
-                      background: boardViewMode === mode ? 'rgba(255,255,255,0.10)' : 'transparent',
+                      background: boardViewMode === mode ? 'var(--surface-elevated)' : 'transparent',
                       color: boardViewMode === mode ? 'var(--text)' : 'var(--muted)',
-                      boxShadow: boardViewMode === mode ? '0 1px 3px rgba(0,0,0,0.4)' : 'none',
+                      boxShadow: boardViewMode === mode ? 'var(--shadow-sm)' : 'none',
                     }}
                   >
                     {mode}
@@ -255,7 +255,7 @@ function App() {
               <div
                 className="mb-4 flex flex-wrap items-center gap-2 rounded-[var(--radius-xl)] px-4 py-3 sm:gap-3"
                 style={{
-                  background: 'rgba(255,255,255,0.04)',
+                  background: 'var(--surface)',
                   border: '1px solid var(--border)',
                 }}
               >

@@ -7,8 +7,11 @@ import { DailyStandup } from './DailyStandup'
 
 function EmptyStateTickets() {
   return (
-    <div className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] p-6 text-center">
-      <p className="text-sm text-[var(--text-secondary)]">
+    <div
+      className="rounded-[var(--radius-xl)] p-6 text-center"
+      style={{ background: 'rgba(255,255,255,0.02)', border: '1px dashed var(--border)' }}
+    >
+      <p className="text-sm" style={{ color: 'var(--muted)' }}>
         Track REQ tickets with owners and follow-ups so nothing gets lost.
       </p>
     </div>
@@ -85,10 +88,14 @@ export function OverviewView({
         onMeetingSheetChange={onMeetingSheetChange}
       />
       <section
-        className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-sm)]"
+        className="rounded-[var(--radius-xl)] p-5"
+        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)' }}
         aria-label="Add ticket"
       >
-        <h2 className="mb-4 text-sm font-semibold text-[var(--text-secondary)]">Add ticket</h2>
+        <h2
+          className="mb-4 text-sm font-semibold"
+          style={{ color: 'var(--text-secondary)', letterSpacing: '-0.01em' }}
+        >Add ticket</h2>
         <TicketCaptureForm
           onSubmit={(payload) => onAddReqTicket?.(payload)}
           scope="PRO"
@@ -133,9 +140,15 @@ function OverviewPersoTodo({ tasks, onToggleTask, onUpdateTask, onDeleteTask }) 
   )
 
   return (
-    <section className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] overflow-hidden shadow-[var(--shadow-sm)]">
-      <h2 className="border-b border-[var(--border)] px-4 py-3 text-sm font-semibold text-[var(--text-secondary)]">
-        To-do perso
+    <section
+      className="rounded-[var(--radius-xl)] overflow-hidden"
+      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)' }}
+    >
+      <h2
+        className="px-4 py-3 text-sm font-semibold"
+        style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-secondary)', letterSpacing: '-0.01em' }}
+      >
+        Personal to-do
       </h2>
       <div className="p-4 space-y-2">
         {persoTasks.length === 0 ? (
@@ -169,7 +182,7 @@ function PersoTodoRow({ task, onToggle, onUpdate, onDelete }) {
   }
 
   return (
-    <li className="group flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)]/50 px-3 py-2.5 hover:border-[var(--border-strong)]">
+    <li className="task-card group flex items-center gap-3 rounded-[var(--radius-md)] border border-[rgba(255,255,255,0.07)] px-3 py-2.5">
       <button
         type="button"
         onClick={() => onToggle?.(task.id)}

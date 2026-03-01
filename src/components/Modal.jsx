@@ -34,7 +34,7 @@ export function Modal({ isOpen, onClose, children, title }) {
   const content = (
     <dialog
       ref={dialogRef}
-      className="fixed inset-0 z-[100] m-0 max-h-[100dvh] w-full max-w-none overflow-auto border-0 bg-transparent p-0 backdrop:bg-black/50 backdrop:backdrop-blur-sm [&::backdrop]:bg-black/50 [&::backdrop]:backdrop-blur-sm"
+      className="fixed inset-0 z-[100] m-0 max-h-[100dvh] w-full max-w-none overflow-auto border-0 bg-transparent p-0 [&::backdrop]:bg-black/70 [&::backdrop]:backdrop-blur-md"
       style={{ paddingLeft: 'env(safe-area-inset-left)', paddingRight: 'env(safe-area-inset-right)' }}
       aria-modal="true"
       aria-labelledby={title ? 'modal-title' : undefined}
@@ -46,11 +46,20 @@ export function Modal({ isOpen, onClose, children, title }) {
         onClick={(e) => e.target === e.currentTarget && onClose?.()}
       >
         <div
-          className="relative w-full max-w-lg rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-lg)] sm:p-6"
+          className="relative w-full max-w-lg rounded-[var(--radius-2xl)] p-4 sm:p-6 fade-in"
+          style={{
+            background: '#13131F',
+            border: '1px solid rgba(255,255,255,0.12)',
+            boxShadow: '0 24px 80px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.04) inset',
+          }}
           onClick={(e) => e.stopPropagation()}
         >
           {title && (
-            <h2 id="modal-title" className="mb-4 text-lg font-semibold text-[var(--text)]">
+            <h2
+              id="modal-title"
+              className="mb-4 text-lg font-semibold"
+              style={{ color: 'var(--text)', letterSpacing: '-0.02em' }}
+            >
               {title}
             </h2>
           )}

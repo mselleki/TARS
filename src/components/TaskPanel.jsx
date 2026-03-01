@@ -43,50 +43,69 @@ export function TaskPanel({ task, onClose, onUpdate }) {
   return (
     <>
       <div
-        className="panel-backdrop-in fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px]"
+        className="panel-backdrop-in fixed inset-0 z-30 bg-black/60"
+        style={{ backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
         aria-hidden
         onClick={onClose}
       />
       <aside
-        className="panel-slide-in fixed right-0 top-0 z-40 flex h-full w-full max-w-md flex-col border-l border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-lg)] touch-pan-y"
+        className="panel-slide-in fixed right-0 top-0 z-40 flex h-full w-full max-w-md flex-col touch-pan-y"
+        style={{
+          background: '#0E0E1A',
+          borderLeft: '1px solid rgba(255,255,255,0.10)',
+          boxShadow: '-24px 0 80px rgba(0,0,0,0.7)',
+        }}
         aria-label="Task detail"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
-          <h2 className="truncate pr-2 text-base font-semibold text-[var(--text)]">
+        <div
+          className="flex items-center justify-between px-5 py-4"
+          style={{ borderBottom: '1px solid var(--border)' }}
+        >
+          <h2
+            className="truncate pr-2 text-base font-semibold"
+            style={{ color: 'var(--text)', letterSpacing: '-0.02em' }}
+          >
             {task.title || 'Untitled'}
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] text-[var(--muted)] hover:bg-[var(--border)] hover:text-[var(--text)]"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-md)] transition-all"
+            style={{ color: 'var(--muted)', background: 'transparent' }}
             aria-label="Close"
           >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
         {task.dueDate && (
-          <div className="border-b border-[var(--border)] px-4 py-2 text-sm text-[var(--muted)]">
+          <div
+            className="px-5 py-2 text-sm"
+            style={{ borderBottom: '1px solid var(--border)', color: 'var(--muted)' }}
+          >
             Due: {formatDate(task.dueDate)}
           </div>
         )}
-        <div className="flex-1 overflow-auto p-4">
-          <label className="mb-1.5 block text-sm font-medium text-[var(--text-secondary)]">
+        <div className="flex-1 overflow-auto p-5">
+          <label
+            className="mb-2 block text-xs font-semibold uppercase tracking-wider"
+            style={{ color: 'var(--muted)' }}
+          >
             Notes
           </label>
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
             onBlur={handleBlur}
-            placeholder="Add a note..."
+            placeholder="Add a note…"
             maxLength={MAX_NOTE_LENGTH}
             rows={6}
-            className="w-full resize-none rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm text-[var(--text)] placeholder:text-[var(--muted)] focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-ring)]"
+            className="textarea-glass w-full resize-none px-4 py-3 text-sm"
           />
-          <p className="mt-1 text-[11px] text-[var(--muted)]">
+          <p className="mt-2 text-[11px]" style={{ color: 'var(--muted-2)' }}>
             {note.length}/{MAX_NOTE_LENGTH}
           </p>
         </div>

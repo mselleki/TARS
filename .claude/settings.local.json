@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Claude_Preview__preview_start",
+      "Bash(timeout /t 5 /nobreak)",
+      "Bash(curl -s http://localhost:5173)",
+      "Bash(netstat -ano)",
+      "Bash(taskkill /PID 66364 /PID 100248 /PID 18184 /PID 78868 /F)",
+      "Bash(cmd /c \"taskkill /PID 66364 /F & taskkill /PID 100248 /F & taskkill /PID 18184 /F & taskkill /PID 78868 /F\")",
+      "Bash(cmd /c \"taskkill /PID 66364 /F 2>&1 & taskkill /PID 100248 /F 2>&1 & taskkill /PID 18184 /F 2>&1 & taskkill /PID 78868 /F 2>&1\")",
+      "Bash(cmd /c \"taskkill /PID 66364 /F\")",
+      "Bash(cmd /c \"taskkill /PID 100248 /F\")",
+      "Bash(cmd /c \"taskkill /PID 18184 /F\")",
+      "Bash(cmd /c \"taskkill /PID 78868 /F\")",
+      "Bash(git add src/ vite.config.js .claude/)"
+    ]
+  }
+}

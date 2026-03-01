@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { useDragDrop } from '../hooks/useDragDrop'
 import { TaskItem } from './TaskItem'
 
-const COLUMN_CONFIG = {
-  backlog: { accent: '', header: 'text-[var(--muted)]' },
-  in_progress: { accent: 'border-t-[3px] border-t-[var(--accent)]', header: 'text-[var(--accent)] font-semibold' },
-  done: { accent: '', header: 'text-[var(--muted)]' },
+const COLUMN_STYLE = {
+  backlog:     { headerColor: 'var(--muted)',    topAccent: null },
+  in_progress: { headerGradient: true,           topAccent: 'var(--accent-gradient)' },
+  done:        { headerColor: 'var(--success)',  topAccent: null },
 }
 
 export function KanbanBoard({
@@ -67,25 +67,53 @@ export function KanbanBoard({
   return (
     <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-[minmax(280px,1fr)_minmax(280px,1fr)_minmax(280px,1fr)]">
       {columns.map((col) => {
-        const config = COLUMN_CONFIG[col.id] ?? COLUMN_CONFIG.backlog
+        const cfg = COLUMN_STYLE[col.id] ?? COLUMN_STYLE.backlog
         const isDragOver = dragOverColumn === col.id
         return (
           <div
             key={col.id}
-            className={`min-w-0 rounded-[var(--radius-xl)] border border-[var(--border)] p-4 transition-[var(--transition)] ${config.accent} ${
-              isDragOver ? 'ring-2 ring-[var(--accent)] ring-offset-2' : ''
-            }`}
-            style={{ backgroundColor: `var(--column-${col.id})` }}
+            className="min-w-0 rounded-[var(--radius-xl)] p-4 transition-all"
+            style={{
+              background: `var(--column-${col.id})`,
+              border: isDragOver
+                ? '1px solid var(--accent-ring)'
+                : '1px solid var(--border)',
+              boxShadow: isDragOver
+                ? '0 0 0 1px var(--accent-ring), 0 0 20px rgba(124,58,237,0.15)'
+                : undefined,
+              ...(cfg.topAccent ? {
+                borderTop: '2px solid transparent',
+                backgroundImage: `${cfg.topAccent}, var(--column-${col.id})`,
+                backgroundOrigin: 'border-box',
+                backgroundClip: 'border-box, padding-box',
+              } : {}),
+            }}
             onDragOver={(e) => onColumnDragOver(e, col.id)}
             onDragLeave={onColumnDragLeave}
             onDrop={(e) => onColumnDrop(e, col.id)}
           >
-            <h3 className={`mb-4 flex items-center justify-between border-b border-[var(--border)] pb-3 text-xs uppercase tracking-wider ${config.header}`}>
-              <span>{col.label}</span>
-              <span className="rounded-[var(--radius-sm)] bg-[var(--surface)] px-2 py-0.5 text-[11px] font-medium tabular-nums text-[var(--muted)]">
+            <div
+              className="mb-4 flex items-center justify-between pb-3"
+              style={{ borderBottom: '1px solid var(--border)' }}
+            >
+              <h3
+                className="text-xs font-semibold uppercase tracking-wider"
+                style={cfg.headerGradient ? {
+                  background: 'var(--accent-gradient)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                } : { color: cfg.headerColor }}
+              >
+                {col.label}
+              </h3>
+              <span
+                className="rounded-[var(--radius-sm)] px-2 py-0.5 text-[11px] font-medium tabular-nums"
+                style={{ background: 'rgba(255,255,255,0.06)', color: 'var(--muted)' }}
+              >
                 {col.tasks.length}
               </span>
-            </h3>
+            </div>
             <ul className="min-h-[80px] space-y-2">
               {col.tasks.map((task) => (
                 <TaskItem

@@ -13,8 +13,6 @@ const GRID_DOMAINS = [
   { value: 'product', label: 'Product' },
   { value: 'vendor', label: 'Vendor' },
   { value: 'customer', label: 'Customer' },
-  { value: 'sector2', label: 'Sector 2' },
-  { value: 'sector4', label: 'Sector 4' },
   { value: 'all', label: 'All' },
 ]
 
@@ -90,22 +88,35 @@ export function DailyStandup({
   }
 
   return (
-    <div className="space-y-10">
-      {/* Daily stand-up notebook */}
+    <div className="space-y-6">
+      {/* Daily stand-up — glass notebook */}
       <section
-        className="relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[#fdfcfa] shadow-[0 2px 8px rgba(0,0,0,0.04), 0 12px 32px -12px rgba(0,0,0,0.08)] dark:bg-[#f5f3f0] dark:text-gray-900 dark:border-gray-300"
+        className="relative overflow-hidden rounded-[var(--radius-2xl)]"
+        style={{
+          background: 'rgba(255,255,255,0.03)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
+        }}
         aria-label="Daily stand-up notebook"
       >
-        <div className="absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-indigo-200/50 via-indigo-100/30 to-transparent dark:from-indigo-300/40 dark:via-indigo-200/20" aria-hidden />
-        <div className="pl-12 pr-6 py-6">
-          <div className="flex items-center justify-between gap-4 mb-5">
-            <h2 className="text-lg font-semibold text-gray-800 tracking-tight dark:text-gray-900">
+        {/* Left accent strip */}
+        <div
+          className="absolute left-0 top-0 bottom-0 w-1 rounded-l-[var(--radius-2xl)]"
+          style={{ background: 'var(--accent-gradient)' }}
+          aria-hidden
+        />
+        <div className="pl-6 pr-5 py-5">
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <h2
+              className="text-base font-semibold"
+              style={{ color: 'var(--text)', letterSpacing: '-0.02em' }}
+            >
               Daily stand-up
             </h2>
             <button
               type="button"
               onClick={handleNewMeeting}
-              className="shrink-0 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-md shadow-indigo-900/20 transition-[var(--transition)] hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-900/25"
+              className="btn-primary shrink-0 px-4 py-2 text-sm"
             >
               + New meeting
             </button>
@@ -115,8 +126,11 @@ export function DailyStandup({
             value={standupLog}
             onChange={(e) => onStandupLogChange?.(e.target.value)}
             placeholder="Click « New meeting » to insert a dated block, then write below…"
-            className="min-h-[240px] w-full resize-y rounded-lg border-0 bg-transparent px-0 py-2 text-[15px] leading-[1.7] text-gray-900 placeholder:text-gray-500 outline-none focus:ring-0 dark:text-gray-900 dark:placeholder:text-gray-600"
-            style={{ fontFamily: 'ui-serif, Georgia, "Times New Roman", serif' }}
+            className="min-h-[220px] w-full resize-y rounded-[var(--radius-lg)] border-0 bg-transparent px-0 py-2 text-[14px] leading-[1.8] placeholder:text-[var(--muted-2)] outline-none focus:ring-0"
+            style={{
+              fontFamily: 'ui-serif, Georgia, "Times New Roman", serif',
+              color: 'var(--text-secondary)',
+            }}
             aria-label="Stand-up notes"
           />
         </div>
@@ -124,187 +138,260 @@ export function DailyStandup({
 
       {/* Country × Domain notebook */}
       <section
-        className="relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[#fdfcfa] p-5 shadow-[0 2px 8px rgba(0,0,0,0.04), 0 12px 32px -12px rgba(0,0,0,0.06)] dark:bg-[#f5f3f0] dark:border-gray-300 dark:shadow-[0 2px 12px rgba(0,0,0,0.08)]"
+        className="relative overflow-hidden rounded-[var(--radius-2xl)]"
+        style={{
+          background: 'rgba(255,255,255,0.03)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
+        }}
         aria-label="Country × Domain notebook"
       >
-        <div className="absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-amber-200/40 via-teal-200/20 to-transparent dark:from-amber-300/30 dark:via-teal-200/15" aria-hidden />
-        <div className="relative mb-5">
-          <h2 className="text-lg font-semibold text-gray-800 tracking-tight dark:text-gray-900">
-            Country × Domain notebook
-          </h2>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-700">
-            X-axis: domains. Y-axis: countries.
-          </p>
-        </div>
-        <div className="relative overflow-x-auto rounded-xl border border-gray-200 bg-white/60 p-3 shadow-inner dark:border-gray-300 dark:bg-white/40">
-          <table className="w-full min-w-[560px] border-collapse">
-            <thead>
-              <tr>
-                <th className="w-16 rounded-tl-lg bg-gray-100/80 px-3 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-600 dark:bg-gray-200/60 dark:text-gray-700">
-                  Country \ Domain
-                </th>
-                {GRID_DOMAINS.map((d, i) => (
+        {/* Left accent strip */}
+        <div
+          className="absolute left-0 top-0 bottom-0 w-1 rounded-l-[var(--radius-2xl)]"
+          style={{ background: 'linear-gradient(180deg, #10B981 0%, #2563EB 100%)' }}
+          aria-hidden
+        />
+        <div className="pl-6 pr-5 py-5">
+          <div className="mb-4">
+            <h2
+              className="text-base font-semibold"
+              style={{ color: 'var(--text)', letterSpacing: '-0.02em' }}
+            >
+              Country × Domain notebook
+            </h2>
+            <p className="mt-0.5 text-sm" style={{ color: 'var(--muted)' }}>
+              X-axis: domains. Y-axis: countries.
+            </p>
+          </div>
+          <div
+            className="overflow-x-auto rounded-[var(--radius-xl)]"
+            style={{
+              border: '1px solid var(--border)',
+              background: 'rgba(255,255,255,0.02)',
+            }}
+          >
+            <table className="w-full min-w-[560px] border-collapse">
+              <thead>
+                <tr>
                   <th
-                    key={d.value}
-                    className={`px-2 py-3 text-center text-xs font-semibold ${i === GRID_DOMAINS.length - 1 ? 'rounded-tr-lg' : ''} ${
-                      d.value === 'product' ? 'bg-amber-100/70 text-amber-800 dark:bg-amber-200/50 dark:text-amber-900' :
-                      d.value === 'vendor' ? 'bg-teal-100/70 text-teal-800 dark:bg-teal-200/50 dark:text-teal-900' :
-                      d.value === 'customer' ? 'bg-indigo-100/70 text-indigo-800 dark:bg-indigo-200/50 dark:text-indigo-900' :
-                      d.value === 'sector2' ? 'bg-emerald-100/70 text-emerald-800 dark:bg-emerald-200/50 dark:text-emerald-900' :
-                      d.value === 'sector4' ? 'bg-rose-100/70 text-rose-800 dark:bg-rose-200/50 dark:text-rose-900' :
-                      'bg-gray-100/80 text-gray-700 dark:bg-gray-200/60 dark:text-gray-800'
-                    }`}
+                    className="w-16 px-3 py-3 text-left text-[10px] font-semibold uppercase tracking-wider rounded-tl-[var(--radius-xl)]"
+                    style={{ background: 'rgba(255,255,255,0.04)', color: 'var(--muted)' }}
                   >
-                    {d.label}
+                    ↕ ↔
                   </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {GRID_COUNTRIES.map((row) => (
-                <tr key={row.value}>
-                  <td className="rounded-l-lg bg-gray-100/60 px-3 py-2 text-xs font-semibold text-gray-700 align-top dark:bg-gray-200/40 dark:text-gray-800">
-                    {row.label}
-                  </td>
-                  {GRID_DOMAINS.map((col) => (
-                    <td key={col.value} className="p-2 align-top">
-                      <SheetCell
-                        countryValue={row.value}
-                        domainValue={col.value}
-                        notes={(getSheet(meetingSheets, sheetKey(row.value, col.value))).notes}
-                        onOpen={handleOpenSheet}
-                        isAnimating={clickedCellKey === sheetKey(row.value, col.value)}
-                      />
-                    </td>
+                  {GRID_DOMAINS.map((d, i) => (
+                    <th
+                      key={d.value}
+                      className={`px-2 py-3 text-center text-xs font-semibold ${i === GRID_DOMAINS.length - 1 ? 'rounded-tr-[var(--radius-xl)]' : ''}`}
+                      style={{
+                        background: d.value === 'product'  ? 'rgba(251,191,36,0.08)'
+                                  : d.value === 'vendor'   ? 'rgba(16,185,129,0.08)'
+                                  : d.value === 'customer' ? 'rgba(124,58,237,0.08)'
+                                  : 'rgba(255,255,255,0.04)',
+                        color:  d.value === 'product'  ? '#FBBF24'
+                              : d.value === 'vendor'   ? '#10B981'
+                              : d.value === 'customer' ? '#A78BFA'
+                              : 'var(--muted)',
+                      }}
+                    >
+                      {d.label}
+                    </th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {GRID_COUNTRIES.map((row) => (
+                  <tr key={row.value}>
+                    <td
+                      className="px-3 py-2 text-xs font-semibold align-top"
+                      style={{ background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)' }}
+                    >
+                      {row.label}
+                    </td>
+                    {GRID_DOMAINS.map((col) => (
+                      <td key={col.value} className="p-1.5 align-top">
+                        <SheetCell
+                          countryValue={row.value}
+                          domainValue={col.value}
+                          notes={(getSheet(meetingSheets, sheetKey(row.value, col.value))).notes}
+                          onOpen={handleOpenSheet}
+                          isAnimating={clickedCellKey === sheetKey(row.value, col.value)}
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
-      {/* Panel feuille */}
+      {/* Notes panel */}
       {selectedSheet && (() => {
         const currentKey = sheetKey(selectedSheet.country, selectedSheet.domain)
         const sheet = getSheet(meetingSheets, currentKey)
         return (
-        <>
-          <div
-            className="panel-backdrop-in fixed inset-0 z-30 bg-black/25 backdrop-blur-[2px]"
-            aria-hidden
-            onClick={() => setSelectedSheet(null)}
-          />
-          <aside
-            className="panel-slide-in fixed right-0 top-0 z-40 flex h-full w-full max-w-md flex-col border-l border-[var(--border)] bg-[var(--surface)] shadow-xl"
-            aria-label="Country × Domain notes"
-          >
-            <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
-              <h3 className="text-base font-semibold text-[var(--text)]">
-                {GRID_COUNTRIES.find((c) => c.value === selectedSheet.country)?.label ?? selectedSheet.country} · {GRID_DOMAINS.find((d) => d.value === selectedSheet.domain)?.label ?? selectedSheet.domain}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setSelectedSheet(null)}
-                className="rounded-lg p-2 text-[var(--muted)] hover:bg-[var(--bg)] hover:text-[var(--text)]"
-                aria-label="Close"
+          <>
+            <div
+              className="panel-backdrop-in fixed inset-0 z-30 bg-black/60"
+              style={{ backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
+              aria-hidden
+              onClick={() => setSelectedSheet(null)}
+            />
+            <aside
+              className="panel-slide-in fixed right-0 top-0 z-40 flex h-full w-full max-w-md flex-col"
+              style={{
+                background: '#0E0E1A',
+                borderLeft: '1px solid rgba(255,255,255,0.10)',
+                boxShadow: '-24px 0 80px rgba(0,0,0,0.7)',
+              }}
+              aria-label="Country × Domain notes"
+            >
+              <div
+                className="flex items-center justify-between px-5 py-4"
+                style={{ borderBottom: '1px solid var(--border)' }}
               >
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
-            </div>
-            <div className="flex flex-1 flex-col gap-6 overflow-auto p-4">
-              <section aria-label="Notes">
-                <h4 className="mb-2 text-sm font-semibold text-[var(--text)]">Notes</h4>
-                <textarea
-                  value={sheet.notes}
-                  onChange={(e) => onMeetingSheetChange?.(currentKey, { notes: e.target.value })}
-                  placeholder="Notes…"
-                  className="min-h-[180px] w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--bg)]/50 px-4 py-3 text-sm leading-relaxed text-[var(--text)] placeholder:text-[var(--muted)] outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-ring)]/30"
-                  style={{ fontFamily: 'ui-serif, Georgia, serif' }}
-                  aria-label="Notes"
-                  autoFocus
-                />
-              </section>
-              <section aria-label="Tasks">
-                <h4 className="mb-2 text-sm font-semibold text-[var(--text)]">Tasks</h4>
-                <ul className="space-y-2">
-                  {sheet.tasks.map((t) => (
-                    <li key={t.id} className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={t.done}
-                        onChange={() => {
-                          const next = sheet.tasks.map((x) => (x.id === t.id ? { ...x, done: !x.done } : x))
-                          onMeetingSheetChange?.(currentKey, { tasks: next })
-                        }}
-                        className="h-4 w-4 rounded border-[var(--border-strong)] text-[var(--accent)] focus:ring-[var(--accent-ring)]"
-                        aria-label={t.label || 'Toggle'}
-                      />
-                      <input
-                        type="text"
-                        value={t.label}
-                        onChange={(e) => {
-                          const next = sheet.tasks.map((x) => (x.id === t.id ? { ...x, label: e.target.value } : x))
-                          onMeetingSheetChange?.(currentKey, { tasks: next })
-                        }}
-                        placeholder="Task label"
-                        className="min-w-0 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-sm text-[var(--text)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent-ring)]"
-                      />
-                    </li>
-                  ))}
-                </ul>
+                <h3
+                  className="text-base font-semibold"
+                  style={{ color: 'var(--text)', letterSpacing: '-0.02em' }}
+                >
+                  {GRID_COUNTRIES.find((c) => c.value === selectedSheet.country)?.label ?? selectedSheet.country}
+                  {' · '}
+                  {GRID_DOMAINS.find((d) => d.value === selectedSheet.domain)?.label ?? selectedSheet.domain}
+                </h3>
                 <button
                   type="button"
-                  onClick={() => {
-                    const newTask = { id: crypto.randomUUID(), label: '', done: false }
-                    onMeetingSheetChange?.(currentKey, { tasks: [...sheet.tasks, newTask] })
-                  }}
-                  className="mt-2 flex items-center gap-2 rounded-lg border border-dashed border-[var(--border)] px-3 py-2 text-sm text-[var(--muted)] transition-[var(--transition)] hover:border-[var(--accent)]/50 hover:bg-[var(--accent-subtle)] hover:text-[var(--text)]"
+                  onClick={() => setSelectedSheet(null)}
+                  className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] transition-all"
+                  style={{ color: 'var(--muted)', background: 'transparent' }}
+                  aria-label="Close"
                 >
-                  <span className="text-base">+</span> Add task
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
-              </section>
-            </div>
-          </aside>
-        </>
+              </div>
+              <div className="flex flex-1 flex-col gap-5 overflow-auto p-5">
+                <section aria-label="Notes">
+                  <h4
+                    className="mb-2 text-xs font-semibold uppercase tracking-wider"
+                    style={{ color: 'var(--muted)' }}
+                  >
+                    Notes
+                  </h4>
+                  <textarea
+                    value={sheet.notes}
+                    onChange={(e) => onMeetingSheetChange?.(currentKey, { notes: e.target.value })}
+                    placeholder="Notes…"
+                    className="textarea-glass min-h-[180px] w-full px-4 py-3 text-sm leading-relaxed"
+                    style={{ fontFamily: 'ui-serif, Georgia, serif' }}
+                    aria-label="Notes"
+                    autoFocus
+                  />
+                </section>
+                <section aria-label="Tasks">
+                  <h4
+                    className="mb-2 text-xs font-semibold uppercase tracking-wider"
+                    style={{ color: 'var(--muted)' }}
+                  >
+                    Tasks
+                  </h4>
+                  <ul className="space-y-2">
+                    {sheet.tasks.map((t) => (
+                      <li key={t.id} className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={t.done}
+                          onChange={() => {
+                            const next = sheet.tasks.map((x) => (x.id === t.id ? { ...x, done: !x.done } : x))
+                            onMeetingSheetChange?.(currentKey, { tasks: next })
+                          }}
+                          className="h-4 w-4 rounded"
+                          style={{ accentColor: 'var(--accent)' }}
+                          aria-label={t.label || 'Toggle'}
+                        />
+                        <input
+                          type="text"
+                          value={t.label}
+                          onChange={(e) => {
+                            const next = sheet.tasks.map((x) => (x.id === t.id ? { ...x, label: e.target.value } : x))
+                            onMeetingSheetChange?.(currentKey, { tasks: next })
+                          }}
+                          placeholder="Task label"
+                          className="input-glass min-w-0 flex-1 rounded-[var(--radius-md)] px-3 py-1.5 text-sm"
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newTask = { id: crypto.randomUUID(), label: '', done: false }
+                      onMeetingSheetChange?.(currentKey, { tasks: [...sheet.tasks, newTask] })
+                    }}
+                    className="mt-2 flex items-center gap-2 rounded-[var(--radius-lg)] px-3 py-2 text-sm transition-all"
+                    style={{
+                      border: '1px dashed var(--border-strong)',
+                      color: 'var(--muted)',
+                    }}
+                  >
+                    <span className="text-base leading-none">+</span> Add task
+                  </button>
+                </section>
+              </div>
+            </aside>
+          </>
         )
       })()}
     </div>
   )
 }
 
-const DOMAIN_COLORS = {
-  product: 'bg-amber-50 border-amber-200/80 hover:bg-amber-100/80 hover:border-amber-300 dark:bg-amber-100/60 dark:border-amber-300/70 dark:hover:bg-amber-200/50',
-  vendor: 'bg-teal-50/90 border-teal-200/80 hover:bg-teal-100/80 hover:border-teal-300 dark:bg-teal-100/60 dark:border-teal-300/70 dark:hover:bg-teal-200/50',
-  customer: 'bg-indigo-50/90 border-indigo-200/80 hover:bg-indigo-100/80 hover:border-indigo-300 dark:bg-indigo-100/60 dark:border-indigo-300/70 dark:hover:bg-indigo-200/50',
-  sector2: 'bg-emerald-50/90 border-emerald-200/80 hover:bg-emerald-100/80 hover:border-emerald-300 dark:bg-emerald-100/60 dark:border-emerald-300/70 dark:hover:bg-emerald-200/50',
-  sector4: 'bg-rose-50/90 border-rose-200/80 hover:bg-rose-100/80 hover:border-rose-300 dark:bg-rose-100/60 dark:border-rose-300/70 dark:hover:bg-rose-200/50',
-  all: 'bg-gray-50 border-gray-200 hover:bg-gray-100 hover:border-gray-300 dark:bg-gray-100/70 dark:border-gray-300 dark:hover:bg-gray-200/60',
+const DOMAIN_CELL_STYLE = {
+  product:  { bg: 'rgba(251,191,36,0.06)',  border: 'rgba(251,191,36,0.15)',  hoverBg: 'rgba(251,191,36,0.10)' },
+  vendor:   { bg: 'rgba(16,185,129,0.06)',  border: 'rgba(16,185,129,0.15)',  hoverBg: 'rgba(16,185,129,0.10)' },
+  customer: { bg: 'rgba(124,58,237,0.06)',  border: 'rgba(124,58,237,0.15)',  hoverBg: 'rgba(124,58,237,0.10)' },
+  all:      { bg: 'rgba(255,255,255,0.03)', border: 'rgba(255,255,255,0.08)', hoverBg: 'rgba(255,255,255,0.06)' },
 }
 
 function SheetCell({ countryValue, domainValue, notes, onOpen, isAnimating }) {
-  const domainClass = DOMAIN_COLORS[domainValue] ?? DOMAIN_COLORS.all
+  const style = DOMAIN_CELL_STYLE[domainValue] ?? DOMAIN_CELL_STYLE.all
   const preview = notes ? (notes.trim().slice(0, 60) + (notes.length > 60 ? '…' : '')) : null
-
-  const handleClick = () => {
-    onOpen?.(countryValue, domainValue)
-  }
 
   return (
     <button
       type="button"
-      onClick={handleClick}
-      className={`sheet-cell block w-full rounded-xl border text-left shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-indigo-400/50 focus:ring-offset-1 active:scale-[0.99] ${domainClass} ${isAnimating ? 'sheet-cell--clicked' : ''}`}
-      style={{ minHeight: '112px' }}
+      onClick={() => onOpen?.(countryValue, domainValue)}
+      className={`sheet-cell block w-full rounded-[var(--radius-lg)] text-left transition-all duration-200 hover:scale-[1.02] focus:outline-none active:scale-[0.99] ${isAnimating ? 'sheet-cell--clicked' : ''}`}
+      style={{
+        minHeight: '96px',
+        background: style.bg,
+        border: `1px solid ${style.border}`,
+        boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
+      }}
       aria-label="Open notes"
     >
-      <div className="flex min-h-[112px] items-center justify-center px-3 py-3">
+      <div className="flex min-h-[96px] items-center justify-center px-3 py-3">
         {preview ? (
-          <p className="text-xs leading-relaxed text-gray-800 line-clamp-3 dark:text-gray-900" style={{ fontFamily: 'ui-serif, Georgia, serif' }}>
+          <p
+            className="text-xs leading-relaxed line-clamp-3"
+            style={{
+              fontFamily: 'ui-serif, Georgia, serif',
+              color: 'var(--text-secondary)',
+            }}
+          >
             {preview}
           </p>
         ) : (
-          <p className="text-xs italic text-gray-500 dark:text-gray-600" style={{ fontFamily: 'ui-serif, Georgia, serif' }}>
+          <p
+            className="text-xs italic"
+            style={{
+              fontFamily: 'ui-serif, Georgia, serif',
+              color: 'var(--muted-2)',
+            }}
+          >
             — Click to edit…
           </p>
         )}

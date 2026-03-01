@@ -35,9 +35,9 @@ function App() {
   const [toastMessage, setToastMessage] = useState('')
   const [isDarkMode, setIsDarkMode] = useState(() => {
     try {
-      return localStorage.getItem('organizer-theme') === 'dark'
+      return localStorage.getItem('organizer-theme') !== 'light'
     } catch {
-      return false
+      return true
     }
   })
   const searchRef = useRef(null)
@@ -220,45 +220,51 @@ function App() {
               <button
                 type="button"
                 onClick={() => handleNewTask()}
-                className="flex min-h-[48px] touch-manipulation items-center gap-3 rounded-[var(--radius-xl)] border-2 border-dashed border-[var(--border)] bg-[var(--surface)] px-4 py-3.5 text-left text-sm font-semibold text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-[var(--transition)] active:border-[var(--accent)]/40 active:bg-[var(--accent-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-ring)] sm:min-h-0 hover:border-[var(--accent)]/40 hover:bg-[var(--accent-subtle)]"
+                className="btn-primary flex min-h-[40px] touch-manipulation items-center gap-2 px-4 py-2.5 text-sm sm:min-h-0"
               >
-                <span className="flex h-7 w-7 items-center justify-center rounded-[var(--radius-md)] bg-[var(--bg)] text-[var(--muted)]">
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                </span>
-                Add a task
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                New task
               </button>
-              <div role="group" aria-label="View mode" className="flex rounded-[var(--radius-md)] bg-[var(--bg)] p-0.5">
-                <button
-                  type="button"
-                  onClick={() => setBoardViewMode('list')}
-                  className={`rounded-[var(--radius-sm)] px-3 py-1.5 text-[11px] font-medium transition-[var(--transition)] ${
-                    boardViewMode === 'list' ? 'bg-[var(--surface)] text-[var(--text)] shadow-[var(--shadow-sm)] border border-[var(--border)]' : 'text-[var(--muted)] hover:text-[var(--text)]'
-                  }`}
-                >
-                  List
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setBoardViewMode('cards')}
-                  className={`rounded-[var(--radius-sm)] px-3 py-1.5 text-[11px] font-medium transition-[var(--transition)] ${
-                    boardViewMode === 'cards' ? 'bg-[var(--surface)] text-[var(--text)] shadow-[var(--shadow-sm)] border border-[var(--border)]' : 'text-[var(--muted)] hover:text-[var(--text)]'
-                  }`}
-                >
-                  Cards
-                </button>
+              <div
+                role="group"
+                aria-label="View mode"
+                className="flex rounded-[var(--radius-md)] p-0.5"
+                style={{ background: 'rgba(255,255,255,0.06)' }}
+              >
+                {['list', 'cards'].map((mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => setBoardViewMode(mode)}
+                    className="rounded-[var(--radius-sm)] px-3 py-1.5 text-[11px] font-medium capitalize transition-all"
+                    style={{
+                      background: boardViewMode === mode ? 'rgba(255,255,255,0.10)' : 'transparent',
+                      color: boardViewMode === mode ? 'var(--text)' : 'var(--muted)',
+                      boxShadow: boardViewMode === mode ? '0 1px 3px rgba(0,0,0,0.4)' : 'none',
+                    }}
+                  >
+                    {mode}
+                  </button>
+                ))}
               </div>
             </div>
 
             {context === 'pro' && (
-              <div className="mb-4 flex flex-wrap items-center gap-2 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] px-3 py-2.5 sm:gap-3 sm:px-4">
-                <span className="text-xs font-medium text-[var(--muted)]">Filtres :</span>
+              <div
+                className="mb-4 flex flex-wrap items-center gap-2 rounded-[var(--radius-xl)] px-4 py-3 sm:gap-3"
+                style={{
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid var(--border)',
+                }}
+              >
+                <span className="text-xs font-medium" style={{ color: 'var(--muted)' }}>Filters:</span>
                 <select
                   value={boardFilters.projectId}
                   onChange={(e) => setBoardFilters((f) => ({ ...f, projectId: e.target.value }))}
-                  className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] px-2.5 py-1.5 text-sm text-[var(--text)]"
-                  aria-label="Sous-projet"
+                  className="input-glass rounded-[var(--radius-md)] px-2.5 py-1.5 text-sm"
+                  aria-label="Sub-project"
                 >
                   <option value="">All sub-projects</option>
                   {state.projects.filter((p) => p.context === context).map((p) => (
@@ -268,7 +274,7 @@ function App() {
                 <select
                   value={boardFilters.countryId}
                   onChange={(e) => setBoardFilters((f) => ({ ...f, countryId: e.target.value }))}
-                  className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] px-2.5 py-1.5 text-sm text-[var(--text)]"
+                  className="input-glass rounded-[var(--radius-md)] px-2.5 py-1.5 text-sm"
                   aria-label="Country"
                 >
                   <option value="">All countries</option>
@@ -279,7 +285,7 @@ function App() {
                 <select
                   value={boardFilters.domain}
                   onChange={(e) => setBoardFilters((f) => ({ ...f, domain: e.target.value }))}
-                  className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] px-2.5 py-1.5 text-sm text-[var(--text)]"
+                  className="input-glass rounded-[var(--radius-md)] px-2.5 py-1.5 text-sm"
                   aria-label="Domain"
                 >
                   <option value="">All domains</option>
@@ -291,7 +297,8 @@ function App() {
                   <button
                     type="button"
                     onClick={() => setBoardFilters({ projectId: '', countryId: '', domain: '' })}
-                    className="text-xs font-medium text-[var(--muted)] underline hover:text-[var(--text)]"
+                    className="text-xs font-medium transition-all"
+                    style={{ color: 'var(--muted)' }}
                   >
                     Reset
                   </button>

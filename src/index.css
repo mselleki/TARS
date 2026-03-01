@@ -1,181 +1,68 @@
 @import "tailwindcss";
+@import "./design-system.css";
 
-:root {
-  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  /* Design tokens 2025 */
-  --bg: #f6f7f9;
-  --surface: #ffffff;
-  --surface-elevated: #ffffff;
-  --border: #e5e7eb;
-  --border-strong: #d1d5db;
-  --text: #111827;
-  --text-secondary: #374151;
-  --muted: #6b7280;
-  --muted-2: #9ca3af;
-
-  --accent: #4338ca;
-  --accent-hover: #3730a3;
-  --accent-subtle: rgba(67, 56, 202, 0.08);
-  --accent-ring: rgba(67, 56, 202, 0.4);
-
-  --danger: #dc2626;
-  --danger-subtle: rgba(220, 38, 38, 0.08);
-  --success: #059669;
-  --success-subtle: rgba(5, 150, 105, 0.08);
-  --warn: #d97706;
-  --warning: #d97706;
-  --warning-subtle: rgba(217, 119, 6, 0.12);
-
-  /* Semantic */
-  --color-page: var(--bg);
-  --color-surface: var(--surface);
-  --color-surface-elevated: var(--surface-elevated);
-  --color-border: var(--border);
-  --color-border-strong: var(--border-strong);
-  --color-text: var(--text);
-  --color-text-secondary: var(--text-secondary);
-  --color-text-muted: var(--muted);
-  --color-text-ghost: var(--muted-2);
-  --color-accent: var(--accent);
-  --color-accent-hover: var(--accent-hover);
-  --color-accent-subtle: var(--accent-subtle);
-
-  /* Priority chips: accent outline / muted */
-  --priority-high: var(--danger);
-  --priority-high-bg: var(--danger-subtle);
-  --priority-medium: var(--muted);
-  --priority-medium-bg: var(--border);
-  --priority-low: var(--muted-2);
-  --priority-low-bg: transparent;
-  --priority-today: var(--warning);
-  --priority-today-bg: var(--warning-subtle);
-
-  /* Energy chips: neutral + subtle accent */
-  --energy-deep: var(--accent);
-  --energy-deep-chip: border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--accent)];
-  --energy-quick: var(--success);
-  --energy-quick-chip: border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--success)];
-  --energy-light: var(--muted);
-  --energy-light-chip: border border-[var(--border)] bg-[var(--surface)] text-[var(--muted)];
-
-  /* Columns: subtle cool tint */
-  --column-backlog: rgba(229, 231, 235, 0.5);
-  --column-in-progress: rgba(67, 56, 202, 0.06);
-  --column-done: rgba(107, 114, 128, 0.04);
-
-  /* Sidebar */
-  --sidebar-bg: #ffffff;
-  --sidebar-border: var(--border);
-
-  /* Scale */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 12px;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.06);
-  --transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.dark {
-  --bg: #0f172a;
-  --surface: #1e293b;
-  --surface-elevated: #334155;
-  --border: #334155;
-  --border-strong: #475569;
-  --text: #f8fafc;
-  --text-secondary: #e2e8f0;
-  --muted: #94a3b8;
-  --muted-2: #64748b;
-  --accent: #6366f1;
-  --accent-hover: #818cf8;
-  --accent-subtle: rgba(99, 102, 241, 0.15);
-  --accent-ring: rgba(99, 102, 241, 0.5);
-  --danger: #f87171;
-  --danger-subtle: rgba(248, 113, 113, 0.15);
-  --warning: #fbbf24;
-  --warning-subtle: rgba(251, 191, 36, 0.15);
-  --priority-today: var(--warning);
-  --priority-today-bg: var(--warning-subtle);
-  --success: #34d399;
-  --success-subtle: rgba(52, 211, 153, 0.15);
-  --column-backlog: rgba(51, 65, 85, 0.5);
-  --column-in-progress: rgba(99, 102, 241, 0.08);
-  --column-done: rgba(100, 116, 139, 0.08);
-  --sidebar-bg: #1e293b;
-  --color-border-subtle: #334155;
-}
-
-/* Legacy aliases */
-:root {
-  --color-border-subtle: #f3f4f6;
-  --color-primary: var(--accent);
-  --color-primary-hover: var(--accent-hover);
-  --color-primary-subtle: var(--accent-subtle);
-  --color-status-active: var(--accent);
-  --color-status-active-bg: var(--accent-subtle);
-  --nav-accent: var(--accent);
-  --nav-accent-bg: var(--accent-subtle);
-  --color-priority-high: var(--priority-high);
-  --color-priority-high-bg: var(--priority-high-bg);
-  --color-priority-medium: var(--priority-medium);
-  --color-priority-medium-bg: var(--priority-medium-bg);
-  --color-priority-low: var(--priority-low);
-  --color-priority-low-bg: var(--priority-low-bg);
-  --color-priority-today: var(--priority-today);
-  --color-priority-today-bg: var(--priority-today-bg);
-  --color-energy-deep: var(--energy-deep);
-  --color-energy-quick: var(--energy-quick);
-  --color-energy-light: var(--energy-light);
-  --color-done: var(--muted);
-  --color-done-bg: var(--surface);
-  --color-overdue: var(--danger);
-  --color-overdue-bg: var(--danger-subtle);
-  --color-sidebar: var(--sidebar-bg);
-  --color-destructive-muted: var(--muted);
-  --color-secondary-subtle: var(--border);
-}
-
+/* ── Task completion animation ── */
 @keyframes task-complete {
-  0% { opacity: 1; transform: scale(1); }
-  50% { transform: scale(0.998); }
-  100% { opacity: 0.96; transform: scale(1); }
+  0%   { opacity: 1; transform: scale(1); }
+  50%  { transform: scale(0.998); }
+  100% { opacity: 0.85; transform: scale(1); }
 }
 
 .task-complete {
-  animation: task-complete 0.2s ease-out;
+  animation: task-complete 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* ── Panel slide-in ── */
 @keyframes panel-slide-in {
-  from { transform: translateX(100%); opacity: 0.98; }
-  to { transform: translateX(0); opacity: 1; }
+  from { transform: translateX(100%); opacity: 0.95; }
+  to   { transform: translateX(0);    opacity: 1; }
 }
 
 @keyframes panel-backdrop-in {
   from { opacity: 0; }
-  to { opacity: 1; }
+  to   { opacity: 1; }
 }
 
 .panel-slide-in {
-  animation: panel-slide-in 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+  animation: panel-slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .panel-backdrop-in {
-  animation: panel-backdrop-in 0.2s ease-out;
+  animation: panel-backdrop-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* ── Sheet cell pop ── */
 @keyframes sheet-cell-pop {
-  0% { transform: scale(1); }
-  40% { transform: scale(0.96); }
+  0%   { transform: scale(1); }
+  40%  { transform: scale(0.96); }
   100% { transform: scale(1); }
 }
 
 .sheet-cell--clicked {
-  animation: sheet-cell-pop 0.22s ease-out;
+  animation: sheet-cell-pop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Safe area for notched devices (e.g. iPhone 15 Pro) */
+/* ── Fade in ── */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fade-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Toast entrance ── */
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px) scale(0.95); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+.toast-in {
+  animation: toast-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Safe area (notched devices) ── */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom);
@@ -184,6 +71,7 @@
     padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
   }
 }
+
 .safe-area-inset-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0);
 }

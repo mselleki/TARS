@@ -98,13 +98,9 @@ export function TaskItem({
             ? 'border-l-[var(--priority-today)]'
             : 'border-l-[var(--border)]'
 
-  const baseClasses = `group flex min-w-0 flex-wrap items-start gap-3 overflow-visible rounded-[var(--radius-lg)] border border-[var(--border)] border-l-2 bg-[var(--surface)] px-3 py-2.5 transition-[var(--transition)] ${
-    isDone
-      ? 'opacity-90'
-      : ''
-  } shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:border-[var(--border-strong)] ${
-    selected || (isFocus && !isDone) ? 'ring-2 ring-[var(--accent-ring)] ring-offset-2 shadow-[var(--shadow-md)]' : ''
-  } ${leftBar} ${editingField ? 'ring-2 ring-[var(--accent-ring)] ring-offset-2' : ''}`
+  const baseClasses = `task-card group flex min-w-0 flex-wrap items-start gap-3 overflow-visible rounded-[var(--radius-lg)] border border-[rgba(255,255,255,0.07)] border-l-2 px-3 py-2.5 ${
+    isDone ? 'opacity-60' : ''
+  } ${leftBar}`
 
   const handleCardClick = (e) => {
     if (e.target.closest('button, input, select, textarea')) return
@@ -114,6 +110,10 @@ export function TaskItem({
   return (
     <li
       className={`${compact ? baseClasses.replace('py-2.5', 'py-2') : baseClasses} ${draggable ? 'cursor-grab active:cursor-grabbing' : ''} ${isDone ? 'task-complete' : ''} ${onSelect ? 'cursor-pointer' : ''}`}
+      style={selected || (isFocus && !isDone) ? {
+        borderColor: 'var(--accent-ring)',
+        boxShadow: '0 0 0 1px var(--accent-ring), 0 0 20px rgba(124,58,237,0.2)',
+      } : undefined}
       data-task-id={task.id}
       draggable={draggable ?? false}
       onDragStart={onDragStart}
@@ -127,9 +127,14 @@ export function TaskItem({
         <button
           type="button"
           onClick={() => onToggle(task.id)}
-          className={`flex h-5 w-5 items-center justify-center rounded-[var(--radius-sm)] border-2 transition-[var(--transition)] ${
-            isDone ? 'border-[var(--muted)] bg-[var(--muted)] text-white' : 'border-[var(--border-strong)] text-transparent hover:border-[var(--accent)] hover:bg-[var(--accent-subtle)]'
-          }`}
+          className="flex h-5 w-5 items-center justify-center rounded-[var(--radius-sm)] border-2 transition-all"
+          style={isDone ? {
+            background: 'var(--accent-gradient)',
+            borderColor: 'transparent',
+          } : {
+            borderColor: 'rgba(255,255,255,0.2)',
+            background: 'transparent',
+          }}
           aria-label={isDone ? 'Mark incomplete' : 'Mark complete'}
         >
           {isDone && (

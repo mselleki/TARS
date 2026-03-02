@@ -121,7 +121,7 @@ export function DailyStandup({
         </div>
       </section>
 
-      {/* Country × Domain — inline expansion, no modal */}
+      {/* Country × Domain — cards always visible, panel on click */}
       <section
         className="relative overflow-hidden rounded-[var(--radius-2xl)]"
         style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-md)' }}
@@ -130,49 +130,84 @@ export function DailyStandup({
         <div className="absolute left-0 top-0 bottom-0 w-1 rounded-l-[var(--radius-2xl)]"
           style={{ background: 'var(--success)' }} aria-hidden />
 
-        {/* Header — always visible */}
-        <div className="flex items-center gap-3 pl-6 pr-4 pt-4 pb-3">
-          {selectedCountry && (
-            <button
-              type="button"
-              onClick={() => setSelectedCountry(null)}
-              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[var(--radius-sm)] transition-colors hover:bg-[var(--surface-2)]"
-              style={{ color: 'var(--muted)' }}
-              aria-label="Back to countries"
-            >
-              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-          )}
-          <div className="min-w-0 flex-1">
-            <h2 className="text-sm font-semibold" style={{ color: 'var(--text)', letterSpacing: '-0.01em' }}>
-              {selectedCountry ? openCountry?.fullLabel : 'Country × Domain'}
-            </h2>
-            {!selectedCountry && (
-              <p className="text-[11px]" style={{ color: 'var(--muted)' }}>
-                Select a market to open notes &amp; tasks.
-              </p>
-            )}
+        <div className="pl-6 pr-5 py-4">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.07em]" style={{ color: 'var(--muted)' }}>
+            Country × Domain
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {GRID_COUNTRIES.map(country => (
+              <CountryCard
+                key={country.value}
+                country={country}
+                dots={getCountryDots(country.value)}
+                isActive={selectedCountry === country.value}
+                onClick={() => setSelectedCountry(
+                  selectedCountry === country.value ? null : country.value
+                )}
+              />
+            ))}
           </div>
         </div>
+      </section>
 
-        <div className="pl-6 pr-5 pb-5">
-          {!selectedCountry ? (
-            /* Country cards grid */
-            <div className="flex flex-wrap gap-2">
-              {GRID_COUNTRIES.map(country => (
-                <CountryCard
-                  key={country.value}
-                  country={country}
-                  dots={getCountryDots(country.value)}
-                  onClick={() => setSelectedCountry(country.value)}
-                />
-              ))}
+      {/* Right-side panel */}
+      {selectedCountry && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 z-30"
+            style={{ background: 'rgba(0,0,0,0.18)' }}
+            onClick={() => setSelectedCountry(null)}
+            aria-hidden
+          />
+
+          {/* Panel */}
+          <aside
+            className="panel-slide-in fixed top-0 right-0 bottom-0 z-40 flex flex-col"
+            style={{
+              width: '360px',
+              background: 'var(--panel-bg)',
+              borderLeft: '1px solid var(--border)',
+              boxShadow: 'var(--shadow-xl)',
+            }}
+            aria-label={`${openCountry?.fullLabel} notes`}
+          >
+            {/* Panel header */}
+            <div
+              className="flex shrink-0 items-center justify-between px-5 py-4"
+              style={{ borderBottom: '1px solid var(--border)' }}
+            >
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.07em]" style={{ color: 'var(--muted)' }}>
+                  Country · Domain
+                </p>
+                <p className="text-base font-bold" style={{ color: 'var(--text)', letterSpacing: '-0.02em' }}>
+                  {openCountry?.fullLabel}
+                </p>
+              </div>
+              {/* Country switcher */}
+              <div className="flex items-center gap-1">
+                {GRID_COUNTRIES.map(c => (
+                  <button
+                    key={c.value}
+                    type="button"
+                    onClick={() => setSelectedCountry(c.value)}
+                    className="rounded-[var(--radius-sm)] px-2 py-1 text-[11px] font-semibold transition-all"
+                    style={{
+                      background: selectedCountry === c.value ? 'var(--accent)' : 'var(--surface-2)',
+                      color: selectedCountry === c.value ? '#fff' : 'var(--muted)',
+                      border: '1px solid',
+                      borderColor: selectedCountry === c.value ? 'var(--accent)' : 'var(--border)',
+                    }}
+                  >
+                    {c.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          ) : (
-            /* Inline domain notes — no overlay */
-            <div className="space-y-5 fade-in">
+
+            {/* Domain sections */}
+            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
               {GRID_DOMAINS.map(d => {
                 const key = sheetKey(selectedCountry, d.value)
                 const domainSheet = getSheet(meetingSheets, key)
@@ -240,28 +275,46 @@ export function DailyStandup({
                 )
               })}
             </div>
-          )}
-        </div>
-      </section>
+
+            {/* Close button */}
+            <div
+              className="shrink-0 px-5 py-3"
+              style={{ borderTop: '1px solid var(--border)' }}
+            >
+              <button
+                type="button"
+                onClick={() => setSelectedCountry(null)}
+                className="w-full rounded-[var(--radius-md)] py-2 text-[13px] font-medium transition-all"
+                style={{ background: 'var(--surface-2)', color: 'var(--muted)', border: '1px solid var(--border)' }}
+              >
+                Close  ·  Esc
+              </button>
+            </div>
+          </aside>
+        </>
+      )}
     </div>
   )
 }
 
-function CountryCard({ country, dots, onClick }) {
+function CountryCard({ country, dots, isActive, onClick }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="group flex flex-col items-start rounded-[var(--radius-lg)] px-3 py-2.5 transition-all hover:bg-[var(--surface-elevated)] active:scale-[0.98]"
+      className="group flex flex-col items-start rounded-[var(--radius-lg)] px-3 py-2.5 transition-all active:scale-[0.97]"
       style={{
-        background: 'var(--surface-2)',
-        border: '1px solid var(--border)',
+        background: isActive ? 'var(--accent-subtle)' : 'var(--surface-2)',
+        border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
         minWidth: '72px',
         flex: '1 1 auto',
         maxWidth: '120px',
       }}
     >
-      <span className="text-[15px] font-bold" style={{ color: 'var(--text)', letterSpacing: '-0.02em' }}>
+      <span
+        className="text-[15px] font-bold"
+        style={{ color: isActive ? 'var(--accent)' : 'var(--text)', letterSpacing: '-0.02em' }}
+      >
         {country.label}
       </span>
       <span className="mt-0.5 text-[10px] leading-tight truncate w-full" style={{ color: 'var(--muted)' }}>

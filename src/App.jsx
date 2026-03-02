@@ -6,6 +6,7 @@ import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import { Header } from './components/Header'
 import { Sidebar } from './components/Sidebar'
 import { BottomNav } from './components/BottomNav'
+import { TodayQuickPanel } from './components/TodayQuickPanel'
 import { OverviewView } from './components/OverviewView'
 import { TaskComposer } from './components/TaskComposer'
 import { KanbanBoard } from './components/KanbanBoard'
@@ -31,6 +32,7 @@ function App() {
   const [composerProjectId, setComposerProjectId] = useState(null)
   const [composerInitialDueDate, setComposerInitialDueDate] = useState('')
   const [isSilentMode, setIsSilentMode] = useState(false)
+  const [showTodayPanel, setShowTodayPanel] = useState(false)
   const [selectedTaskId, setSelectedTaskId] = useState(null)
   const [toastMessage, setToastMessage] = useState('')
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -174,19 +176,20 @@ function App() {
         <div className="aurora-blob aurora-blob-3" />
       </div>
 
-      <Sidebar view={view} onViewChange={setView} />
+      <Sidebar
+        view={view}
+        onViewChange={setView}
+        context={context}
+        onContextChange={setContext}
+        onOpenTodayPanel={() => setShowTodayPanel((v) => !v)}
+      />
 
       <div className="flex min-w-0 flex-1 flex-col pb-20 md:pb-0">
       <Header
-        context={context}
-        onContextChange={setContext}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         searchResultsCount={view === 'overview' ? (state.reqTickets ?? []).length : filtered.length}
         searchRef={searchRef}
-        view={view}
-        ticketFilters={ticketFilters}
-        onTicketFiltersChange={setTicketFilters}
         onInstallClick={install}
         canInstall={canInstall}
         isSilentMode={isSilentMode}
@@ -204,6 +207,7 @@ function App() {
             reqTickets={state.reqTickets ?? []}
             searchQuery={searchQuery}
             filters={ticketFilters}
+            onFiltersChange={setTicketFilters}
             onAddReqTicket={addReqTicket}
             onUpdateReqTicket={updateReqTicket}
             onDeleteReqTicket={deleteReqTicket}
@@ -224,21 +228,78 @@ function App() {
 
         {view === 'board' && (
           <>
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 sm:mb-6 sm:gap-4">
+            {/* Board toolbar: new task + filters + view mode */}
+            <div className="mb-5 flex flex-wrap items-center gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={() => handleNewTask()}
-                className="btn-primary flex min-h-[40px] touch-manipulation items-center gap-2 px-4 py-2.5 text-sm sm:min-h-0"
+                className="btn-primary flex min-h-[36px] touch-manipulation items-center gap-2 px-4 py-2 text-sm sm:min-h-0"
               >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
                 New task
               </button>
+
+              {/* Filters — pill selects, only for pro */}
+              {context === 'pro' && (
+                <>
+                  <div
+                    className="h-4 w-px shrink-0"
+                    style={{ background: 'var(--border)' }}
+                    aria-hidden
+                  />
+                  <select
+                    value={boardFilters.projectId}
+                    onChange={(e) => setBoardFilters((f) => ({ ...f, projectId: e.target.value }))}
+                    className={`input-glass rounded-[var(--radius-full)] px-3 py-1.5 text-[12px] transition-colors ${boardFilters.projectId ? 'text-[var(--accent)] border-[var(--accent-ring)]' : ''}`}
+                    aria-label="Sub-project"
+                  >
+                    <option value="">Project</option>
+                    {state.projects.filter((p) => p.context === context).map((p) => (
+                      <option key={p.id} value={p.id}>{p.title}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={boardFilters.countryId}
+                    onChange={(e) => setBoardFilters((f) => ({ ...f, countryId: e.target.value }))}
+                    className={`input-glass rounded-[var(--radius-full)] px-3 py-1.5 text-[12px] transition-colors ${boardFilters.countryId ? 'text-[var(--accent)] border-[var(--accent-ring)]' : ''}`}
+                    aria-label="Country"
+                  >
+                    <option value="">Country</option>
+                    {COUNTRIES.map((c) => (
+                      <option key={c.value} value={c.value}>{c.label}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={boardFilters.domain}
+                    onChange={(e) => setBoardFilters((f) => ({ ...f, domain: e.target.value }))}
+                    className={`input-glass rounded-[var(--radius-full)] px-3 py-1.5 text-[12px] transition-colors ${boardFilters.domain ? 'text-[var(--accent)] border-[var(--accent-ring)]' : ''}`}
+                    aria-label="Domain"
+                  >
+                    <option value="">Domain</option>
+                    {DOMAINS.map((d) => (
+                      <option key={d.value} value={d.value}>{d.label}</option>
+                    ))}
+                  </select>
+                  {(boardFilters.projectId || boardFilters.countryId || boardFilters.domain) && (
+                    <button
+                      type="button"
+                      onClick={() => setBoardFilters({ projectId: '', countryId: '', domain: '' })}
+                      className="text-[11px] font-medium transition-colors"
+                      style={{ color: 'var(--muted)' }}
+                    >
+                      ✕ Reset
+                    </button>
+                  )}
+                </>
+              )}
+
+              {/* View mode toggle — pushed right */}
               <div
                 role="group"
                 aria-label="View mode"
-                className="flex rounded-[var(--radius-md)] p-0.5"
+                className="ml-auto flex rounded-[var(--radius-md)] p-0.5"
                 style={{ background: 'var(--surface-2)' }}
               >
                 {['list', 'cards'].map((mode) => (
@@ -258,61 +319,6 @@ function App() {
                 ))}
               </div>
             </div>
-
-            {context === 'pro' && (
-              <div
-                className="mb-4 flex flex-wrap items-center gap-2 rounded-[var(--radius-xl)] px-4 py-3 sm:gap-3"
-                style={{
-                  background: 'var(--surface)',
-                  border: '1px solid var(--border)',
-                }}
-              >
-                <span className="text-xs font-medium" style={{ color: 'var(--muted)' }}>Filters:</span>
-                <select
-                  value={boardFilters.projectId}
-                  onChange={(e) => setBoardFilters((f) => ({ ...f, projectId: e.target.value }))}
-                  className="input-glass rounded-[var(--radius-md)] px-2.5 py-1.5 text-sm"
-                  aria-label="Sub-project"
-                >
-                  <option value="">All sub-projects</option>
-                  {state.projects.filter((p) => p.context === context).map((p) => (
-                    <option key={p.id} value={p.id}>{p.title}</option>
-                  ))}
-                </select>
-                <select
-                  value={boardFilters.countryId}
-                  onChange={(e) => setBoardFilters((f) => ({ ...f, countryId: e.target.value }))}
-                  className="input-glass rounded-[var(--radius-md)] px-2.5 py-1.5 text-sm"
-                  aria-label="Country"
-                >
-                  <option value="">All countries</option>
-                  {COUNTRIES.map((c) => (
-                    <option key={c.value} value={c.value}>{c.label}</option>
-                  ))}
-                </select>
-                <select
-                  value={boardFilters.domain}
-                  onChange={(e) => setBoardFilters((f) => ({ ...f, domain: e.target.value }))}
-                  className="input-glass rounded-[var(--radius-md)] px-2.5 py-1.5 text-sm"
-                  aria-label="Domain"
-                >
-                  <option value="">All domains</option>
-                  {DOMAINS.map((d) => (
-                    <option key={d.value} value={d.value}>{d.label}</option>
-                  ))}
-                </select>
-                {(boardFilters.projectId || boardFilters.countryId || boardFilters.domain) && (
-                  <button
-                    type="button"
-                    onClick={() => setBoardFilters({ projectId: '', countryId: '', domain: '' })}
-                    className="text-xs font-medium transition-all"
-                    style={{ color: 'var(--muted)' }}
-                  >
-                    Reset
-                  </button>
-                )}
-              </div>
-            )}
             {filtered.length === 0 ? (
               searchQuery ? (
                 <SearchEmptyState onClear={() => setSearchQuery('')} />
@@ -408,6 +414,15 @@ function App() {
           />
         ) : null
       })()}
+
+      <TodayQuickPanel
+        isOpen={showTodayPanel}
+        onClose={() => setShowTodayPanel(false)}
+        tasks={state.tasks.filter((t) => t.context === context)}
+        todayPlan={todayPlan}
+        projects={state.projects.filter((p) => p.context === context)}
+        onToggle={toggleTaskStatus}
+      />
 
       <Toast
         message={toastMessage}

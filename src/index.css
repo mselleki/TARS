@@ -132,10 +132,20 @@ body {
   animation: task-complete 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ── Panel slide-in ── */
+/* ── Panel slide-in (right) ── */
 @keyframes panel-slide-in {
   from { transform: translateX(100%); opacity: 0.95; }
   to   { transform: translateX(0);    opacity: 1; }
+}
+
+/* ── Panel slide-in (left) ── */
+@keyframes panel-slide-left-in {
+  from { transform: translateX(-100%); opacity: 0.95; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+.panel-slide-left-in {
+  animation: panel-slide-left-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes panel-backdrop-in {

@@ -1,4 +1,4 @@
-import { VIEWS } from '../constants'
+import { VIEWS, CONTEXTS } from '../constants'
 
 const ICONS = {
   overview: (
@@ -28,28 +28,27 @@ const ICONS = {
   ),
 }
 
-function NavButton({ viewId, label, isActive, collapsed, onClick }) {
+function NavButton({ viewId, label, isActive, onClick }) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={`sidebar-item w-full text-left border-none${isActive ? ' active' : ''}`}
-      style={{ justifyContent: collapsed ? 'center' : 'flex-start' }}
-      title={collapsed ? label : undefined}
+      title={label}
     >
       <span className="sidebar-item-icon flex h-6 w-6 shrink-0 items-center justify-center">
         {ICONS[viewId] ?? ICONS.overview}
       </span>
-      {!collapsed && (
-        <span className="truncate" style={{ letterSpacing: '-0.01em' }}>{label}</span>
-      )}
+      <span className="truncate" style={{ letterSpacing: '-0.01em' }}>{label}</span>
     </button>
   )
 }
 
-export function Sidebar({ view, onViewChange, collapsed = false }) {
-  const primaryViews = VIEWS.filter((v) => v.primary)
-  const secondaryViews = VIEWS.filter((v) => !v.primary)
+export function Sidebar({ view, onViewChange, context, onContextChange, onOpenTodayPanel, collapsed = false }) {
+  // Exclude 'today' from regular nav — it's a quick-panel button instead
+  const navViews = VIEWS.filter((v) => v.id !== 'today')
+  const primaryViews = navViews.filter((v) => v.primary)
+  const secondaryViews = navViews.filter((v) => !v.primary)
 
   return (
     <aside
@@ -62,51 +61,93 @@ export function Sidebar({ view, onViewChange, collapsed = false }) {
       aria-label="Navigation"
     >
       {/* Logo */}
-      <div
-        className="flex items-center px-4 py-5"
-        style={{ minHeight: '64px', justifyContent: collapsed ? 'center' : 'flex-start' }}
-      >
-        {collapsed ? (
-          <span
-            className="gradient-text font-bold text-lg"
-            style={{ letterSpacing: '-0.03em' }}
-          >
-            T
-          </span>
-        ) : (
-          <span
-            className="gradient-text font-bold text-xl"
-            style={{ letterSpacing: '-0.03em' }}
-          >
-            TARS
-          </span>
-        )}
+      <div className="flex items-center px-4 pt-5 pb-4" style={{ minHeight: '60px' }}>
+        <span
+          className="gradient-text font-bold text-xl"
+          style={{ letterSpacing: '-0.03em' }}
+        >
+          {collapsed ? 'T' : 'TARS'}
+        </span>
       </div>
+
+      {/* Context switcher — Pro / Perso */}
+      {!collapsed && (
+        <div className="px-2 pb-3">
+          <div
+            className="flex rounded-[var(--radius-md)] p-0.5"
+            style={{ background: 'var(--surface-2)' }}
+            role="group"
+            aria-label="Context"
+          >
+            {CONTEXTS.map((ctx) => (
+              <button
+                key={ctx.value}
+                type="button"
+                onClick={() => onContextChange?.(ctx.value)}
+                className="flex-1 rounded-[var(--radius-sm)] py-1.5 text-[12px] font-semibold transition-all"
+                style={{
+                  background: context === ctx.value ? 'var(--surface-elevated)' : 'transparent',
+                  color: context === ctx.value ? 'var(--accent)' : 'var(--muted)',
+                  boxShadow: context === ctx.value ? 'var(--shadow-sm)' : 'none',
+                  letterSpacing: '0.01em',
+                }}
+              >
+                {ctx.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Divider */}
       <div style={{ height: '1px', background: 'var(--sidebar-border)', marginBottom: '8px' }} />
 
       <nav className="flex flex-1 flex-col gap-0.5 px-2 py-2">
+        {/* Regular primary views */}
         {primaryViews.map((v) => (
           <NavButton
             key={v.id}
             viewId={v.id}
             label={v.label}
             isActive={view === v.id}
-            collapsed={collapsed}
             onClick={() => onViewChange(v.id)}
           />
         ))}
 
-        {!collapsed && secondaryViews.length > 0 && (
+        {/* Today — quick panel button, visually distinct */}
+        <button
+          type="button"
+          onClick={onOpenTodayPanel}
+          className="sidebar-item w-full border-none text-left"
+          title="Today quick view"
+        >
+          <span className="sidebar-item-icon flex h-6 w-6 shrink-0 items-center justify-center">
+            {ICONS.today}
+          </span>
+          {!collapsed && (
+            <span className="truncate" style={{ letterSpacing: '-0.01em' }}>Today</span>
+          )}
+          {!collapsed && (
+            <span
+              className="ml-auto rounded-[4px] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider"
+              style={{ background: 'var(--surface-elevated)', color: 'var(--muted-2)' }}
+            >
+              quick
+            </span>
+          )}
+        </button>
+
+        {secondaryViews.length > 0 && (
           <div className="my-3 flex items-center gap-2 px-1">
             <div style={{ height: '1px', flex: 1, background: 'var(--sidebar-border)' }} />
-            <span
-              className="section-header px-1"
-              style={{ fontSize: '9px', letterSpacing: '0.1em' }}
-            >
-              More
-            </span>
+            {!collapsed && (
+              <span
+                className="section-header px-1"
+                style={{ fontSize: '9px', letterSpacing: '0.1em' }}
+              >
+                More
+              </span>
+            )}
             <div style={{ height: '1px', flex: 1, background: 'var(--sidebar-border)' }} />
           </div>
         )}
@@ -117,7 +158,6 @@ export function Sidebar({ view, onViewChange, collapsed = false }) {
             viewId={v.id}
             label={v.label}
             isActive={view === v.id}
-            collapsed={collapsed}
             onClick={() => onViewChange(v.id)}
           />
         ))}

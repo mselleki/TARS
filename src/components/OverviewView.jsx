@@ -4,6 +4,7 @@ import { TicketList } from './TicketList'
 import { CoursesPanel } from './CoursesPanel'
 import { PersoAgenda } from './PersoAgenda'
 import { DailyStandup } from './DailyStandup'
+import { DOMAINS, COUNTRIES } from '../constants'
 
 function EmptyStateTickets() {
   return (
@@ -23,6 +24,7 @@ export function OverviewView({
   reqTickets = [],
   searchQuery = '',
   filters = {},
+  onFiltersChange,
   onAddReqTicket,
   onUpdateReqTicket,
   onDeleteReqTicket,
@@ -107,28 +109,76 @@ export function OverviewView({
         </section>
 
         <section aria-label="Tickets">
+          {/* Inline filters + count */}
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <span className="text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>Tickets</span>
+            {proTickets.length > 0 && (
+              <span className="text-xs" style={{ color: 'var(--muted)' }}>
+                {proTickets.length}
+              </span>
+            )}
+            {onFiltersChange && (
+              <>
+                <div className="ml-auto flex flex-wrap items-center gap-1.5">
+                  <select
+                    value={filters.domain ?? ''}
+                    onChange={(e) => onFiltersChange({ ...filters, domain: e.target.value || null })}
+                    className="input-glass rounded-[var(--radius-full)] px-2.5 py-1 text-[11px]"
+                    aria-label="Domain"
+                  >
+                    <option value="">Domain</option>
+                    {DOMAINS.map((d) => (
+                      <option key={d.value} value={d.value}>{d.label}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={filters.countryId ?? ''}
+                    onChange={(e) => onFiltersChange({ ...filters, countryId: e.target.value || null })}
+                    className="input-glass rounded-[var(--radius-full)] px-2.5 py-1 text-[11px]"
+                    aria-label="Country"
+                  >
+                    <option value="">Country</option>
+                    {COUNTRIES.map((c) => (
+                      <option key={c.value} value={c.value}>{c.label}</option>
+                    ))}
+                  </select>
+                  <input
+                    type="text"
+                    value={filters.owner ?? ''}
+                    onChange={(e) => onFiltersChange({ ...filters, owner: e.target.value || null })}
+                    placeholder="Owner…"
+                    className="input-glass w-20 rounded-[var(--radius-full)] px-2.5 py-1 text-[11px]"
+                    aria-label="Owner"
+                  />
+                  {(filters.domain || filters.countryId || filters.owner) && (
+                    <button
+                      type="button"
+                      onClick={() => onFiltersChange({ domain: null, countryId: null, owner: null })}
+                      className="text-[11px] transition-colors"
+                      style={{ color: 'var(--muted)' }}
+                    >
+                      ✕ Reset
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+
           {showEmptyState ? (
             <EmptyStateTickets />
           ) : (
-            <>
-              <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-[var(--text-secondary)]">Tickets</h2>
-                <span className="text-xs text-[var(--muted)]">
-                  {proTickets.length} ticket{proTickets.length !== 1 ? 's' : ''}
-                </span>
-              </div>
-              <TicketList
-                tickets={reqTickets}
-                searchQuery={searchQuery}
-                scopeFilter="PRO"
-                filters={filters}
-                onMarkDone={handleMarkDone}
-                onSetWaiting={handleSetWaiting}
-                onAddFollowUp={handleAddFollowUp}
-                onSetDueDate={handleSetDueDate}
-                onDelete={onDeleteReqTicket}
-              />
-            </>
+            <TicketList
+              tickets={reqTickets}
+              searchQuery={searchQuery}
+              scopeFilter="PRO"
+              filters={filters}
+              onMarkDone={handleMarkDone}
+              onSetWaiting={handleSetWaiting}
+              onAddFollowUp={handleAddFollowUp}
+              onSetDueDate={handleSetDueDate}
+              onDelete={onDeleteReqTicket}
+            />
           )}
         </section>
       </div>

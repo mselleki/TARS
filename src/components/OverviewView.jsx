@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { TicketCaptureForm } from './TicketCaptureForm'
 import { CoursesPanel } from './CoursesPanel'
 import { PersoAgenda } from './PersoAgenda'
-import { DailyStandup } from './DailyStandup'
+import { NotesPanel } from './NotesPanel'
 import { CockpitFocusColumn } from './CockpitFocusColumn'
 
 export function OverviewView({
@@ -27,6 +27,8 @@ export function OverviewView({
   meetingSheets = {},
   onMeetingSheetChange,
 }) {
+  const [focusMode, setFocusMode] = useState('tickets')
+
   const proTickets = useMemo(() => reqTickets.filter((t) => t.scope === 'PRO'), [reqTickets])
   const existingOwners = useMemo(() => reqTickets.map((t) => t.owner).filter(Boolean), [reqTickets])
 
@@ -65,52 +67,94 @@ export function OverviewView({
     )
   }
 
+  const ticketsDominant = focusMode === 'tickets'
+  const gridCols = ticketsDominant
+    ? 'minmax(0,3fr) minmax(0,2fr)'
+    : 'minmax(0,2fr) minmax(0,3fr)'
+
   return (
-    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+    <div className="space-y-3">
 
-      {/* ── Left: Focus cockpit — DOMINANT ── */}
-      <CockpitFocusColumn
-        tickets={proTickets}
-        filters={filters}
-        onFiltersChange={onFiltersChange}
-        onMarkDone={handleMarkDone}
-        onSetWaiting={handleSetWaiting}
-        onAddFollowUp={handleAddFollowUp}
-        onSetDueDate={handleSetDueDate}
-        onDelete={onDeleteReqTicket}
-      />
+      {/* ── Focus toggle ── */}
+      <div className="flex justify-end">
+        <div
+          className="flex rounded-[var(--radius-md)] p-0.5"
+          style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
+          role="group"
+          aria-label="Focus mode"
+        >
+          {[
+            { id: 'tickets', label: 'Tickets' },
+            { id: 'notes',   label: 'Notes' },
+          ].map(opt => {
+            const isActive = focusMode === opt.id
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => setFocusMode(opt.id)}
+                className="rounded-[var(--radius-sm)] px-3 py-1 text-[11px] font-semibold transition-all"
+                style={{
+                  background: isActive ? 'var(--accent)' : 'transparent',
+                  color:      isActive ? '#fff' : 'var(--muted)',
+                }}
+              >
+                {opt.label}
+              </button>
+            )
+          })}
+        </div>
+      </div>
 
-      {/* ── Right: Context + Capture — quieter ── */}
-      <div className="min-w-0 space-y-4">
+      {/* ── Two-column layout ── */}
+      <div
+        className="grid gap-6"
+        style={{ gridTemplateColumns: gridCols }}
+      >
 
-        {/* Stand-up + Country × Domain */}
-        <DailyStandup
-          standupLog={standupLog}
-          onStandupLogChange={onStandupLogChange}
-          meetingSheets={meetingSheets}
-          onMeetingSheetChange={onMeetingSheetChange}
+        {/* ── Left: Focus cockpit ── */}
+        <CockpitFocusColumn
+          tickets={proTickets}
+          filters={filters}
+          onFiltersChange={onFiltersChange}
+          onMarkDone={handleMarkDone}
+          onSetWaiting={handleSetWaiting}
+          onAddFollowUp={handleAddFollowUp}
+          onSetDueDate={handleSetDueDate}
+          onDelete={onDeleteReqTicket}
         />
 
-        {/* Ticket capture */}
-        <section
-          className="overflow-hidden rounded-[var(--radius-xl)]"
-          style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}
-          aria-label="Add ticket"
-        >
-          <div className="px-4 pt-3 pb-1">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.09em]" style={{ color: 'var(--muted)' }}>
-              Add ticket
-            </p>
-          </div>
-          <div className="px-4 pb-4">
-            <TicketCaptureForm
-              onSubmit={(payload) => onAddReqTicket?.(payload)}
-              scope="PRO"
-              existingOwners={existingOwners}
-            />
-          </div>
-        </section>
+        {/* ── Right: Notes + Capture ── */}
+        <div className="min-w-0 space-y-4">
 
+          <NotesPanel
+            meetingSheets={meetingSheets}
+            onMeetingSheetChange={onMeetingSheetChange}
+            standupLog={standupLog}
+            compact={ticketsDominant}
+          />
+
+          {/* Ticket capture */}
+          <section
+            className="overflow-hidden rounded-[var(--radius-xl)]"
+            style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}
+            aria-label="Add ticket"
+          >
+            <div className="px-4 pt-3 pb-1">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.09em]" style={{ color: 'var(--muted)' }}>
+                Add ticket
+              </p>
+            </div>
+            <div className="px-4 pb-4">
+              <TicketCaptureForm
+                onSubmit={(payload) => onAddReqTicket?.(payload)}
+                scope="PRO"
+                existingOwners={existingOwners}
+              />
+            </div>
+          </section>
+
+        </div>
       </div>
     </div>
   )

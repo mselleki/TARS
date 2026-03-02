@@ -166,7 +166,14 @@ function App() {
   const isEmpty = contextTasks.length === 0
 
   return (
-    <div className="flex min-h-screen bg-[var(--bg)] text-[var(--text)]">
+    <div className="flex min-h-screen text-[var(--text)]">
+      {/* Aurora animated background */}
+      <div className="aurora-bg" aria-hidden="true">
+        <div className="aurora-blob aurora-blob-1" />
+        <div className="aurora-blob aurora-blob-2" />
+        <div className="aurora-blob aurora-blob-3" />
+      </div>
+
       <Sidebar view={view} onViewChange={setView} />
 
       <div className="flex min-w-0 flex-1 flex-col pb-20 md:pb-0">
@@ -189,7 +196,8 @@ function App() {
         syncStatus={syncStatus}
       />
 
-      <main className={`flex-1 overflow-auto px-3 py-4 sm:px-6 sm:py-6 lg:mx-auto ${view === 'board' ? 'lg:max-w-7xl' : 'lg:max-w-4xl'}`}>
+      <main className={`flex-1 overflow-auto px-3 py-4 sm:px-6 sm:py-6 lg:mx-auto ${view === 'board' ? 'lg:max-w-7xl' : view === 'overview' ? 'lg:max-w-6xl' : 'lg:max-w-4xl'}`}>
+        <div key={view} className="view-transition">
         {view === 'overview' && (
           <OverviewView
             context={context}
@@ -368,6 +376,7 @@ function App() {
           />
         )}
 
+        </div>{/* end view-transition */}
       </main>
       </div>
 

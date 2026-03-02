@@ -96,7 +96,7 @@ export function DailyStandup({
         aria-label="Daily stand-up notebook"
       >
         <div className="absolute left-0 top-0 bottom-0 w-1 rounded-l-[var(--radius-2xl)]"
-          style={{ background: 'var(--accent-gradient)' }} aria-hidden />
+          style={{ background: 'var(--accent)' }} aria-hidden />
         <div className="pl-6 pr-5 py-5">
           <div className="flex items-center justify-between gap-4 mb-4">
             <h2 className="text-base font-semibold" style={{ color: 'var(--text)', letterSpacing: '-0.02em' }}>
@@ -111,7 +111,7 @@ export function DailyStandup({
             value={standupLog}
             onChange={(e) => onStandupLogChange?.(e.target.value)}
             placeholder="Click « New meeting » to insert a dated block, then write below…"
-            className="min-h-[220px] w-full resize-y rounded-[var(--radius-lg)] border-0 bg-transparent px-0 py-2 text-[14px] leading-[1.8] placeholder:text-[var(--muted-2)] outline-none focus:ring-0"
+            className="min-h-[160px] w-full resize-y rounded-[var(--radius-lg)] border-0 bg-transparent px-0 py-2 text-[14px] leading-[1.8] placeholder:text-[var(--muted-2)] outline-none focus:ring-0"
             style={{ fontFamily: 'ui-serif, Georgia, "Times New Roman", serif', color: 'var(--text-secondary)' }}
             aria-label="Stand-up notes"
           />
@@ -125,7 +125,7 @@ export function DailyStandup({
         aria-label="Country × Domain notebook"
       >
         <div className="absolute left-0 top-0 bottom-0 w-1 rounded-l-[var(--radius-2xl)]"
-          style={{ background: 'linear-gradient(180deg, #10B981 0%, #2563EB 100%)' }} aria-hidden />
+          style={{ background: 'var(--success)' }} aria-hidden />
         <div className="pl-6 pr-5 py-5">
           <div className="mb-4">
             <h2 className="text-base font-semibold" style={{ color: 'var(--text)', letterSpacing: '-0.02em' }}>
@@ -267,7 +267,7 @@ function CountryCard({ country, dots, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="group flex flex-col items-start rounded-[var(--radius-xl)] p-4 transition-all hover:scale-[1.02] hover:shadow-md active:scale-[0.99]"
+      className="group flex flex-col items-start rounded-[var(--radius-xl)] p-4 transition-all hover:bg-[var(--surface-elevated)] active:scale-[0.98]"
       style={{
         background: 'var(--surface-2)',
         border: '1px solid var(--border)',

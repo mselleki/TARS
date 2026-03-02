@@ -80,55 +80,58 @@ export function OverviewView({
   }
 
   return (
-    <div className="space-y-6">
-      <DailyStandup
-        standupLog={standupLog}
-        onStandupLogChange={onStandupLogChange}
-        meetingSheets={meetingSheets}
-        onMeetingSheetChange={onMeetingSheetChange}
-      />
-      <section
-        className="rounded-[var(--radius-xl)] p-5"
-        style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
-        aria-label="Add ticket"
-      >
-        <h2
-          className="mb-4 text-sm font-semibold"
-          style={{ color: 'var(--text-secondary)', letterSpacing: '-0.01em' }}
-        >Add ticket</h2>
-        <TicketCaptureForm
-          onSubmit={(payload) => onAddReqTicket?.(payload)}
-          scope="PRO"
-          existingOwners={existingOwners}
-          initialFocus
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+      {/* Left column: standup notes + country context */}
+      <div className="min-w-0">
+        <DailyStandup
+          standupLog={standupLog}
+          onStandupLogChange={onStandupLogChange}
+          meetingSheets={meetingSheets}
+          onMeetingSheetChange={onMeetingSheetChange}
         />
-      </section>
+      </div>
 
-      <section aria-label="Tickets">
-        {showEmptyState ? (
-          <EmptyStateTickets />
-        ) : (
-          <>
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-[var(--text-secondary)]">Tickets</h2>
-              <span className="text-xs text-[var(--muted)]">
-                {proTickets.length} ticket{proTickets.length !== 1 ? 's' : ''}
-              </span>
-            </div>
-            <TicketList
-              tickets={reqTickets}
-              searchQuery={searchQuery}
-              scopeFilter="PRO"
-              filters={filters}
-              onMarkDone={handleMarkDone}
-              onSetWaiting={handleSetWaiting}
-              onAddFollowUp={handleAddFollowUp}
-              onSetDueDate={handleSetDueDate}
-              onDelete={onDeleteReqTicket}
-            />
-          </>
-        )}
-      </section>
+      {/* Right column: ticket capture + ticket list */}
+      <div className="min-w-0 space-y-4">
+        <section
+          className="rounded-[var(--radius-xl)] p-4"
+          style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+          aria-label="Add ticket"
+        >
+          <TicketCaptureForm
+            onSubmit={(payload) => onAddReqTicket?.(payload)}
+            scope="PRO"
+            existingOwners={existingOwners}
+            initialFocus
+          />
+        </section>
+
+        <section aria-label="Tickets">
+          {showEmptyState ? (
+            <EmptyStateTickets />
+          ) : (
+            <>
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="text-sm font-semibold text-[var(--text-secondary)]">Tickets</h2>
+                <span className="text-xs text-[var(--muted)]">
+                  {proTickets.length} ticket{proTickets.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+              <TicketList
+                tickets={reqTickets}
+                searchQuery={searchQuery}
+                scopeFilter="PRO"
+                filters={filters}
+                onMarkDone={handleMarkDone}
+                onSetWaiting={handleSetWaiting}
+                onAddFollowUp={handleAddFollowUp}
+                onSetDueDate={handleSetDueDate}
+                onDelete={onDeleteReqTicket}
+              />
+            </>
+          )}
+        </section>
+      </div>
     </div>
   )
 }

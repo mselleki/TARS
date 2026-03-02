@@ -50,23 +50,15 @@ export function BottomNav({ view, onViewChange }) {
             aria-label={v.label}
           >
             <span style={{
-              color: isActive ? undefined : 'var(--muted)',
-              background: isActive ? 'var(--accent-gradient)' : undefined,
-              WebkitBackgroundClip: isActive ? 'text' : undefined,
-              WebkitTextFillColor: isActive ? 'transparent' : undefined,
-              backgroundClip: isActive ? 'text' : undefined,
-              transition: 'all 200ms cubic-bezier(0.16, 1, 0.3, 1)',
+              color: isActive ? 'var(--accent)' : 'var(--muted)',
+              transition: 'color 200ms cubic-bezier(0.16, 1, 0.3, 1)',
             }}>
               {ICONS[v.id] ?? ICONS.overview}
             </span>
             <span
               className="text-[10px] font-medium"
               style={{
-                color: isActive ? undefined : 'var(--muted-2)',
-                background: isActive ? 'var(--accent-gradient)' : undefined,
-                WebkitBackgroundClip: isActive ? 'text' : undefined,
-                WebkitTextFillColor: isActive ? 'transparent' : undefined,
-                backgroundClip: isActive ? 'text' : undefined,
+                color: isActive ? 'var(--accent)' : 'var(--muted-2)',
               }}
             >
               {v.label}
@@ -74,7 +66,7 @@ export function BottomNav({ view, onViewChange }) {
             {isActive && (
               <span
                 className="absolute bottom-0 h-[2px] w-8 rounded-full"
-                style={{ background: 'var(--accent-gradient)' }}
+                style={{ background: 'var(--accent)' }}
               />
             )}
           </button>

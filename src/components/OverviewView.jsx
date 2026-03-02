@@ -1,23 +1,9 @@
 import { useMemo, useState } from 'react'
 import { TicketCaptureForm } from './TicketCaptureForm'
-import { TicketList } from './TicketList'
 import { CoursesPanel } from './CoursesPanel'
 import { PersoAgenda } from './PersoAgenda'
 import { DailyStandup } from './DailyStandup'
-import { DOMAINS, COUNTRIES } from '../constants'
-
-function EmptyStateTickets() {
-  return (
-    <div
-      className="rounded-[var(--radius-xl)] p-6 text-center"
-      style={{ background: 'var(--surface)', border: '1px dashed var(--border)' }}
-    >
-      <p className="text-sm" style={{ color: 'var(--muted)' }}>
-        Track REQ tickets with owners and follow-ups so nothing gets lost.
-      </p>
-    </div>
-  )
-}
+import { CockpitFocusColumn } from './CockpitFocusColumn'
 
 export function OverviewView({
   context = 'pro',
@@ -43,13 +29,11 @@ export function OverviewView({
 }) {
   const proTickets = useMemo(() => reqTickets.filter((t) => t.scope === 'PRO'), [reqTickets])
   const existingOwners = useMemo(() => reqTickets.map((t) => t.owner).filter(Boolean), [reqTickets])
-  const hasTickets = proTickets.length > 0
-  const showEmptyState = !hasTickets
 
-  const handleMarkDone = (id) => onUpdateReqTicket?.(id, { status: 'DONE' })
-  const handleSetWaiting = (id) => onUpdateReqTicket?.(id, { status: 'WAITING_REPLY' })
+  const handleMarkDone    = (id) => onUpdateReqTicket?.(id, { status: 'DONE' })
+  const handleSetWaiting  = (id) => onUpdateReqTicket?.(id, { status: 'WAITING_REPLY' })
   const handleAddFollowUp = (id) => onUpdateReqTicket?.(id, { lastFollowUpAt: Date.now() })
-  const handleSetDueDate = (id, dueAt) => onUpdateReqTicket?.(id, { dueAt })
+  const handleSetDueDate  = (id, dueAt) => onUpdateReqTicket?.(id, { dueAt })
 
   if (context === 'perso') {
     return (
@@ -82,109 +66,57 @@ export function OverviewView({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-      {/* Left column: standup notes + country context */}
-      <div className="min-w-0">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+
+      {/* ── Left: Focus cockpit — DOMINANT ── */}
+      <CockpitFocusColumn
+        tickets={proTickets}
+        filters={filters}
+        onFiltersChange={onFiltersChange}
+        onMarkDone={handleMarkDone}
+        onSetWaiting={handleSetWaiting}
+        onAddFollowUp={handleAddFollowUp}
+        onSetDueDate={handleSetDueDate}
+        onDelete={onDeleteReqTicket}
+      />
+
+      {/* ── Right: Context + Capture — quieter ── */}
+      <div className="min-w-0 space-y-4">
+
+        {/* Stand-up + Country × Domain */}
         <DailyStandup
           standupLog={standupLog}
           onStandupLogChange={onStandupLogChange}
           meetingSheets={meetingSheets}
           onMeetingSheetChange={onMeetingSheetChange}
         />
-      </div>
 
-      {/* Right column: ticket capture + ticket list */}
-      <div className="min-w-0 space-y-4">
+        {/* Ticket capture */}
         <section
-          className="rounded-[var(--radius-xl)] p-4"
-          style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+          className="overflow-hidden rounded-[var(--radius-xl)]"
+          style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}
           aria-label="Add ticket"
         >
-          <TicketCaptureForm
-            onSubmit={(payload) => onAddReqTicket?.(payload)}
-            scope="PRO"
-            existingOwners={existingOwners}
-            initialFocus
-          />
-        </section>
-
-        <section aria-label="Tickets">
-          {/* Inline filters + count */}
-          <div className="mb-3 flex flex-wrap items-center gap-2">
-            <span className="text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>Tickets</span>
-            {proTickets.length > 0 && (
-              <span className="text-xs" style={{ color: 'var(--muted)' }}>
-                {proTickets.length}
-              </span>
-            )}
-            {onFiltersChange && (
-              <>
-                <div className="ml-auto flex flex-wrap items-center gap-1.5">
-                  <select
-                    value={filters.domain ?? ''}
-                    onChange={(e) => onFiltersChange({ ...filters, domain: e.target.value || null })}
-                    className="input-glass rounded-[var(--radius-full)] px-2.5 py-1 text-[11px]"
-                    aria-label="Domain"
-                  >
-                    <option value="">Domain</option>
-                    {DOMAINS.map((d) => (
-                      <option key={d.value} value={d.value}>{d.label}</option>
-                    ))}
-                  </select>
-                  <select
-                    value={filters.countryId ?? ''}
-                    onChange={(e) => onFiltersChange({ ...filters, countryId: e.target.value || null })}
-                    className="input-glass rounded-[var(--radius-full)] px-2.5 py-1 text-[11px]"
-                    aria-label="Country"
-                  >
-                    <option value="">Country</option>
-                    {COUNTRIES.map((c) => (
-                      <option key={c.value} value={c.value}>{c.label}</option>
-                    ))}
-                  </select>
-                  <input
-                    type="text"
-                    value={filters.owner ?? ''}
-                    onChange={(e) => onFiltersChange({ ...filters, owner: e.target.value || null })}
-                    placeholder="Owner…"
-                    className="input-glass w-20 rounded-[var(--radius-full)] px-2.5 py-1 text-[11px]"
-                    aria-label="Owner"
-                  />
-                  {(filters.domain || filters.countryId || filters.owner) && (
-                    <button
-                      type="button"
-                      onClick={() => onFiltersChange({ domain: null, countryId: null, owner: null })}
-                      className="text-[11px] transition-colors"
-                      style={{ color: 'var(--muted)' }}
-                    >
-                      ✕ Reset
-                    </button>
-                  )}
-                </div>
-              </>
-            )}
+          <div className="px-4 pt-3 pb-1">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.09em]" style={{ color: 'var(--muted)' }}>
+              Add ticket
+            </p>
           </div>
-
-          {showEmptyState ? (
-            <EmptyStateTickets />
-          ) : (
-            <TicketList
-              tickets={reqTickets}
-              searchQuery={searchQuery}
-              scopeFilter="PRO"
-              filters={filters}
-              onMarkDone={handleMarkDone}
-              onSetWaiting={handleSetWaiting}
-              onAddFollowUp={handleAddFollowUp}
-              onSetDueDate={handleSetDueDate}
-              onDelete={onDeleteReqTicket}
+          <div className="px-4 pb-4">
+            <TicketCaptureForm
+              onSubmit={(payload) => onAddReqTicket?.(payload)}
+              scope="PRO"
+              existingOwners={existingOwners}
             />
-          )}
+          </div>
         </section>
+
       </div>
     </div>
   )
 }
+
+/* ── Perso context ── */
 
 function OverviewPersoTodo({ tasks, onToggleTask, onUpdateTask, onDeleteTask }) {
   const persoTasks = useMemo(
@@ -194,7 +126,7 @@ function OverviewPersoTodo({ tasks, onToggleTask, onUpdateTask, onDeleteTask }) 
 
   return (
     <section
-      className="rounded-[var(--radius-xl)] overflow-hidden"
+      className="overflow-hidden rounded-[var(--radius-xl)]"
       style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
     >
       <h2
@@ -203,7 +135,7 @@ function OverviewPersoTodo({ tasks, onToggleTask, onUpdateTask, onDeleteTask }) 
       >
         Personal to-do
       </h2>
-      <div className="p-4 space-y-2">
+      <div className="space-y-2 p-4">
         {persoTasks.length === 0 ? (
           <p className="text-xs text-[var(--muted)]">No tasks. Add some from Projects or the Board (Perso context).</p>
         ) : (

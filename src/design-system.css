@@ -13,22 +13,22 @@
   -moz-osx-font-smoothing: grayscale;
 
   /* ── Backgrounds ── */
-  --bg:               #FFFFFF;
-  --bg-2:             #FFFFFF;
+  --bg:               #FAF9F7;
+  --bg-2:             #FAF9F7;
   --surface:          #FFFFFF;
-  --surface-2:        #F9FAFB;
+  --surface-2:        #F5F3F0;
   --surface-elevated: #FFFFFF;
 
   /* ── Borders ── */
-  --border:           rgba(0, 0, 0, 0.08);
-  --border-strong:    rgba(0, 0, 0, 0.14);
-  --border-subtle:    rgba(0, 0, 0, 0.05);
+  --border:           rgba(68, 64, 60, 0.10);
+  --border-strong:    rgba(68, 64, 60, 0.18);
+  --border-subtle:    rgba(68, 64, 60, 0.06);
 
-  /* ── Text (Apple HIG scale) ── */
-  --text:             #1C1C1E;
-  --text-secondary:   #48484A;
-  --muted:            #8E8E93;
-  --muted-2:          #AEAEB2;
+  /* ── Text (palette stone, chaleureuse) ── */
+  --text:             #1C1917;
+  --text-secondary:   #44403C;
+  --muted:            #A8A29E;
+  --muted-2:          #D6D3D1;
 
   /* ── Accent: violet (single decisive hue) ── */
   --accent-from:      #6D28D9;
@@ -55,9 +55,9 @@
   --warning-subtle:   rgba(255, 159, 10, 0.10);
 
   /* ── Sidebar ── */
-  --sidebar-bg:       #FAFAFA;
-  --sidebar-border:   rgba(0, 0, 0, 0.07);
-  --sidebar-gradient: #FAFAFA;
+  --sidebar-bg:       #FFFFFF;
+  --sidebar-border:   rgba(68, 64, 60, 0.08);
+  --sidebar-gradient: #FFFFFF;
 
   /* ── Glass ── */
   --glass-bg:         #FFFFFF;
@@ -85,12 +85,12 @@
   --column-in-progress: rgba(109, 40, 217, 0.04);
   --column-done:        rgba(16, 185, 129, 0.04);
 
-  /* ── Scale ── */
-  --radius-sm:  6px;
-  --radius-md:  8px;
-  --radius-lg:  12px;
-  --radius-xl:  16px;
-  --radius-2xl: 20px;
+  /* ── Scale (arrondis plus généreux) ── */
+  --radius-sm:  8px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+  --radius-xl:  18px;
+  --radius-2xl: 22px;
   --radius-full: 9999px;
 
   /* ── Shadows (real shadows for light mode) ── */
@@ -110,6 +110,26 @@
   /* ── Transitions ── */
   --transition:      200ms cubic-bezier(0.16, 1, 0.3, 1);
   --transition-slow: 350ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ── Couleurs par module (refonte cockpit) ── */
+  --mod-cockpit:        #6D28D9;
+  --mod-cockpit-bg:     #EDE9FE;
+  --mod-tasks:          #0369A1;
+  --mod-tasks-bg:       #E0F2FE;
+  --mod-projects:       #6D28D9;
+  --mod-projects-bg:    #EDE9FE;
+  --mod-tickets:        #C2410C;
+  --mod-tickets-bg:     #FFEDD5;
+  --mod-rituals:        #15803D;
+  --mod-rituals-bg:     #DCFCE7;
+  --mod-notes:          #A16207;
+  --mod-notes-bg:       #FEF9C3;
+  --mod-agenda:         #BE185D;
+  --mod-agenda-bg:      #FCE7F3;
+  --mod-courses:        #B45309;
+  --mod-courses-bg:     #FEF3C7;
+  --overdue:            #C2410C;
+  --overdue-bg:         #FFEDD5;
 
   /* ── Legacy aliases (keep for components using old vars) ── */
   --color-page:             var(--bg);
@@ -243,6 +263,18 @@
 
   /* ── Legacy aliases ── */
   --color-border-subtle: var(--border-subtle);
+
+  /* ── Module bg overrides for dark mode ── */
+  --mod-cockpit-bg:     rgba(109, 40, 217, 0.18);
+  --mod-tasks-bg:       rgba(3, 105, 161, 0.18);
+  --mod-projects-bg:    rgba(109, 40, 217, 0.18);
+  --mod-tickets-bg:     rgba(194, 65, 12, 0.18);
+  --mod-rituals-bg:     rgba(21, 128, 61, 0.18);
+  --mod-notes-bg:       rgba(161, 98, 7, 0.18);
+  --mod-agenda-bg:      rgba(190, 24, 93, 0.18);
+  --mod-courses-bg:     rgba(180, 83, 9, 0.18);
+  --overdue:            #FB923C;
+  --overdue-bg:         rgba(194, 65, 12, 0.20);
 }
 
 /* ============================================================

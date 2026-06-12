@@ -13,7 +13,10 @@ export function useSpeech({ lang = "fr-FR", onResult } = {}) {
   const [error, setError] = useState(null);
   const recognitionRef = useRef(null);
   const onResultRef = useRef(onResult);
-  onResultRef.current = onResult;
+
+  useEffect(() => {
+    onResultRef.current = onResult;
+  });
 
   const stop = useCallback(() => {
     recognitionRef.current?.stop();

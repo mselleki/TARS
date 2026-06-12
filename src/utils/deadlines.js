@@ -40,12 +40,11 @@ export function collectDeadlines(
   }
   for (const t of reqTickets) {
     if (t.status === "DONE" || !t.dueAt) continue;
-    items.push({
-      id: t.id,
-      kind: "ticket",
-      title: t.summary || t.id,
-      due: String(t.dueAt).slice(0, 10),
-    });
+    const due =
+      typeof t.dueAt === "number"
+        ? new Date(t.dueAt).toISOString().slice(0, 10)
+        : String(t.dueAt).slice(0, 10);
+    items.push({ id: t.id, kind: "ticket", title: t.summary || t.id, due });
   }
   for (const item of items) {
     item.days = daysUntil(item.due, ref);

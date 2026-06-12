@@ -92,4 +92,24 @@ describe("collectDeadlines", () => {
     );
     expect(result[0].title).toBe("REQ9");
   });
+
+  it("handles numeric epoch-ms dueAt from real ticket data", () => {
+    const dueMs = Date.UTC(2026, 5, 12); // 2026-06-12
+    const result = collectDeadlines(
+      {
+        tasks: [],
+        reqTickets: [
+          {
+            id: "REQ5",
+            summary: "Epoch ticket",
+            status: "ACTIONABLE",
+            dueAt: dueMs,
+          },
+        ],
+      },
+      REF,
+    );
+    expect(result[0].due).toBe("2026-06-12");
+    expect(result[0].days).toBe(1);
+  });
 });

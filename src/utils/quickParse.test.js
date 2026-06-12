@@ -30,6 +30,11 @@ describe("parseQuickInput — dates", () => {
       "2026-06-11",
     );
   });
+  it("parses aujourd’hui with typographic apostrophe", () => {
+    expect(parseQuickInput("appeler la banque aujourd’hui", REF).dueDate).toBe(
+      "2026-06-11",
+    );
+  });
   it("parses après-demain before demain", () => {
     expect(parseQuickInput("rendez-vous après-demain", REF).dueDate).toBe(
       "2026-06-13",

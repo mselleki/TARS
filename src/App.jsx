@@ -85,7 +85,6 @@ function App() {
     addReqTicket,
     updateReqTicket,
     deleteReqTicket,
-    setStandupLog,
     setMeetingSheet,
     addRitual,
     updateRitual,
@@ -128,7 +127,7 @@ function App() {
     onGoOverview: handleGoOverview,
     onEscape: handleEscape,
     onQuickCapture: () => setShowQuickCapture(true),
-    enabled: !showComposer,
+    enabled: !showComposer && !showQuickCapture,
   });
 
   const handleAddTask = useCallback(
@@ -141,15 +140,27 @@ function App() {
     [addTask, context],
   );
 
+  const STANDUP_SHEET_KEY = "notes-tab|standup";
+
   const handleQuickCapture = useCallback(
     (parsed) => {
       if (parsed.target === "ticket") {
-        addReqTicket({ summary: parsed.title, dueAt: parsed.dueDate || null });
+        addReqTicket({
+          summary: parsed.title,
+          dueAt: parsed.dueDate
+            ? new Date(`${parsed.dueDate}T12:00:00`).getTime()
+            : null,
+        });
         setToastMessage("Ticket créé");
       } else if (parsed.target === "note") {
-        setStandupLog(
-          `${state.standupLog ? state.standupLog + "\n" : ""}• ${parsed.title}`,
-        );
+        const sheet = state.meetingSheets?.[STANDUP_SHEET_KEY];
+        const current =
+          (sheet && typeof sheet === "object" ? sheet.notes : sheet) ||
+          state.standupLog ||
+          "";
+        setMeetingSheet(STANDUP_SHEET_KEY, {
+          notes: `${current ? current + "\n" : ""}• ${parsed.title}`,
+        });
         setToastMessage("Note ajoutée");
       } else {
         addTask({
@@ -164,7 +175,14 @@ function App() {
       }
       setShowQuickCapture(false);
     },
-    [addReqTicket, setStandupLog, addTask, context, state.standupLog],
+    [
+      addReqTicket,
+      setMeetingSheet,
+      addTask,
+      context,
+      state.meetingSheets,
+      state.standupLog,
+    ],
   );
 
   const handleStatusChange = (id, status) => {

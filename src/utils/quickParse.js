@@ -42,7 +42,7 @@ function removeAt(text, index, length) {
 const DATE_RULES = [
   { re: /\bapres[- ]demain\b/, resolve: () => 2 },
   { re: /\bdemain\b/, resolve: () => 1 },
-  { re: /\baujourd'?hui\b/, resolve: () => 0 },
+  { re: /\baujourd[’']?hui\b/, resolve: () => 0 },
   { re: /\bdans\s+(\d+)\s+jours?\b/, resolve: (m) => Number(m[1]) },
   {
     re: /\b(dimanche|lundi|mardi|mercredi|jeudi|vendredi|samedi)(\s+prochain)?\b/,

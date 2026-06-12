@@ -17,12 +17,16 @@ export function QuickCapture({ isOpen, onClose, onSubmit }) {
 
   useEffect(() => {
     if (isOpen) {
-      setText("");
       const t = setTimeout(() => inputRef.current?.focus(), 80);
       return () => clearTimeout(t);
     }
     stop();
   }, [isOpen, stop]);
+
+  const handleClose = () => {
+    setText("");
+    onClose?.();
+  };
 
   const parsed = parseQuickInput(text);
   const canSubmit = parsed.title.length > 0;
@@ -35,7 +39,7 @@ export function QuickCapture({ isOpen, onClose, onSubmit }) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Capture rapide">
+    <Modal isOpen={isOpen} onClose={handleClose} title="Capture rapide">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="flex items-center gap-2">
           <input
@@ -43,6 +47,7 @@ export function QuickCapture({ isOpen, onClose, onSubmit }) {
             type="text"
             value={listening && interim ? `${text} ${interim}`.trim() : text}
             onChange={(e) => setText(e.target.value)}
+            readOnly={listening}
             placeholder={
               "Ex. « payer le loyer demain », « ticket : relancer X vendredi »"
             }
@@ -105,7 +110,7 @@ export function QuickCapture({ isOpen, onClose, onSubmit }) {
             <span className="font-medium" style={{ color: "var(--text)" }}>
               {parsed.title}
             </span>
-            {parsed.dueDate && (
+            {parsed.dueDate && parsed.target !== "note" && (
               <span
                 className="rounded-full px-2.5 py-1"
                 style={{
@@ -116,7 +121,7 @@ export function QuickCapture({ isOpen, onClose, onSubmit }) {
                 📅 {formatCountdown(daysUntil(parsed.dueDate))}
               </span>
             )}
-            {parsed.dueTime && (
+            {parsed.dueTime && parsed.target !== "note" && (
               <span
                 className="rounded-full px-2.5 py-1"
                 style={{
@@ -133,7 +138,7 @@ export function QuickCapture({ isOpen, onClose, onSubmit }) {
         <div className="flex justify-end gap-2">
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className="rounded-[var(--radius-lg)] border px-4 py-2.5 text-sm font-medium transition-colors"
             style={{
               borderColor: "var(--border)",

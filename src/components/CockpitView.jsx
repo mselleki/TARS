@@ -132,7 +132,12 @@ export function CockpitView({
     [rituals, projects, tasks, context],
   );
 
-  const doneToday = contextTasks.filter((t) => t.status === "done").length;
+  const doneToday = useMemo(() => {
+    const start = new Date(`${todayStr}T00:00:00`).getTime();
+    return contextTasks.filter(
+      (t) => t.status === "done" && (t.updatedAt ?? 0) >= start,
+    ).length;
+  }, [contextTasks, todayStr]);
 
   return (
     <div className="space-y-6">

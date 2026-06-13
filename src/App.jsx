@@ -237,10 +237,18 @@ function App() {
         case "query": {
           if (intent.query === "today") {
             const now = voiceContext.numberedTasks;
-            if (!now.length) return { message: "Rien d'urgent aujourd'hui." };
-            return {
-              message: `Tu as ${now.length} chose${now.length > 1 ? "s" : ""} : ${now.map((t) => t.title).join(", ")}.`,
-            };
+            if (now.length) {
+              return {
+                message: `Tu as ${now.length} chose${now.length > 1 ? "s" : ""} : ${now.map((t) => t.title).join(", ")}.`,
+              };
+            }
+            const active = voiceContext.activeTasks;
+            if (active.length) {
+              return {
+                message: `Rien de planifié pour aujourd'hui. Tu as ${active.length} tâche${active.length > 1 ? "s" : ""} en cours.`,
+              };
+            }
+            return { message: "Rien à faire, tout est clair." };
           }
           if (intent.query === "overdue") {
             const n = collectDeadlines({

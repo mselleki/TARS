@@ -7,29 +7,34 @@ const SpeechRecognitionImpl =
 
 export const speechSupported = Boolean(SpeechRecognitionImpl);
 
-export function useSpeech({
-  lang = "fr-FR",
-  onResult,
-  continuous = false,
-} = {}) {
+// Half-duplex by design: each start() listens for a single utterance and ends.
+// The caller decides when to re-arm (via onEnd), so the microphone can be kept
+// closed while the app speaks — preventing the TTS output from being recognized
+// as new input (acoustic feedback loop).
+export function useSpeech({ lang = "fr-FR", onResult, onEnd, onError } = {}) {
   const [listening, setListening] = useState(false);
   const [interim, setInterim] = useState("");
-  const [error, setError] = useState(null);
   const recognitionRef = useRef(null);
-  const wantRef = useRef(false);
   const onResultRef = useRef(onResult);
+  const onEndRef = useRef(onEnd);
+  const onErrorRef = useRef(onError);
 
   useEffect(() => {
     onResultRef.current = onResult;
   });
+  useEffect(() => {
+    onEndRef.current = onEnd;
+  });
+  useEffect(() => {
+    onErrorRef.current = onError;
+  });
 
-  const launchRef = useRef(null);
-
-  const launch = useCallback(() => {
+  const start = useCallback(() => {
+    if (!SpeechRecognitionImpl || recognitionRef.current) return;
     const recognition = new SpeechRecognitionImpl();
     recognition.lang = lang;
     recognition.interimResults = true;
-    recognition.continuous = continuous;
+    recognition.continuous = false;
 
     recognition.onresult = (event) => {
       let finalText = "";
@@ -41,50 +46,33 @@ export function useSpeech({
       setInterim(interimText);
       if (finalText) onResultRef.current?.(finalText.trim());
     };
+    // onerror only reports; onend (which always follows) does the cleanup and
+    // notification, so each recognition is finalized exactly once.
     recognition.onerror = (event) => {
-      setError(event.error);
-      wantRef.current = false;
-      setListening(false);
-      recognitionRef.current = null;
+      onErrorRef.current?.(event.error);
     };
     recognition.onend = () => {
       recognitionRef.current = null;
+      setListening(false);
       setInterim("");
-      if (continuous && wantRef.current && launchRef.current) {
-        launchRef.current();
-      } else {
-        setListening(false);
-      }
+      onEndRef.current?.();
     };
 
     recognitionRef.current = recognition;
     recognition.start();
     setListening(true);
-  }, [lang, continuous]);
-
-  useEffect(() => {
-    launchRef.current = launch;
-  }, [launch]);
-
-  const start = useCallback(() => {
-    if (!SpeechRecognitionImpl || recognitionRef.current) return;
-    setError(null);
-    setInterim("");
-    wantRef.current = true;
-    launch();
-  }, [launch]);
+  }, [lang]);
 
   const stop = useCallback(() => {
-    wantRef.current = false;
-    recognitionRef.current?.stop();
+    recognitionRef.current?.abort();
   }, []);
 
   useEffect(() => {
     return () => {
-      wantRef.current = false;
       recognitionRef.current?.abort();
+      recognitionRef.current = null;
     };
   }, []);
 
-  return { supported: speechSupported, listening, interim, error, start, stop };
+  return { supported: speechSupported, listening, interim, start, stop };
 }

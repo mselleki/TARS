@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Modal } from "./Modal";
 import { useSpeech } from "../hooks/useSpeech";
 import { useSpeak } from "../hooks/useSpeak";
@@ -8,6 +8,7 @@ import { formatCountdown, daysUntil } from "../utils/deadlines";
 
 const TARGET_LABELS = { task: "Tâche", ticket: "Ticket", note: "Note" };
 const TARGET_COLORS = { task: "tasks", ticket: "tickets", note: "notes" };
+const TRANSIENT_ERRORS = new Set(["no-speech", "aborted"]);
 
 export function QuickCapture({
   isOpen,
@@ -18,10 +19,15 @@ export function QuickCapture({
 }) {
   const [text, setText] = useState("");
   const [journal, setJournal] = useState([]);
+  const [sessionActive, setSessionActive] = useState(false);
+  const [voiceError, setVoiceError] = useState(null);
   const inputRef = useRef(null);
   const pendingRef = useRef(null);
+  const sessionRef = useRef(false);
+  const speakingRef = useRef(false);
   const voiceRef = useRef(voiceContext);
   const cmdRef = useRef(onVoiceCommand);
+  const speechRef = useRef(null);
 
   useEffect(() => {
     voiceRef.current = voiceContext;
@@ -32,37 +38,86 @@ export function QuickCapture({
 
   const { speak, cancel } = useSpeak();
 
-  const handleTranscript = (transcript) => {
-    if (!transcript) return;
-    const intent = pendingRef.current
-      ? resolveAmbiguous(transcript, pendingRef.current)
-      : interpretCommand(transcript, voiceRef.current);
-    pendingRef.current = null;
-    const result = cmdRef.current?.(intent) ?? { message: "" };
-    if (result.pending) pendingRef.current = result.pending;
-    if (result.message) {
-      speak(result.message);
-      setJournal((j) => [...j, result.message].slice(-6));
-    }
-  };
+  // Re-open the microphone only when a session is active and the app is not
+  // currently speaking — this is what makes the session half-duplex.
+  const reArm = useCallback(() => {
+    if (sessionRef.current && !speakingRef.current) speechRef.current?.start();
+  }, []);
 
-  const { supported, listening, interim, error, start, stop } = useSpeech({
-    continuous: true,
-    onResult: handleTranscript,
+  const onResult = useCallback(
+    (transcript) => {
+      if (!transcript) return;
+      const intent = pendingRef.current
+        ? resolveAmbiguous(transcript, pendingRef.current)
+        : interpretCommand(transcript, voiceRef.current);
+      pendingRef.current = null;
+      const result = cmdRef.current?.(intent) ?? { message: "" };
+      if (result.pending) pendingRef.current = result.pending;
+      if (result.message) {
+        setJournal((j) => [...j, result.message].slice(-6));
+        speakingRef.current = true;
+        speak(result.message, () => {
+          speakingRef.current = false;
+          reArm();
+        });
+      }
+      // No spoken reply → the recognition's onEnd re-arms the next turn.
+    },
+    [speak, reArm],
+  );
+
+  const onEnd = useCallback(() => {
+    reArm();
+  }, [reArm]);
+
+  const onError = useCallback((err) => {
+    if (TRANSIENT_ERRORS.has(err)) return; // onEnd re-arms
+    sessionRef.current = false;
+    speakingRef.current = false;
+    setSessionActive(false);
+    setVoiceError(err);
+  }, []);
+
+  const { supported, listening, interim, start, stop } = useSpeech({
+    onResult,
+    onEnd,
+    onError,
   });
+
+  useEffect(() => {
+    speechRef.current = { start, stop };
+  }, [start, stop]);
+
+  const stopSession = useCallback(() => {
+    sessionRef.current = false;
+    speakingRef.current = false;
+    pendingRef.current = null;
+    setSessionActive(false);
+    cancel();
+    stop();
+  }, [cancel, stop]);
+
+  const startSession = () => {
+    setVoiceError(null);
+    setText("");
+    sessionRef.current = true;
+    setSessionActive(true);
+    start();
+  };
 
   useEffect(() => {
     if (isOpen) {
       const t = setTimeout(() => inputRef.current?.focus(), 80);
       return () => clearTimeout(t);
     }
-    stop();
-    cancel();
-    pendingRef.current = null;
+    stopSession();
     setJournal([]);
-  }, [isOpen, stop, cancel]);
+    setText("");
+    setVoiceError(null);
+  }, [isOpen, stopSession]);
 
   const handleClose = () => {
+    stopSession();
     setText("");
     onClose?.();
   };
@@ -84,11 +139,11 @@ export function QuickCapture({
           <input
             ref={inputRef}
             type="text"
-            value={listening && interim ? interim : text}
+            value={sessionActive && interim ? interim : text}
             onChange={(e) => setText(e.target.value)}
-            readOnly={listening}
+            readOnly={sessionActive}
             placeholder={
-              listening
+              sessionActive
                 ? "À l'écoute… dites une commande"
                 : "Ex. « payer le loyer demain », « va aux tickets »"
             }
@@ -103,19 +158,21 @@ export function QuickCapture({
           {supported && (
             <button
               type="button"
-              onClick={listening ? stop : start}
-              className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-all${listening ? " pulse-glow" : ""}`}
+              onClick={sessionActive ? stopSession : startSession}
+              className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-all${sessionActive ? " pulse-glow" : ""}`}
               style={{
-                background: listening ? "var(--accent)" : "var(--surface-2)",
-                color: listening ? "#fff" : "var(--text-secondary)",
+                background: sessionActive
+                  ? "var(--accent)"
+                  : "var(--surface-2)",
+                color: sessionActive ? "#fff" : "var(--text-secondary)",
                 border: "1px solid var(--border)",
               }}
               aria-label={
-                listening
+                sessionActive
                   ? "Terminer la session vocale"
                   : "Démarrer la session vocale"
               }
-              title={listening ? "Terminer" : "Session vocale (fr)"}
+              title={sessionActive ? "Terminer" : "Session vocale (fr)"}
             >
               <svg
                 className="h-5 w-5"
@@ -134,17 +191,18 @@ export function QuickCapture({
           )}
         </div>
 
-        {listening && (
+        {sessionActive && (
           <p className="text-xs" style={{ color: "var(--accent)" }}>
-            Session vocale active — « va aux tickets », « termine la 1 », «
-            reporte X à demain », « qu'est-ce que j'ai aujourd'hui ». Cliquez le
-            micro pour terminer.
+            {listening ? "🎙 À l'écoute…" : "🔊 Réponse en cours…"} Session
+            vocale — « va aux tickets », « termine la 1 », « reporte X à demain
+            », « qu'est-ce que j'ai aujourd'hui ». Cliquez le micro pour
+            terminer.
           </p>
         )}
 
-        {error && (
+        {voiceError && !sessionActive && (
           <p className="text-xs" style={{ color: "var(--danger)" }}>
-            Dictée indisponible ({error}). Vous pouvez taper votre texte.
+            Dictée indisponible ({voiceError}). Vous pouvez taper votre texte.
           </p>
         )}
 
@@ -164,7 +222,7 @@ export function QuickCapture({
           </ul>
         )}
 
-        {!listening && canSubmit && (
+        {!sessionActive && canSubmit && (
           <div className="flex flex-wrap items-center gap-2 text-xs">
             <span
               className="rounded-full px-2.5 py-1 font-semibold"
@@ -217,7 +275,7 @@ export function QuickCapture({
           </button>
           <button
             type="submit"
-            disabled={!canSubmit || listening}
+            disabled={!canSubmit || sessionActive}
             className="rounded-[var(--radius-lg)] px-5 py-2.5 text-sm font-semibold text-white transition-colors disabled:opacity-40"
             style={{ background: "var(--accent)" }}
           >

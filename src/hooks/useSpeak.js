@@ -6,11 +6,18 @@ export const speakSupported = Boolean(synth);
 
 export function useSpeak({ lang = "fr-FR" } = {}) {
   const speak = useCallback(
-    (text) => {
-      if (!synth || !text) return;
+    (text, onDone) => {
+      if (!synth || !text) {
+        onDone?.();
+        return;
+      }
       synth.cancel();
       const utterance = new SpeechSynthesisUtterance(String(text));
       utterance.lang = lang;
+      if (onDone) {
+        utterance.onend = () => onDone();
+        utterance.onerror = () => onDone();
+      }
       synth.speak(utterance);
     },
     [lang],

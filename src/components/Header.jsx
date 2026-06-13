@@ -16,6 +16,8 @@ export function Header({
   onInstallClick,
   canInstall,
   onOpenQuickCapture,
+  onOpenVoice,
+  voiceSupported = false,
   isDarkMode = false,
   onToggleDarkMode = () => {},
   syncStatus = "idle",
@@ -163,6 +165,32 @@ export function Header({
               )}
             </div>
 
+            {/* Commande vocale */}
+            {voiceSupported && (
+              <button
+                type="button"
+                onClick={onOpenVoice}
+                className="flex min-h-[36px] min-w-[36px] touch-manipulation items-center justify-center rounded-[var(--radius-md)] p-2 transition-all"
+                style={{ color: "var(--muted)" }}
+                aria-label="Commande vocale"
+                title="Commande vocale"
+              >
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.8}
+                    d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
+                  />
+                </svg>
+              </button>
+            )}
+
             {/* Capture rapide */}
             <button
               type="button"
@@ -173,7 +201,7 @@ export function Header({
                 boxShadow: "var(--accent-glow)",
               }}
               aria-label="Capture rapide (N)"
-              title="Capture rapide — texte ou voix (N)"
+              title="Capture rapide — texte (N)"
             >
               <svg
                 className="h-3.5 w-3.5"
@@ -185,7 +213,7 @@ export function Header({
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
+                  d="M12 4v16m8-8H4"
                 />
               </svg>
               Capturer

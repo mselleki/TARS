@@ -15,6 +15,8 @@ import { Modal } from "./components/Modal";
 import { Toast } from "./components/Toast";
 import { TaskPanel } from "./components/TaskPanel";
 import { CockpitView } from "./components/CockpitView";
+import { VoiceDock } from "./components/VoiceDock";
+import { speechSupported } from "./hooks/useSpeech";
 import { QuickCapture } from "./components/QuickCapture";
 import { TicketsModule } from "./components/modules/TicketsModule";
 import { NotesModule } from "./components/modules/NotesModule";
@@ -51,6 +53,7 @@ function App() {
   const [composerProjectId, setComposerProjectId] = useState(null);
   const [composerInitialDueDate, setComposerInitialDueDate] = useState("");
   const [showQuickCapture, setShowQuickCapture] = useState(false);
+  const [voiceOpen, setVoiceOpen] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [toastMessage, setToastMessage] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -368,6 +371,8 @@ function App() {
           onInstallClick={install}
           canInstall={canInstall}
           onOpenQuickCapture={() => setShowQuickCapture(true)}
+          onOpenVoice={() => setVoiceOpen((v) => !v)}
+          voiceSupported={speechSupported}
           isDarkMode={isDarkMode}
           onToggleDarkMode={() => setIsDarkMode((v) => !v)}
           syncStatus={syncStatus}
@@ -668,9 +673,15 @@ function App() {
           handleQuickCapture(parsed);
           setShowQuickCapture(false);
         }}
-        voiceContext={voiceContext}
-        onVoiceCommand={handleVoiceCommand}
       />
+
+      {voiceOpen && (
+        <VoiceDock
+          onClose={() => setVoiceOpen(false)}
+          voiceContext={voiceContext}
+          onVoiceCommand={handleVoiceCommand}
+        />
+      )}
 
       <Toast message={toastMessage} onDismiss={() => setToastMessage("")} />
 

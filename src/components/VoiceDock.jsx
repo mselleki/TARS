@@ -17,8 +17,7 @@ export function VoiceDock({ onClose, voiceContext, onVoiceCommand }) {
 
   return (
     <div
-      className="dock-slide-up fixed inset-x-0 z-30 px-3 pb-2"
-      style={{ bottom: "calc(64px + env(safe-area-inset-bottom, 0px))" }}
+      className="dock-slide-up fixed inset-x-0 bottom-16 z-30 px-3 pb-2 md:bottom-4"
       role="status"
       aria-live="polite"
     >

@@ -119,7 +119,7 @@ export function buildResponse(content, snapshot) {
             actions.push({ type: "complete_task", taskId: input.taskId });
           break;
         case "snooze_task":
-          if (validIds.has(input.taskId))
+          if (validIds.has(input.taskId) && input.dueDate)
             actions.push({
               type: "snooze_task",
               taskId: input.taskId,

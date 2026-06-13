@@ -30,7 +30,7 @@ export function QuickCapture({
     cmdRef.current = onVoiceCommand;
   });
 
-  const { speak } = useSpeak();
+  const { speak, cancel } = useSpeak();
 
   const handleTranscript = (transcript) => {
     if (!transcript) return;
@@ -57,9 +57,10 @@ export function QuickCapture({
       return () => clearTimeout(t);
     }
     stop();
+    cancel();
     pendingRef.current = null;
     setJournal([]);
-  }, [isOpen, stop]);
+  }, [isOpen, stop, cancel]);
 
   const handleClose = () => {
     setText("");

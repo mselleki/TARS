@@ -1,53 +1,60 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useSpeech } from "./useSpeech";
 import { useSpeak } from "./useSpeak";
-import { interpretCommand, resolveAmbiguous } from "../utils/voiceCommands";
 
 const TRANSIENT_ERRORS = new Set(["no-speech", "aborted"]);
 
-// Half-duplex voice session: listens one utterance, executes the command,
-// speaks the reply with the mic closed, then re-arms. See
-// memory voice-session-half-duplex — never keep the mic open during TTS.
-export function useVoiceSession({ voiceContext = {}, onVoiceCommand }) {
+// Half-duplex voice session: listens one utterance, calls the assistant,
+// speaks the reply with the mic closed, then re-arms. Never keep the mic open
+// during the network call or TTS (acoustic feedback loop). `busyRef` is a
+// synchronous guard — `onresult`/`onend` fire back-to-back before React
+// re-renders, so a state flag would race; the ref does not.
+export function useVoiceSession({ onTranscript }) {
   const [journal, setJournal] = useState([]);
   const [error, setError] = useState(null);
   const [active, setActive] = useState(false);
+  const [thinking, setThinking] = useState(false);
   const sessionRef = useRef(false);
-  const speakingRef = useRef(false);
-  const pendingRef = useRef(null);
-  const voiceRef = useRef(voiceContext);
-  const cmdRef = useRef(onVoiceCommand);
+  const busyRef = useRef(false);
+  const onTranscriptRef = useRef(onTranscript);
   const speechRef = useRef(null);
 
   useEffect(() => {
-    voiceRef.current = voiceContext;
-  });
-  useEffect(() => {
-    cmdRef.current = onVoiceCommand;
+    onTranscriptRef.current = onTranscript;
   });
 
   const { speak, cancel } = useSpeak();
 
   const reArm = useCallback(() => {
-    if (sessionRef.current && !speakingRef.current) speechRef.current?.start();
+    if (sessionRef.current && !busyRef.current) speechRef.current?.start();
   }, []);
 
   const onResult = useCallback(
-    (transcript) => {
+    async (transcript) => {
       if (!transcript) return;
-      const intent = pendingRef.current
-        ? resolveAmbiguous(transcript, pendingRef.current)
-        : interpretCommand(transcript, voiceRef.current);
-      pendingRef.current = null;
-      const result = cmdRef.current?.(intent) ?? { message: "" };
-      if (result.pending) pendingRef.current = result.pending;
-      if (result.message) {
-        setJournal((j) => [...j, result.message].slice(-6));
-        speakingRef.current = true;
-        speak(result.message, () => {
-          speakingRef.current = false;
+      busyRef.current = true;
+      setThinking(true);
+      let result;
+      try {
+        result = await onTranscriptRef.current?.(transcript);
+      } catch {
+        result = { speech: "Assistant indisponible." };
+      }
+      setThinking(false);
+      if (!sessionRef.current) {
+        busyRef.current = false;
+        return;
+      }
+      const speech = result?.speech;
+      if (speech) {
+        setJournal((j) => [...j, speech].slice(-6));
+        speak(speech, () => {
+          busyRef.current = false;
           reArm();
         });
+      } else {
+        busyRef.current = false;
+        reArm();
       }
     },
     [speak, reArm],
@@ -60,7 +67,7 @@ export function useVoiceSession({ voiceContext = {}, onVoiceCommand }) {
   const onError = useCallback((err) => {
     if (TRANSIENT_ERRORS.has(err)) return;
     sessionRef.current = false;
-    speakingRef.current = false;
+    busyRef.current = false;
     setActive(false);
     setError(err);
   }, []);
@@ -87,12 +94,22 @@ export function useVoiceSession({ voiceContext = {}, onVoiceCommand }) {
 
   const stop = useCallback(() => {
     sessionRef.current = false;
-    speakingRef.current = false;
-    pendingRef.current = null;
+    busyRef.current = false;
     setActive(false);
+    setThinking(false);
     cancel();
     recStop();
   }, [cancel, recStop]);
 
-  return { supported, active, listening, interim, journal, error, start, stop };
+  return {
+    supported,
+    active,
+    listening,
+    thinking,
+    interim,
+    journal,
+    error,
+    start,
+    stop,
+  };
 }

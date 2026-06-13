@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { collectDeadlines, isOverdue } from "../utils/deadlines";
 import { today } from "../utils/date";
+import { selectNowTasks } from "../utils/cockpit";
 
 const TILES = [
   { view: "rituals", color: "rituals", label: "Rituels" },
@@ -27,7 +28,7 @@ function frenchDate() {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-function NowRow({ task, onToggle }) {
+function NowRow({ index, task, onToggle }) {
   const overdue = isOverdue(task.dueDate);
   return (
     <li
@@ -47,6 +48,13 @@ function NowRow({ task, onToggle }) {
         }}
         aria-label="Marquer comme fait"
       />
+      <span
+        className="shrink-0 text-[11px] font-semibold tabular-nums"
+        style={{ color: "var(--muted-2)", minWidth: "1.1em" }}
+        aria-hidden
+      >
+        {index}
+      </span>
       <span
         className="min-w-0 flex-1 truncate text-sm"
         style={{ color: "var(--text)" }}
@@ -86,27 +94,10 @@ export function CockpitView({
     [tasks, context],
   );
 
-  const nowTasks = useMemo(() => {
-    const focusIds = todayPlan?.focusTaskIds ?? [];
-    const isNow = (t) =>
-      t.status !== "done" &&
-      (t.doToday ||
-        focusIds.includes(t.id) ||
-        (t.dueDate && String(t.dueDate).slice(0, 10) <= todayStr));
-    const rank = (t) => {
-      if (t.dueDate && String(t.dueDate).slice(0, 10) < todayStr) return 0;
-      if (t.doToday || focusIds.includes(t.id)) return 1;
-      return 2;
-    };
-    return contextTasks
-      .filter(isNow)
-      .sort(
-        (a, b) =>
-          rank(a) - rank(b) ||
-          String(a.dueTime ?? "").localeCompare(String(b.dueTime ?? "")),
-      )
-      .slice(0, 8);
-  }, [contextTasks, todayPlan, todayStr]);
+  const nowTasks = useMemo(
+    () => selectNowTasks(tasks, context, todayPlan, todayStr),
+    [tasks, context, todayPlan, todayStr],
+  );
 
   const deadlines = useMemo(
     () =>
@@ -178,8 +169,13 @@ export function CockpitView({
             </div>
           ) : (
             <ul className="space-y-2">
-              {nowTasks.map((t) => (
-                <NowRow key={t.id} task={t} onToggle={onToggleTask} />
+              {nowTasks.map((t, i) => (
+                <NowRow
+                  key={t.id}
+                  index={i + 1}
+                  task={t}
+                  onToggle={onToggleTask}
+                />
               ))}
             </ul>
           )}

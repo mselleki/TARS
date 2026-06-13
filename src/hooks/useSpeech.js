@@ -7,27 +7,29 @@ const SpeechRecognitionImpl =
 
 export const speechSupported = Boolean(SpeechRecognitionImpl);
 
-export function useSpeech({ lang = "fr-FR", onResult } = {}) {
+export function useSpeech({
+  lang = "fr-FR",
+  onResult,
+  continuous = false,
+} = {}) {
   const [listening, setListening] = useState(false);
   const [interim, setInterim] = useState("");
   const [error, setError] = useState(null);
   const recognitionRef = useRef(null);
+  const wantRef = useRef(false);
   const onResultRef = useRef(onResult);
 
   useEffect(() => {
     onResultRef.current = onResult;
   });
 
-  const stop = useCallback(() => {
-    recognitionRef.current?.stop();
-  }, []);
+  const launchRef = useRef(null);
 
-  const start = useCallback(() => {
-    if (!SpeechRecognitionImpl || recognitionRef.current) return;
+  const launch = useCallback(() => {
     const recognition = new SpeechRecognitionImpl();
     recognition.lang = lang;
     recognition.interimResults = true;
-    recognition.continuous = false;
+    recognition.continuous = continuous;
 
     recognition.onresult = (event) => {
       let finalText = "";
@@ -41,23 +43,48 @@ export function useSpeech({ lang = "fr-FR", onResult } = {}) {
     };
     recognition.onerror = (event) => {
       setError(event.error);
+      wantRef.current = false;
       setListening(false);
       recognitionRef.current = null;
     };
     recognition.onend = () => {
-      setListening(false);
-      setInterim("");
       recognitionRef.current = null;
+      setInterim("");
+      if (continuous && wantRef.current && launchRef.current) {
+        launchRef.current();
+      } else {
+        setListening(false);
+      }
     };
 
-    setError(null);
-    setInterim("");
     recognitionRef.current = recognition;
     recognition.start();
     setListening(true);
-  }, [lang]);
+  }, [lang, continuous]);
 
-  useEffect(() => () => recognitionRef.current?.abort(), []);
+  useEffect(() => {
+    launchRef.current = launch;
+  }, [launch]);
+
+  const start = useCallback(() => {
+    if (!SpeechRecognitionImpl || recognitionRef.current) return;
+    setError(null);
+    setInterim("");
+    wantRef.current = true;
+    launch();
+  }, [launch]);
+
+  const stop = useCallback(() => {
+    wantRef.current = false;
+    recognitionRef.current?.stop();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      wantRef.current = false;
+      recognitionRef.current?.abort();
+    };
+  }, []);
 
   return { supported: speechSupported, listening, interim, error, start, stop };
 }

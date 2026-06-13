@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useStore } from "./hooks/useStore";
 import { useTaskFilters } from "./hooks/useTaskFilters";
 import { usePWA } from "./hooks/usePWA";
@@ -24,12 +24,8 @@ import { AgendaModule } from "./components/modules/AgendaModule";
 import { CoursesModule } from "./components/modules/CoursesModule";
 import { RitualsModule } from "./components/modules/RitualsModule";
 import { today } from "./utils/date";
-import { selectNowTasks, selectActiveTasks } from "./utils/cockpit";
-import {
-  collectDeadlines,
-  formatCountdown,
-  daysUntil,
-} from "./utils/deadlines";
+import { buildSnapshot } from "./utils/assistant";
+import { getAssistantUrl } from "./utils/remoteSync";
 import { COUNTRIES, DOMAINS } from "./constants";
 import "./App.css";
 
@@ -193,124 +189,50 @@ function App() {
     ],
   );
 
-  const voiceContext = useMemo(
-    () => ({
-      numberedTasks: selectNowTasks(state.tasks, context, todayPlan, today()),
-      activeTasks: selectActiveTasks(state.tasks, context),
-      view,
-      refISO: today(),
-    }),
-    [state.tasks, context, todayPlan, view],
-  );
-
-  const handleVoiceCommand = useCallback(
-    (intent) => {
-      const titleOf = (id) =>
-        state.tasks.find((t) => t.id === id)?.title ?? "la tâche";
-      switch (intent.kind) {
-        case "navigate": {
-          const labels = {
-            cockpit: "le cockpit",
-            tasks: "les tâches",
-            projects: "les projets",
-            tickets: "les tickets",
-            rituals: "les rituels",
-            notes: "les notes",
-            agenda: "l'agenda",
-            courses: "les cours",
-          };
-          setView(intent.view);
-          return { message: `Ouvert ${labels[intent.view] ?? intent.view}` };
-        }
-        case "complete": {
-          const title = titleOf(intent.taskId);
-          toggleTaskStatus(intent.taskId);
-          return { message: `Terminé : ${title}` };
-        }
-        case "snooze": {
-          const title = titleOf(intent.taskId);
-          updateTask(intent.taskId, {
-            dueDate: intent.dueDate,
-            doToday: intent.dueDate === today(),
+  const applyAssistantActions = useCallback(
+    (actions) => {
+      for (const a of actions ?? []) {
+        if (a.type === "navigate") setView(a.view);
+        else if (a.type === "complete_task") toggleTaskStatus(a.taskId);
+        else if (a.type === "snooze_task")
+          updateTask(a.taskId, {
+            dueDate: a.dueDate,
+            doToday: a.dueDate === today(),
           });
-          return {
-            message: `Reporté ${title} à ${formatCountdown(daysUntil(intent.dueDate))}`,
-          };
-        }
-        case "query": {
-          if (intent.query === "today") {
-            const now = voiceContext.numberedTasks;
-            if (now.length) {
-              return {
-                message: `Tu as ${now.length} chose${now.length > 1 ? "s" : ""} : ${now.map((t) => t.title).join(", ")}.`,
-              };
-            }
-            const active = voiceContext.activeTasks;
-            if (active.length) {
-              return {
-                message: `Rien de planifié pour aujourd'hui. Tu as ${active.length} tâche${active.length > 1 ? "s" : ""} en cours.`,
-              };
-            }
-            return { message: "Rien à faire, tout est clair." };
-          }
-          if (intent.query === "overdue") {
-            const n = collectDeadlines({
-              tasks: voiceContext.activeTasks,
-              reqTickets: state.reqTickets ?? [],
-            }).filter((d) => d.overdue).length;
-            return {
-              message: n
-                ? `${n} chose${n > 1 ? "s" : ""} en retard.`
-                : "Rien en retard, bravo.",
-            };
-          }
-          const next = collectDeadlines({
-            tasks: voiceContext.activeTasks,
-            reqTickets: state.reqTickets ?? [],
-          })[0];
-          return {
-            message: next
-              ? `Prochaine échéance : ${next.title}, ${next.label}.`
-              : "Aucune échéance à venir.",
-          };
-        }
-        case "ambiguous": {
-          if (!intent.candidates.length)
-            return { message: "Je n'ai pas trouvé cette tâche." };
-          const list = intent.candidates
-            .map((t, i) => `${i + 1}. ${t.title}`)
-            .join(" — ");
-          return {
-            message: `Laquelle ? ${list}`,
-            pending: {
-              action: intent.action,
-              candidates: intent.candidates,
-              dueDate: intent.dueDate,
-            },
-          };
-        }
-        case "capture": {
-          handleQuickCapture(intent.parsed);
-          const label =
-            intent.parsed.target === "ticket"
-              ? "Ticket créé"
-              : intent.parsed.target === "note"
-                ? "Note ajoutée"
-                : "Tâche créée";
-          return { message: label };
-        }
-        default:
-          return { message: "Je n'ai pas compris." };
+        else if (a.type === "create_item")
+          handleQuickCapture({
+            target: a.target,
+            title: a.title,
+            dueDate: a.dueDate || "",
+            dueTime: a.dueTime || "",
+          });
       }
     },
-    [
-      state.tasks,
-      state.reqTickets,
-      voiceContext,
-      toggleTaskStatus,
-      updateTask,
-      handleQuickCapture,
-    ],
+    [toggleTaskStatus, updateTask, handleQuickCapture],
+  );
+
+  const handleTranscript = useCallback(
+    async (transcript) => {
+      const url = getAssistantUrl();
+      if (!url) return { speech: "Assistant non configuré." };
+      const snapshot = buildSnapshot(state, context, view, today());
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ transcript, context, snapshot }),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        const data = await res.json();
+        applyAssistantActions(data.actions);
+        return { speech: data.speech ?? "" };
+      } catch {
+        return {
+          speech: "Assistant indisponible. Réessaie, ou tape via Capturer.",
+        };
+      }
+    },
+    [state, context, view, applyAssistantActions],
   );
 
   const handleStatusChange = (id, status) => {
@@ -678,8 +600,7 @@ function App() {
       {voiceOpen && (
         <VoiceDock
           onClose={() => setVoiceOpen(false)}
-          voiceContext={voiceContext}
-          onVoiceCommand={handleVoiceCommand}
+          onTranscript={handleTranscript}
         />
       )}
 

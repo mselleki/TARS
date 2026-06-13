@@ -1,12 +1,9 @@
 import { useEffect } from "react";
 import { useVoiceSession } from "../hooks/useVoiceSession";
 
-export function VoiceDock({ onClose, voiceContext, onVoiceCommand }) {
-  const { active, listening, interim, journal, error, start, stop } =
-    useVoiceSession({
-      voiceContext,
-      onVoiceCommand,
-    });
+export function VoiceDock({ onClose, onTranscript }) {
+  const { active, listening, thinking, interim, journal, error, start, stop } =
+    useVoiceSession({ onTranscript });
 
   useEffect(() => {
     start();
@@ -38,19 +35,21 @@ export function VoiceDock({ onClose, voiceContext, onVoiceCommand }) {
             }}
             aria-hidden
           >
-            {listening ? "🎙" : "🔊"}
+            {thinking ? "🧠" : listening ? "🎙" : "🔊"}
           </span>
           <span
             className="min-w-0 flex-1 truncate text-sm"
             style={{ color: "var(--text)" }}
           >
-            {interim
-              ? interim
-              : listening
-                ? "À l'écoute… dites une commande"
-                : active
-                  ? "Réponse en cours…"
-                  : "Session vocale"}
+            {thinking
+              ? "🧠 Réflexion…"
+              : interim
+                ? interim
+                : listening
+                  ? "À l'écoute… dites une commande"
+                  : active
+                    ? "Réponse en cours…"
+                    : "Session vocale"}
           </span>
           <button
             type="button"

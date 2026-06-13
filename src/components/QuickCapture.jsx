@@ -1,18 +1,54 @@
 import { useState, useEffect, useRef } from "react";
 import { Modal } from "./Modal";
 import { useSpeech } from "../hooks/useSpeech";
+import { useSpeak } from "../hooks/useSpeak";
 import { parseQuickInput } from "../utils/quickParse";
+import { interpretCommand, resolveAmbiguous } from "../utils/voiceCommands";
 import { formatCountdown, daysUntil } from "../utils/deadlines";
 
 const TARGET_LABELS = { task: "Tâche", ticket: "Ticket", note: "Note" };
 const TARGET_COLORS = { task: "tasks", ticket: "tickets", note: "notes" };
 
-export function QuickCapture({ isOpen, onClose, onSubmit }) {
+export function QuickCapture({
+  isOpen,
+  onClose,
+  onSubmit,
+  voiceContext = {},
+  onVoiceCommand,
+}) {
   const [text, setText] = useState("");
+  const [journal, setJournal] = useState([]);
   const inputRef = useRef(null);
+  const pendingRef = useRef(null);
+  const voiceRef = useRef(voiceContext);
+  const cmdRef = useRef(onVoiceCommand);
+
+  useEffect(() => {
+    voiceRef.current = voiceContext;
+  });
+  useEffect(() => {
+    cmdRef.current = onVoiceCommand;
+  });
+
+  const { speak } = useSpeak();
+
+  const handleTranscript = (transcript) => {
+    if (!transcript) return;
+    const intent = pendingRef.current
+      ? resolveAmbiguous(transcript, pendingRef.current)
+      : interpretCommand(transcript, voiceRef.current);
+    pendingRef.current = null;
+    const result = cmdRef.current?.(intent) ?? { message: "" };
+    if (result.pending) pendingRef.current = result.pending;
+    if (result.message) {
+      speak(result.message);
+      setJournal((j) => [...j, result.message].slice(-6));
+    }
+  };
+
   const { supported, listening, interim, error, start, stop } = useSpeech({
-    onResult: (transcript) =>
-      setText((prev) => (prev ? `${prev} ${transcript}` : transcript)),
+    continuous: true,
+    onResult: handleTranscript,
   });
 
   useEffect(() => {
@@ -21,6 +57,8 @@ export function QuickCapture({ isOpen, onClose, onSubmit }) {
       return () => clearTimeout(t);
     }
     stop();
+    pendingRef.current = null;
+    setJournal([]);
   }, [isOpen, stop]);
 
   const handleClose = () => {
@@ -45,11 +83,13 @@ export function QuickCapture({ isOpen, onClose, onSubmit }) {
           <input
             ref={inputRef}
             type="text"
-            value={listening && interim ? `${text} ${interim}`.trim() : text}
+            value={listening && interim ? interim : text}
             onChange={(e) => setText(e.target.value)}
             readOnly={listening}
             placeholder={
-              "Ex. « payer le loyer demain », « ticket : relancer X vendredi »"
+              listening
+                ? "À l'écoute… dites une commande"
+                : "Ex. « payer le loyer demain », « va aux tickets »"
             }
             className="min-w-0 flex-1 rounded-[var(--radius-lg)] border px-4 py-3 text-base outline-none transition-colors focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-ring)]"
             style={{
@@ -69,8 +109,12 @@ export function QuickCapture({ isOpen, onClose, onSubmit }) {
                 color: listening ? "#fff" : "var(--text-secondary)",
                 border: "1px solid var(--border)",
               }}
-              aria-label={listening ? "Arrêter l'écoute" : "Dicter"}
-              title={listening ? "Arrêter l'écoute" : "Dicter (fr)"}
+              aria-label={
+                listening
+                  ? "Terminer la session vocale"
+                  : "Démarrer la session vocale"
+              }
+              title={listening ? "Terminer" : "Session vocale (fr)"}
             >
               <svg
                 className="h-5 w-5"
@@ -89,14 +133,37 @@ export function QuickCapture({ isOpen, onClose, onSubmit }) {
           )}
         </div>
 
+        {listening && (
+          <p className="text-xs" style={{ color: "var(--accent)" }}>
+            Session vocale active — « va aux tickets », « termine la 1 », «
+            reporte X à demain », « qu'est-ce que j'ai aujourd'hui ». Cliquez le
+            micro pour terminer.
+          </p>
+        )}
+
         {error && (
           <p className="text-xs" style={{ color: "var(--danger)" }}>
             Dictée indisponible ({error}). Vous pouvez taper votre texte.
           </p>
         )}
 
-        {/* Aperçu de l'interprétation */}
-        {canSubmit && (
+        {journal.length > 0 && (
+          <ul
+            className="flex flex-col gap-1 rounded-[var(--radius-lg)] p-2 text-xs"
+            style={{
+              background: "var(--surface-2)",
+              color: "var(--text-secondary)",
+            }}
+          >
+            {journal.map((line, i) => (
+              <li key={i} className="truncate">
+                ↳ {line}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {!listening && canSubmit && (
           <div className="flex flex-wrap items-center gap-2 text-xs">
             <span
               className="rounded-full px-2.5 py-1 font-semibold"
@@ -145,11 +212,11 @@ export function QuickCapture({ isOpen, onClose, onSubmit }) {
               color: "var(--text-secondary)",
             }}
           >
-            Annuler
+            Fermer
           </button>
           <button
             type="submit"
-            disabled={!canSubmit}
+            disabled={!canSubmit || listening}
             className="rounded-[var(--radius-lg)] px-5 py-2.5 text-sm font-semibold text-white transition-colors disabled:opacity-40"
             style={{ background: "var(--accent)" }}
           >

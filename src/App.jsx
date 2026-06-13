@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useStore } from "./hooks/useStore";
 import { useTaskFilters } from "./hooks/useTaskFilters";
 import { usePWA } from "./hooks/usePWA";
@@ -22,6 +22,12 @@ import { AgendaModule } from "./components/modules/AgendaModule";
 import { CoursesModule } from "./components/modules/CoursesModule";
 import { RitualsModule } from "./components/modules/RitualsModule";
 import { today } from "./utils/date";
+import { selectNowTasks, selectActiveTasks } from "./utils/cockpit";
+import {
+  collectDeadlines,
+  formatCountdown,
+  daysUntil,
+} from "./utils/deadlines";
 import { COUNTRIES, DOMAINS } from "./constants";
 import "./App.css";
 
@@ -173,7 +179,6 @@ function App() {
         });
         setToastMessage("Tâche créée");
       }
-      setShowQuickCapture(false);
     },
     [
       addReqTicket,
@@ -182,6 +187,118 @@ function App() {
       context,
       state.meetingSheets,
       state.standupLog,
+    ],
+  );
+
+  const voiceContext = useMemo(
+    () => ({
+      numberedTasks: selectNowTasks(state.tasks, context, todayPlan, today()),
+      activeTasks: selectActiveTasks(state.tasks, context),
+      view,
+      refISO: today(),
+    }),
+    [state.tasks, context, todayPlan, view],
+  );
+
+  const handleVoiceCommand = useCallback(
+    (intent) => {
+      const titleOf = (id) =>
+        state.tasks.find((t) => t.id === id)?.title ?? "la tâche";
+      switch (intent.kind) {
+        case "navigate": {
+          const labels = {
+            cockpit: "le cockpit",
+            tasks: "les tâches",
+            projects: "les projets",
+            tickets: "les tickets",
+            rituals: "les rituels",
+            notes: "les notes",
+            agenda: "l'agenda",
+            courses: "les cours",
+          };
+          setView(intent.view);
+          return { message: `Ouvert ${labels[intent.view] ?? intent.view}` };
+        }
+        case "complete": {
+          const title = titleOf(intent.taskId);
+          toggleTaskStatus(intent.taskId);
+          return { message: `Terminé : ${title}` };
+        }
+        case "snooze": {
+          const title = titleOf(intent.taskId);
+          updateTask(intent.taskId, {
+            dueDate: intent.dueDate,
+            doToday: intent.dueDate === today(),
+          });
+          return {
+            message: `Reporté ${title} à ${formatCountdown(daysUntil(intent.dueDate))}`,
+          };
+        }
+        case "query": {
+          if (intent.query === "today") {
+            const now = voiceContext.numberedTasks;
+            if (!now.length) return { message: "Rien d'urgent aujourd'hui." };
+            return {
+              message: `Tu as ${now.length} chose${now.length > 1 ? "s" : ""} : ${now.map((t) => t.title).join(", ")}.`,
+            };
+          }
+          if (intent.query === "overdue") {
+            const n = collectDeadlines({
+              tasks: voiceContext.activeTasks,
+              reqTickets: state.reqTickets ?? [],
+            }).filter((d) => d.overdue).length;
+            return {
+              message: n
+                ? `${n} chose${n > 1 ? "s" : ""} en retard.`
+                : "Rien en retard, bravo.",
+            };
+          }
+          const next = collectDeadlines({
+            tasks: voiceContext.activeTasks,
+            reqTickets: state.reqTickets ?? [],
+          })[0];
+          return {
+            message: next
+              ? `Prochaine échéance : ${next.title}, ${next.label}.`
+              : "Aucune échéance à venir.",
+          };
+        }
+        case "ambiguous": {
+          if (!intent.candidates.length)
+            return { message: "Je n'ai pas trouvé cette tâche." };
+          const list = intent.candidates
+            .map((t, i) => `${i + 1}. ${t.title}`)
+            .join(" — ");
+          return {
+            message: `Laquelle ? ${list}`,
+            pending: {
+              action: intent.action,
+              candidates: intent.candidates,
+              dueDate: intent.dueDate,
+            },
+          };
+        }
+        case "capture": {
+          handleQuickCapture(intent.parsed);
+          const label =
+            intent.parsed.target === "ticket"
+              ? "Ticket créé"
+              : intent.parsed.target === "note"
+                ? "Note ajoutée"
+                : "Tâche créée";
+          return { message: label };
+        }
+        default:
+          return { message: "Je n'ai pas compris." };
+      }
+    },
+    [
+      state.tasks,
+      state.reqTickets,
+      voiceContext,
+      toggleTaskStatus,
+      updateTask,
+      handleQuickCapture,
     ],
   );
 
@@ -539,7 +656,12 @@ function App() {
       <QuickCapture
         isOpen={showQuickCapture}
         onClose={() => setShowQuickCapture(false)}
-        onSubmit={handleQuickCapture}
+        onSubmit={(parsed) => {
+          handleQuickCapture(parsed);
+          setShowQuickCapture(false);
+        }}
+        voiceContext={voiceContext}
+        onVoiceCommand={handleVoiceCommand}
       />
 
       <Toast message={toastMessage} onDismiss={() => setToastMessage("")} />

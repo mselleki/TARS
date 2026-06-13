@@ -104,6 +104,16 @@ body {
   animation: fade-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* ── Dock slide-up (bottom bar) ── */
+@keyframes dock-slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.dock-slide-up {
+  animation: dock-slide-up 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 /* ── Toast entrance ── */
 @keyframes toast-in {
   from { opacity: 0; transform: translateX(-50%) translateY(12px) scale(0.95); }

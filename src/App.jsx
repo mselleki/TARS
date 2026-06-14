@@ -235,6 +235,19 @@ function App() {
     [state, context, view, applyAssistantActions],
   );
 
+  // Warm the serverless assistant the moment the mic opens, so the function is
+  // ready by the time the user finishes their sentence (kills cold-start lag).
+  const handleOpenVoice = useCallback(() => {
+    setVoiceOpen((v) => {
+      const next = !v;
+      if (next) {
+        const url = getAssistantUrl();
+        if (url) fetch(url, { method: "GET" }).catch(() => {});
+      }
+      return next;
+    });
+  }, []);
+
   const handleStatusChange = (id, status) => {
     updateTask(id, { status });
   };
@@ -293,7 +306,7 @@ function App() {
           onInstallClick={install}
           canInstall={canInstall}
           onOpenQuickCapture={() => setShowQuickCapture(true)}
-          onOpenVoice={() => setVoiceOpen((v) => !v)}
+          onOpenVoice={handleOpenVoice}
           voiceSupported={speechSupported}
           isDarkMode={isDarkMode}
           onToggleDarkMode={() => setIsDarkMode((v) => !v)}

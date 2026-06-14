@@ -198,6 +198,11 @@ export default {
     const headers = { "Content-Type": "application/json", ...corsHeaders() };
     if (request.method === "OPTIONS")
       return new Response(null, { status: 204, headers: corsHeaders() });
+    if (request.method === "GET")
+      return new Response(JSON.stringify({ ok: true }), {
+        status: 200,
+        headers,
+      });
     if (request.method !== "POST")
       return new Response(JSON.stringify({ error: "Method not allowed" }), {
         status: 405,

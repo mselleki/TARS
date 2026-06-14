@@ -183,10 +183,14 @@ function redis() {
 async function overRateLimit(ip) {
   const client = redis();
   if (!client) return false;
-  const key = `tars:assistant:rl:${ip}`;
-  const count = await client.incr(key);
-  if (count === 1) await client.expire(key, RATE_WINDOW_S);
-  return count > RATE_LIMIT;
+  try {
+    const key = `tars:assistant:rl:${ip}`;
+    const count = await client.incr(key);
+    if (count === 1) await client.expire(key, RATE_WINDOW_S);
+    return count > RATE_LIMIT;
+  } catch {
+    return false;
+  }
 }
 
 export default {

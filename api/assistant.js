@@ -200,6 +200,7 @@ export default {
         headers,
       });
 
+    let stage = "init";
     try {
       if (!process.env.ANTHROPIC_API_KEY) {
         return new Response(
@@ -210,6 +211,7 @@ export default {
       const ip =
         request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
         "unknown";
+      stage = "ratelimit";
       if (await overRateLimit(ip)) {
         return new Response(JSON.stringify({ error: "rate_limited" }), {
           status: 429,
@@ -228,6 +230,7 @@ export default {
           headers,
         });
 
+      stage = "anthropic";
       const client = new Anthropic();
       const message = await client.messages.create({
         model: MODEL,
@@ -240,11 +243,18 @@ export default {
       const result = buildResponse(message.content, snapshot);
       return new Response(JSON.stringify(result), { status: 200, headers });
     } catch (e) {
-      const msg = e?.message ?? String(e);
-      return new Response(JSON.stringify({ error: msg }), {
-        status: 500,
-        headers,
-      });
+      const detail = e?.cause?.code || e?.cause?.message || null;
+      console.error("[assistant] error at", stage, e?.stack || e);
+      return new Response(
+        JSON.stringify({
+          error: e?.message ?? String(e),
+          stage,
+          detail,
+          name: e?.name ?? null,
+          status: e?.status ?? null,
+        }),
+        { status: 500, headers },
+      );
     }
   },
 };
